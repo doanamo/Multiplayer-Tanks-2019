@@ -9,7 +9,7 @@ generate_cmake32:
     script:
         - mkdir cmake-build32
         - cd cmake-build32
-        - cmake -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -m32" -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -m32" "./"
+        - cmake -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -m32" -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -m32" "../."
     artifacts:
         paths:
             - cmake-build32/
@@ -19,7 +19,7 @@ generate_cmake64:
     script:
         - mkdir cmake-build64
         - cd cmake-build64
-        - cmake "./"
+        - cmake "../."
     artifacts:
         paths:
             - cmake-build64/
