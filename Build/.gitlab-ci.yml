@@ -1,0 +1,69 @@
+image: gunstarpl/game-engine-linux-dev
+
+stages:
+    - generate
+    - build
+
+generate_cmake32:
+    stage: generate
+    script:
+        - mkdir cmake-build32
+        - cd cmake-build32
+        - cmake -DCMAKE_C_FLAGS="${CMAKE_C_FLAGS} -m32" -DCMAKE_CXX_FLAGS="${CMAKE_CXX_FLAGS} -m32" "./"
+    artifacts:
+        paths:
+            - cmake-build32/
+        
+generate_cmake64:
+    stage: generate
+    script:
+        - mkdir cmake-build64
+        - cd cmake-build64
+        - cmake "./"
+    artifacts:
+        paths:
+            - cmake-build64/
+    
+build_debug32:
+    stage: build
+    dependencies:
+        - generate_cmake32
+    script:
+        - cd cmake-build32
+        - cmake --build . --config Debug
+    artifacts:
+        paths:
+            - cmake-build32/
+            
+build_release32:
+    stage: build
+    dependencies:
+        - generate_cmake32
+    script:
+        - cd cmake-build32
+        - cmake --build . --config Release
+    artifacts:
+        paths:
+            - cmake-build32/
+
+build_debug64:
+    stage: build
+    dependencies:
+        - generate_cmake64
+    script:
+        - cd cmake-build64
+        - cmake --build . --config Debug
+    artifacts:
+        paths:
+            - cmake-build64/
+            
+build_release64:
+    stage: build
+    dependencies:
+        - generate_cmake64
+    script:
+        - cd cmake-build64
+        - cmake --build . --config Release
+    artifacts:
+        paths:
+            - cmake-build64/
