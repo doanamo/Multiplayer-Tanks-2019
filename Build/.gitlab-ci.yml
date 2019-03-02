@@ -1,4 +1,4 @@
-image: gunstarpl/game-engine-linux-dev
+image: gunstarpl/tanks-linux-dev
 
 stages:
     - generate
