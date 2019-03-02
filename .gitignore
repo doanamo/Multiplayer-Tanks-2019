@@ -2,4 +2,4 @@
 Build/CMake-*/
 
 # Ignore external directory with third party libraries.
-# External/*
+External/*

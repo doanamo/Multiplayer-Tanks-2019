@@ -40,3 +40,33 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
         COMPILE_FLAGS "/Yc\"Precompiled.hpp\" /Fp\"${CMAKE_CURRENT_BINARY_DIR}/Source/Precompiled-$(Configuration).pch\""
     )
 endif()
+
+# Add SFML library.
+set(BUILD_SHARED_LIBS FALSE)
+
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/External/SFML-2.5.1" "External/SFML" EXCLUDE_FROM_ALL)
+target_include_directories("Game" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/External/SFML-2.5.1/include")
+
+set_property(TARGET "sfml-main" PROPERTY PROJECT_LABEL "SFML-Main")
+set_property(TARGET "sfml-main" PROPERTY FOLDER "External")
+target_link_libraries("Game" "sfml-main")
+
+set_property(TARGET "sfml-system" PROPERTY PROJECT_LABEL "SFML-System")
+set_property(TARGET "sfml-system" PROPERTY FOLDER "External")
+target_link_libraries("Game" "sfml-system")
+
+set_property(TARGET "sfml-window" PROPERTY PROJECT_LABEL "SFML-Window")
+set_property(TARGET "sfml-window" PROPERTY FOLDER "External")
+target_link_libraries("Game" "sfml-window")
+
+set_property(TARGET "sfml-graphics" PROPERTY PROJECT_LABEL "SFML-Graphics")
+set_property(TARGET "sfml-graphics" PROPERTY FOLDER "External")
+target_link_libraries("Game" "sfml-graphics")
+
+set_property(TARGET "sfml-audio" PROPERTY PROJECT_LABEL "SFML-Audio")
+set_property(TARGET "sfml-audio" PROPERTY FOLDER "External")
+target_link_libraries("Game" "sfml-audio")
+
+set_property(TARGET "sfml-network" PROPERTY PROJECT_LABEL "SFML-Network")
+set_property(TARGET "sfml-network" PROPERTY FOLDER "External")
+target_link_libraries("Game" "sfml-network")
