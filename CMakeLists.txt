@@ -72,3 +72,9 @@ target_link_libraries("Game" "sfml-audio")
 set_property(TARGET "sfml-network" PROPERTY PROJECT_LABEL "SFML-Network")
 set_property(TARGET "sfml-network" PROPERTY FOLDER "External")
 target_link_libraries("Game" "sfml-network")
+
+# Add ImGui library.
+add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/External/ImGui-1.68" "External/ImGui" EXCLUDE_FROM_ALL)
+target_include_directories("Game" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/External/ImGui-1.68")
+set_property(TARGET "ImGui" PROPERTY FOLDER "External")
+target_link_libraries("Game" "ImGui")
