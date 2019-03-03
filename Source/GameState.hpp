@@ -7,6 +7,9 @@ class GameState
 public:
     GameState();
 
+    bool initialize();
+    void shutdown();
+
 public:
     sf::RectangleShape playerShape;
     sf::Vector2f playerCurrentPosition;

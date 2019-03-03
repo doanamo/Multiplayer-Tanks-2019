@@ -33,6 +33,12 @@ bool initializeGlobals()
     // Create game state instance.
     g_gameState = new GameState;
 
+    if(!g_gameState->initialize())
+    {
+        shutdownGlobals();
+        return false;
+    }
+
     // Initialize application.
     g_application = new Application;
 
@@ -57,6 +63,7 @@ void shutdownGlobals()
 
     if(g_gameState)
     {
+        g_gameState->shutdown();
         delete g_gameState;
         g_gameState = nullptr;
     }

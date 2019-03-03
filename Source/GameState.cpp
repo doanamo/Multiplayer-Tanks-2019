@@ -4,3 +4,13 @@
 GameState::GameState()
 {
 }
+
+bool GameState::initialize()
+{
+    return true;
+}
+
+void GameState::shutdown()
+{
+
+}
