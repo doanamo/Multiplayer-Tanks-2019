@@ -8,6 +8,8 @@ set(SOURCE_FILES
     "Source/Main.cpp"
 	"Source/Window.h"
 	"Source/Window.cpp"
+	"Source/AssetManager.h"
+	"Source/AssetManager.cpp"
 )
 
 # Specify available build configuration types.
