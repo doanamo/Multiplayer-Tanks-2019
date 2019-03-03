@@ -3,10 +3,12 @@
 #include "Window.h"
 #include "AssetManager.h"
 #include "Application.hpp"
+#include "GameState.hpp"
 
 Window* g_window = nullptr;
 AssetManager* g_assetManager = nullptr;
 Application* g_application = nullptr;
+GameState* g_gameState = nullptr;
 
 bool initializeGlobals()
 {
@@ -28,6 +30,9 @@ bool initializeGlobals()
         return false;
     }
 
+    // Create game state instance.
+    g_gameState = new GameState;
+
     // Initialize application.
     g_application = new Application;
 
@@ -48,6 +53,12 @@ void shutdownGlobals()
         g_application->shutdown();
         delete g_application;
         g_application = nullptr;
+    }
+
+    if(g_gameState)
+    {
+        delete g_gameState;
+        g_gameState = nullptr;
     }
 
     if(g_assetManager)

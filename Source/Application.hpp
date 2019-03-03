@@ -14,5 +14,5 @@ public:
     void draw(float updateAlpha);
 
 private:
-
+    sf::View m_view;
 };

@@ -16,6 +16,8 @@ set(SOURCE_FILES
 
     "Source/Application.hpp"
     "Source/Application.cpp"
+    "Source/GameState.hpp"
+    "Source/GameState.cpp"
 )
 
 # Specify available build configuration types.
