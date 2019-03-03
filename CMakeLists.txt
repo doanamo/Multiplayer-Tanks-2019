@@ -6,10 +6,13 @@ set(SOURCE_FILES
     "Source/Precompiled.hpp"
     "Source/Precompiled.cpp"
     "Source/Main.cpp"
-	"Source/Window.h"
-	"Source/Window.cpp"
-	"Source/AssetManager.h"
-	"Source/AssetManager.cpp"
+
+    "Source/Globals.hpp"
+    "Source/Globals.cpp"
+    "Source/Window.h"
+    "Source/Window.cpp"
+    "Source/AssetManager.h"
+    "Source/AssetManager.cpp"
 )
 
 # Specify available build configuration types.
