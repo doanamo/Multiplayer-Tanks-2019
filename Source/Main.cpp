@@ -34,7 +34,7 @@ int main()
         }
 
         // Render application.
-        float updateAlpha = updateRate / updateAccumulator;
+        float updateAlpha = updateAccumulator / updateRate;
 
         g_window->beginRender();
         g_application->draw(updateAlpha);
