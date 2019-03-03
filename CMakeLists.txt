@@ -13,6 +13,9 @@ set(SOURCE_FILES
     "Source/Window.cpp"
     "Source/AssetManager.h"
     "Source/AssetManager.cpp"
+
+    "Source/Application.hpp"
+    "Source/Application.cpp"
 )
 
 # Specify available build configuration types.
