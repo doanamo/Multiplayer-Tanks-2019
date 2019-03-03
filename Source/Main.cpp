@@ -1,35 +1,54 @@
 #include "Precompiled.hpp"
+#include "Window.h"
+
+Window* g_window = nullptr;
+
+void shutdown()
+{
+    // Shutdown in reverse order.
+    g_window->shutdown();
+    delete g_window;
+}
+
+bool initialize()
+{
+    // Initialize window.
+    g_window = new Window;
+
+    if(!g_window->initialize())
+    {
+        shutdown();
+        return false;
+    }
+
+    return true;
+}
 
 int main()
 {
-    // Create SFML window.
-	Window window;
- 
-	// Initialize ImGui.
-	window.initializeImGui();
+    // Initialize everything.
+    if(!initialize())
+        return -1;
 
-	// Temp test shape.
-	sf::CircleShape shape(100.f);
-	shape.setFillColor(sf::Color::Green);
+    // Temp test shape.
+    sf::CircleShape shape(100.f);
+    shape.setFillColor(sf::Color::Green);
 
-    while(window.screen.isOpen())
+    // Run main loop.
+    while(g_window->isOpen())
     {
-		window.storeRuntime();
-		window.elapsedTime = window.timer.restart();
+        sf::Event event;
+        while(g_window->pollEvent(event))
+        {
+        }
 
-		window.listenForCloseEvent();
-
-		window.clearAndUpdate();
-
-		ImGui::ShowDemoWindow(nullptr);
-		window.screen.draw(shape);
-
-		window.renderAndDisplay();
+        g_window->beginRender();
+        ImGui::ShowDemoWindow();
+        g_window->render.draw(shape);
+        g_window->endRender();
     }
 
-    // Shutdown ImGui.
-    ImGui::SFML::Shutdown();
-
-    // Exit application.
+    // Shutdown systems
+    shutdown();
     return 0;
 }

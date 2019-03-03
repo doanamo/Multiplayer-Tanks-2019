@@ -5,30 +5,27 @@
 class Window
 {
 public:
-	Window();
-	virtual ~Window();
+    Window();
+    ~Window();
+
+public:
+    bool initialize();
+    void shutdown();
+
+    bool pollEvent(sf::Event& event);
+    void beginRender();
+    void endRender();
+
+    bool isOpen();
+
+public:
+    sf::RenderTarget& render;
 
 private:
-	char* windowName = "Tanks Project";
-	unsigned const int windowWidth = 1024;
-	unsigned const int windowHeight = 576;
-	float runtime = 0;
+    sf::RenderWindow m_window;
+    sf::Clock m_clock;
 
-public:
-	sf::RenderWindow screen;
-	sf::Clock timer;
-	sf::Time elapsedTime;
-
-private:
-	void createSfmlWindow();
-
-public:
-	bool initializeImGui();
-	void storeRuntime();
-	void listenForCloseEvent();
-	void clearAndUpdate();
-	void renderAndDisplay();
-	
-public:
-	float getRuntime();
+    const char* m_name = "Tanks Project";
+    const unsigned int m_widht = 1024;
+    const unsigned int m_height = 576;
 };

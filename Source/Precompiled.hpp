@@ -15,7 +15,3 @@
 #include <imconfig-SFML.h>
 #include <imgui.h>
 #include <imgui-SFML.h>
-
-// Local
-#include "Window.h"
-
