@@ -16,3 +16,6 @@
 #include <imgui.h>
 #include <imgui-SFML.h>
 
+// Local
+#include "Window.h"
+

@@ -6,6 +6,8 @@ set(SOURCE_FILES
     "Source/Precompiled.hpp"
     "Source/Precompiled.cpp"
     "Source/Main.cpp"
+	"Source/Window.h"
+	"Source/Window.cpp"
 )
 
 # Specify available build configuration types.

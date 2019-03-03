@@ -2,35 +2,29 @@
 
 int main()
 {
-    // Create window.
-    sf::RenderWindow window(sf::VideoMode(1024, 576), "Tanks Project");
+    // Create SFML window.
+	Window window;
+ 
+	// Initialize ImGui.
+	window.initializeImGui();
 
-    // Initialize ImGui.
-    if(!ImGui::SFML::Init(window))
-        return false;
+	// Temp test shape.
+	sf::CircleShape shape(100.f);
+	shape.setFillColor(sf::Color::Green);
 
-    // Run main loop.
-    sf::Clock timer;
-
-    while(window.isOpen())
+    while(window.screen.isOpen())
     {
-        sf::Time elapsedTime = timer.restart();
+		window.storeRuntime();
+		window.elapsedTime = window.timer.restart();
 
-        sf::Event event;
-        while(window.pollEvent(event))
-        {
-            ImGui::SFML::ProcessEvent(event);
+		window.listenForCloseEvent();
 
-            if(event.type == sf::Event::Closed)
-                window.close();
-        }
+		window.clearAndUpdate();
 
-        ImGui::SFML::Update(window, elapsedTime);
-        ImGui::ShowDemoWindow(nullptr);
+		ImGui::ShowDemoWindow(nullptr);
+		window.screen.draw(shape);
 
-        window.clear();
-        ImGui::SFML::Render(window);
-        window.display();
+		window.renderAndDisplay();
     }
 
     // Shutdown ImGui.
