@@ -3,3 +3,6 @@ Build/CMake-*/
 
 # Ignore ImGui config file.
 Deploy/ImGui.ini
+
+# Ignore binaries folder.
+bin
