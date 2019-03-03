@@ -8,7 +8,6 @@ Window::Window() :
 
 Window::~Window()
 {
-    this->shutdown();
 }
 
 bool Window::initialize()

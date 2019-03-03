@@ -2,6 +2,7 @@
 
 // Standard
 #include <iostream>
+#include <map>
 
 // SFML
 #include <SFML/Main.hpp>

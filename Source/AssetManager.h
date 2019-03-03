@@ -1,22 +1,23 @@
 #pragma once
 
-#include <map>
-
-#include <SFML/Graphics.hpp>
+#include "Precompiled.hpp"
 
 class AssetManager
 {
 public:
-	AssetManager() {};
-	virtual ~AssetManager() {};
+    AssetManager();
+    ~AssetManager();
 
-	void loadTexture(std::string textureName, std::string pathAndFilename);
-	sf::Texture& getTexture(std::string textureName);
+    bool initialize();
+    void shutdown();
 
-	void loadFont(std::string fontName, std::string pathAndFilename);
-	sf::Font& getFont(std::string fontName);
+    void loadTexture(std::string textureName, std::string pathAndFilename);
+    sf::Texture& getTexture(std::string textureName);
+
+    void loadFont(std::string fontName, std::string pathAndFilename);
+    sf::Font& getFont(std::string fontName);
 
 private:
-	std::map<std::string, sf::Texture> _textures;
-	std::map<std::string, sf::Font> _fonts;
+    std::map<std::string, sf::Texture> _textures;
+    std::map<std::string, sf::Font> _fonts;
 };
