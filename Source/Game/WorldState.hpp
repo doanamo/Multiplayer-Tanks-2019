@@ -2,10 +2,10 @@
 
 #include "Precompiled.hpp"
 
-class GameState
+class WorldState
 {
 public:
-    GameState();
+    WorldState();
 
     bool initialize();
     void shutdown();

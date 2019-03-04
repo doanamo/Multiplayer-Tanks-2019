@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
-#include "Globals.hpp"
-#include "Window.h"
+#include "System/Globals.hpp"
+#include "System/Window.h"
 #include "Application.hpp"
 
 int main()
@@ -38,7 +38,6 @@ int main()
 
         g_window->beginRender();
         g_application->draw(updateAlpha);
-        ImGui::ShowDemoWindow();
         g_window->endRender();
     }
 

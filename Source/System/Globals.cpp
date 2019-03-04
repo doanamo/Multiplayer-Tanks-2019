@@ -1,14 +1,12 @@
 #include "Precompiled.hpp"
-#include "Globals.hpp"
-#include "Window.h"
-#include "AssetManager.h"
+#include "System/Globals.hpp"
+#include "System/Window.h"
+#include "System/AssetManager.h"
 #include "Application.hpp"
-#include "GameState.hpp"
 
 Window* g_window = nullptr;
 AssetManager* g_assetManager = nullptr;
 Application* g_application = nullptr;
-GameState* g_gameState = nullptr;
 
 bool initializeGlobals()
 {
@@ -25,15 +23,6 @@ bool initializeGlobals()
     g_assetManager = new AssetManager;
 
     if(!g_assetManager->initialize())
-    {
-        shutdownGlobals();
-        return false;
-    }
-
-    // Create game state instance.
-    g_gameState = new GameState;
-
-    if(!g_gameState->initialize())
     {
         shutdownGlobals();
         return false;
@@ -59,13 +48,6 @@ void shutdownGlobals()
         g_application->shutdown();
         delete g_application;
         g_application = nullptr;
-    }
-
-    if(g_gameState)
-    {
-        g_gameState->shutdown();
-        delete g_gameState;
-        g_gameState = nullptr;
     }
 
     if(g_assetManager)

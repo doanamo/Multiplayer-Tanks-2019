@@ -5,19 +5,19 @@ cmake_minimum_required(VERSION 3.10)
 set(SOURCE_FILES
     "Source/Precompiled.hpp"
     "Source/Precompiled.cpp"
-    "Source/Main.cpp"
-
-    "Source/Globals.hpp"
-    "Source/Globals.cpp"
-    "Source/Window.h"
-    "Source/Window.cpp"
-    "Source/AssetManager.h"
-    "Source/AssetManager.cpp"
-
     "Source/Application.hpp"
     "Source/Application.cpp"
-    "Source/GameState.hpp"
-    "Source/GameState.cpp"
+
+    "Source/System/Main.cpp"
+    "Source/System/Globals.hpp"
+    "Source/System/Globals.cpp"
+    "Source/System/Window.h"
+    "Source/System/Window.cpp"
+    "Source/System/AssetManager.h"
+    "Source/System/AssetManager.cpp"
+
+    "Source/Game/WorldState.hpp"
+    "Source/Game/WorldState.cpp"
 )
 
 # Specify available build configuration types.
@@ -28,7 +28,7 @@ project("Tanks")
 add_executable("Game" ${SOURCE_FILES})
 
 # Add source as include directory.
-target_include_directories("Game" PRIVATE ${CMAKE_CURRENT_SOURCE_DIR})
+target_include_directories("Game" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 
 # Organize structure of source files.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)

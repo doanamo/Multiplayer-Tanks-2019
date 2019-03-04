@@ -1,8 +1,8 @@
 #include "Precompiled.hpp"
 #include "Application.hpp"
-#include "Globals.hpp"
-#include "Window.h"
-#include "GameState.hpp"
+#include "System/Globals.hpp"
+#include "System/Window.h"
+#include "Game/WorldState.hpp"
 
 Application::Application()
 {
@@ -14,6 +14,15 @@ Application::~Application()
 
 bool Application::initialize()
 {
+    // Create game state instance.
+    m_gameState = new WorldState;
+
+    if(!m_gameState->initialize())
+    {
+        shutdown();
+        return false;
+    }
+
     // Create render viewport.
     sf::Vector2u size = g_window->render.getSize();
 
@@ -22,15 +31,22 @@ bool Application::initialize()
     g_window->render.setView(m_view);
 
     // Create player shape.
-    g_gameState->playerShape.setFillColor(sf::Color::Green);
-    g_gameState->playerShape.setSize(sf::Vector2f(32.0f, 32.0f));
-    g_gameState->playerShape.setOrigin(sf::Vector2f(16.0f, 16.0f));
+    m_gameState->playerShape.setFillColor(sf::Color::Green);
+    m_gameState->playerShape.setSize(sf::Vector2f(32.0f, 32.0f));
+    m_gameState->playerShape.setOrigin(sf::Vector2f(16.0f, 16.0f));
 
     return true;
 }
 
 void Application::shutdown()
 {
+    // Destroy game state instance.
+    if(m_gameState)
+    {
+        m_gameState->shutdown();
+        delete m_gameState;
+        m_gameState = nullptr;
+    }
 }
 
 void Application::handleEvent(sf::Event& event)
@@ -47,7 +63,7 @@ void Application::handleEvent(sf::Event& event)
 void Application::update(float timeDelta)
 {
     // Save current player position.
-    g_gameState->playerPreviousPosition = g_gameState->playerCurrentPosition;
+    m_gameState->playerPreviousPosition = m_gameState->playerCurrentPosition;
 
     // Move player in direction.
     sf::Vector2f moveDirection;
@@ -64,14 +80,17 @@ void Application::update(float timeDelta)
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
         moveDirection.y += 1.0f;
 
-    g_gameState->playerCurrentPosition += moveDirection * timeDelta * 100.0f; // Todo: Normalize move direction.
+    m_gameState->playerCurrentPosition += moveDirection * timeDelta * 100.0f; // Todo: Normalize move direction.
 }
 
 void Application::draw(float updateAlpha)
 {
     // Draw player shape.
-    sf::Vector2f playerInterpolatedPosition = (1.0f - updateAlpha) * g_gameState->playerPreviousPosition + updateAlpha * g_gameState->playerCurrentPosition;
-    g_gameState->playerShape.setPosition(playerInterpolatedPosition);
+    sf::Vector2f playerInterpolatedPosition = (1.0f - updateAlpha) * m_gameState->playerPreviousPosition + updateAlpha * m_gameState->playerCurrentPosition;
+    m_gameState->playerShape.setPosition(playerInterpolatedPosition);
 
-    g_window->render.draw(g_gameState->playerShape);
+    g_window->render.draw(m_gameState->playerShape);
+
+    // Draw demo ImGui window.
+    ImGui::ShowDemoWindow();
 }
