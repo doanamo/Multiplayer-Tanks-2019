@@ -16,8 +16,13 @@ set(SOURCE_FILES
     "Source/System/AssetManager.h"
     "Source/System/AssetManager.cpp"
 
-    "Source/Game/WorldState.hpp"
-    "Source/Game/WorldState.cpp"
+    "Source/Game/Handle.hpp"
+    "Source/Game/Object.hpp"
+    "Source/Game/Object.cpp"
+    "Source/Game/World.hpp"
+    "Source/Game/World.cpp"
+    "Source/Game/Tank.hpp"
+    "Source/Game/Tank.cpp"
 )
 
 # Specify available build configuration types.

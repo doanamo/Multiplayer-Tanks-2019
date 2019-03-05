@@ -3,6 +3,7 @@
 #include "Precompiled.hpp"
 
 extern class Window* g_window;
+extern sf::RenderTarget* g_render;
 extern class AssetManager* g_assetManager;
 extern class Application* g_application;
 

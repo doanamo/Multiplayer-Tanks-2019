@@ -16,7 +16,9 @@ public:
     void beginRender();
     void endRender();
 
-    bool isOpen();
+    bool isOpen() const;
+    int getWidth() const;
+    int getHeight() const;
 
 public:
     sf::RenderTarget& render;

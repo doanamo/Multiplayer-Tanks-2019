@@ -1,6 +1,6 @@
 #pragma once
 
-class WorldState;
+class World;
 
 class Application
 {
@@ -16,6 +16,6 @@ public:
     void draw(float updateAlpha);
 
 public:
-    sf::View m_view;
-    WorldState* m_gameState;
+    // Game world.
+    World* m_world;
 };

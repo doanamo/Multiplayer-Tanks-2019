@@ -5,6 +5,7 @@
 #include "Application.hpp"
 
 Window* g_window = nullptr;
+sf::RenderTarget* g_render = nullptr;
 AssetManager* g_assetManager = nullptr;
 Application* g_application = nullptr;
 
@@ -18,6 +19,9 @@ bool initializeGlobals()
         shutdownGlobals();
         return false;
     }
+
+    // Create render target pointer without exposing window.
+    g_render = &g_window->render;
 
     // Initialize asset manager.
     g_assetManager = new AssetManager;
@@ -55,6 +59,12 @@ void shutdownGlobals()
         g_assetManager->shutdown();
         delete g_assetManager;
         g_assetManager = nullptr;
+    }
+
+    if(g_render)
+    {
+        // Managed by window instance.
+        g_render = nullptr;
     }
 
     if(g_window)

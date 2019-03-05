@@ -70,7 +70,17 @@ void Window::endRender()
     m_window.display();
 }
 
-bool Window::isOpen()
+bool Window::isOpen() const
 {
     return m_window.isOpen();
+}
+
+int Window::getWidth() const
+{
+    return m_window.getSize().x;
+}
+
+int Window::getHeight() const
+{
+    return m_window.getSize().y;
 }
