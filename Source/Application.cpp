@@ -46,10 +46,16 @@ void Application::shutdown()
 void Application::handleEvent(const sf::Event& event)
 {
     // Handle player tank input.
+    Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_player));
+
     if(event.type == sf::Event::KeyPressed)
     {
         switch(event.key.code)
         {
+        case sf::Keyboard::Key::Space:
+            playerTank->shootProjectile();
+            break;
+
         case sf::Keyboard::Key::Up:
             m_playerMovement = PlayerMovement::Up;
             break;
@@ -81,22 +87,22 @@ void Application::update(float timeDelta)
     {
         if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && (m_playerMovement == PlayerMovement::Up || m_playerMovement == PlayerMovement::None))
         {
-            playerTank->SetMovementInput(sf::Vector2f(0.0f, -1.0f));
+            playerTank->setMovementInput(sf::Vector2f(0.0f, -1.0f));
             m_playerMovement = PlayerMovement::Up;
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && (m_playerMovement == PlayerMovement::Down || m_playerMovement == PlayerMovement::None))
         {
-            playerTank->SetMovementInput(sf::Vector2f(.0f, 1.0f));
+            playerTank->setMovementInput(sf::Vector2f(.0f, 1.0f));
             m_playerMovement = PlayerMovement::Down;
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && (m_playerMovement == PlayerMovement::Left || m_playerMovement == PlayerMovement::None))
         {
-            playerTank->SetMovementInput(sf::Vector2f(-1.0f, 0.0f));
+            playerTank->setMovementInput(sf::Vector2f(-1.0f, 0.0f));
             m_playerMovement = PlayerMovement::Left;
         }
         else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && (m_playerMovement == PlayerMovement::Right || m_playerMovement == PlayerMovement::None))
         {
-            playerTank->SetMovementInput(sf::Vector2f(1.0f, 0.0f));
+            playerTank->setMovementInput(sf::Vector2f(1.0f, 0.0f));
             m_playerMovement = PlayerMovement::Right;
         }
         else

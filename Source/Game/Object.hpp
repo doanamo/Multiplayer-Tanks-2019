@@ -31,6 +31,9 @@ public:
     // Gets handle to this object.
     Handle GetHandle() const;
 
+    // Get world that owns this object.
+    World* GetWorld() const;
+
 private:
     // Handle to self.
     Handle m_handle;

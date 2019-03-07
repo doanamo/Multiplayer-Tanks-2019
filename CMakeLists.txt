@@ -23,6 +23,8 @@ set(SOURCE_FILES
     "Source/Game/World.cpp"
     "Source/Game/Tank.hpp"
     "Source/Game/Tank.cpp"
+    "Source/Game/Projectile.hpp"
+    "Source/Game/Projectile.cpp"
 )
 
 # Specify available build configuration types.

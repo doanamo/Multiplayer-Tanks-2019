@@ -45,3 +45,12 @@ Handle Object::GetHandle() const
     // Return handle to self.
     return m_handle;
 }
+
+World* Object::GetWorld() const
+{
+    // Calling this before being added to a world does not make sense.
+    assert(m_world != nullptr && "Retrieving world from an object that was not added to a world!");
+
+    // Return assigned world.
+    return m_world;
+}

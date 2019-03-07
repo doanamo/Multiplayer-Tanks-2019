@@ -9,7 +9,8 @@ public:
     Tank();
     ~Tank();
 
-    void SetMovementInput(sf::Vector2f movement);
+    void shootProjectile();
+    void setMovementInput(sf::Vector2f movement);
 
     void onUpdate(float timeDelta) override;
     void onDraw(float updateAlpha) override;

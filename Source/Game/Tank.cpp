@@ -1,5 +1,7 @@
 #include "Precompiled.hpp"
 #include "Game/Tank.hpp"
+#include "Game/Projectile.hpp"
+#include "Game/World.hpp"
 
 Tank::Tank() :
     m_currentPosition(0.0f, 0.0f),
@@ -13,10 +15,17 @@ Tank::~Tank()
 {
 }
 
-void Tank::SetMovementInput(sf::Vector2f movement)
+void Tank::shootProjectile()
 {
-    assert(((std::abs(movement.x) == 1.0f && movement.y == 0.0f) || (std::abs(movement.y) == 1.0f && movement.x == 0.0f)) && "Invalid non single directional movement input!");
+    // Create projectile.
+    Projectile* projectile = new Projectile();
+    projectile->setPosition(m_currentPosition);
+    projectile->setDirection(m_facingDirection);
+    GetWorld()->addObject(projectile);
+}
 
+void Tank::setMovementInput(sf::Vector2f movement)
+{
     m_movementDirection = movement;
 }
 
