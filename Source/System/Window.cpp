@@ -20,6 +20,9 @@ bool Window::initialize()
         std::cout << "Could not create SFML window!" << std::endl;
         return false;
     }
+    
+    // Disable key repeats.
+    m_window.setKeyRepeatEnabled(false);
 
     // Initialize ImGui.
     if(!ImGui::SFML::Init(m_window))

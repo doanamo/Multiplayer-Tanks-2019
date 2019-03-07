@@ -9,10 +9,14 @@ public:
     Tank();
     ~Tank();
 
+    void SetMovementInput(sf::Vector2f movement);
+
     void onUpdate(float timeDelta) override;
     void onDraw(float updateAlpha) override;
 
-public:
-    sf::Vector2f currentPosition;
-    sf::Vector2f previousPosition;
+private:
+    sf::Vector2f m_currentPosition;
+    sf::Vector2f m_previousPosition;
+    sf::Vector2f m_facingDirection;
+    sf::Vector2f m_movementDirection;
 };
