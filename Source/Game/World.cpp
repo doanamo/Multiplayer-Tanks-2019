@@ -62,8 +62,10 @@ void World::update(float timeDelta)
     // Update all objects.
     for(ObjectEntry& objectEntry : m_objects)
     {
-        if(objectEntry.object != nullptr)
+        if(objectEntry.exists)
         {
+            assert(objectEntry.object != nullptr && "Existing object entry does not have an object set!");
+
             // Call on update method.
             objectEntry.object->onUpdate(timeDelta);
         }
