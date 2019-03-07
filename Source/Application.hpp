@@ -11,7 +11,7 @@ public:
     bool initialize();
     void shutdown();
 
-    void handleEvent(sf::Event& event);
+    void handleEvent(const sf::Event& event);
     void update(float timeDelta);
     void draw(float updateAlpha);
 

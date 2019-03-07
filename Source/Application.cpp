@@ -42,7 +42,7 @@ void Application::shutdown()
     }
 }
 
-void Application::handleEvent(sf::Event& event)
+void Application::handleEvent(const sf::Event& event)
 {
 }
 
