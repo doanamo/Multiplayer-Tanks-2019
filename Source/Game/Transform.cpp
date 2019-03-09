@@ -20,7 +20,7 @@ Transform::~Transform()
 void Transform::updateInterpolation()
 {
     // Clamp rotation angle to positive 360 degrees.
-    m_currentRotation = std::fmodf(m_currentRotation, 360.0f);
+    m_currentRotation = std::fmod(m_currentRotation, 360.0f);
 
     if(m_currentRotation < 0.0f)
     {
@@ -60,7 +60,7 @@ void Transform::setPosition(const sf::Vector2f& position, bool ignoreInterpolati
 
 void Transform::setDirection(const sf::Vector2f& direction, bool ignoreInterpolation)
 {
-    setRotation(toDegrees(std::atan2f(crossProduct(ForwardVector, direction), dotProduct(ForwardVector, direction))), ignoreInterpolation);
+    setRotation(toDegrees(std::atan2(crossProduct(ForwardVector, direction), dotProduct(ForwardVector, direction))), ignoreInterpolation);
 }
 
 void Transform::setRotation(float rotation, bool ignoreInterpolation)
@@ -93,14 +93,14 @@ sf::Vector2f Transform::getDirection(float updateAlpha) const
     float rotation = toRadians(getRotation(updateAlpha));
 
     sf::Vector2f output;
-    output.x = ForwardVector.x * std::cosf(rotation) - ForwardVector.y * std::sinf(rotation);
-    output.y = ForwardVector.x * std::sinf(rotation) + ForwardVector.y * std::cosf(rotation);
+    output.x = ForwardVector.x * std::cos(rotation) - ForwardVector.y * std::sin(rotation);
+    output.y = ForwardVector.x * std::sin(rotation) + ForwardVector.y * std::cos(rotation);
     return output;
 }
 
 float Transform::getRotation(float updateAlpha) const
 {
-    float angle = std::fmodf(lerp(m_previousRotation, m_currentRotation, updateAlpha), 360.0f);
+    float angle = std::fmod(lerp(m_previousRotation, m_currentRotation, updateAlpha), 360.0f);
 
     if(angle < 0.0f)
     {
