@@ -36,16 +36,16 @@ bool Application::initialize()
     }
 
     // Create player tank object.
-    Tank* tankObject = new Tank();
-    Handle playerHandle = m_world->addObject(tankObject);
+    Tank* playerTank = new Tank();
+    Handle playerHandle = m_world->addObject(playerTank);
     m_playerController->control(playerHandle);
 
     return true;
 }
 
-void Application::shutdown()
+void Application::shutdown() 
 {
-    // Shutdown objects in reverse order.
+    // Shutdown systems in reverse order.
     if(m_playerController)
     {
         delete m_playerController;
@@ -76,13 +76,30 @@ void Application::update(float timeDelta)
 
 void Application::draw(float updateAlpha)
 {
-    // Setup camera view.
-    sf::View view;
-    view.setCenter(0.0f, 0.0f);
-    view.setSize((float)g_window->getWidth(), (float)g_window->getHeight());
-    g_window->render.setView(view);
+    // Calculate render target view size and aspect ration.
+    float horizontalAspectRatio = (float)g_window->getWidth() / (float)g_window->getHeight();
+    float verticalAspectRatio = (float)g_window->getHeight() / (float)g_window->getWidth();
 
-    // Draw the world.
+    if(horizontalAspectRatio >= verticalAspectRatio)
+    {
+        verticalAspectRatio = 1.0f;
+    }
+    else
+    {
+        horizontalAspectRatio = 1.0f;
+    }
+
+    // Setup camera viewport.
+    sf::Vector2f viewportSize;
+    viewportSize.x = 10.0f * horizontalAspectRatio;
+    viewportSize.y = 10.0f * verticalAspectRatio;
+
+    sf::View viewport;
+    viewport.setCenter(0.0f, 0.0f);
+    viewport.setSize(viewportSize);
+    g_window->render.setView(viewport);
+
+    // Draw world objects.
     m_world->draw(updateAlpha);
 
     // Draw demo ImGui window.

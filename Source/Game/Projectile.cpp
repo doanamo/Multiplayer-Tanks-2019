@@ -29,7 +29,7 @@ void Projectile::onUpdate(float timeDelta)
     m_previousPosition = m_currentPosition;
 
     // Move in facing direction.
-    m_currentPosition = m_currentPosition + m_facingDirection * 300.0f * timeDelta;
+    m_currentPosition = m_currentPosition + m_facingDirection * 16.0f * timeDelta;
 
     // Destroy projectile at the end of its lifetime.
     m_remainingLifetime = std::max(0.0f, m_remainingLifetime - timeDelta);
@@ -47,8 +47,8 @@ void Projectile::onDraw(float updateAlpha)
 
     sf::RectangleShape projectileShape;
     projectileShape.setFillColor(sf::Color::Red);
-    projectileShape.setSize(sf::Vector2f(8.0f, 8.0f));
-    projectileShape.setOrigin(sf::Vector2f(4.0, 4.0));
+    projectileShape.setSize(sf::Vector2f(0.3f, 0.3f));
+    projectileShape.setOrigin(sf::Vector2f(0.15f, 0.15f));
     projectileShape.setPosition(interpolatedPosition);
     g_render->draw(projectileShape);
 }

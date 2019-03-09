@@ -41,7 +41,7 @@ void Tank::onUpdate(float timeDelta)
         m_facingDirection = m_movementDirection;
 
         // Update current position.
-        m_currentPosition += m_movementDirection * timeDelta * 120.0f;
+        m_currentPosition += m_movementDirection * timeDelta * 8.0f;
         m_movementDirection = sf::Vector2f(0.0f, 0.0f);
     }
 }
@@ -53,15 +53,15 @@ void Tank::onDraw(float updateAlpha)
 
     sf::RectangleShape tankShape;
     tankShape.setFillColor(sf::Color::Green);
-    tankShape.setSize(sf::Vector2f(32.0f, 32.0f));
-    tankShape.setOrigin(sf::Vector2f(16.0f, 16.0f));
+    tankShape.setSize(sf::Vector2f(1.0f, 1.0f));
+    tankShape.setOrigin(sf::Vector2f(0.5f, 0.5f));
     tankShape.setPosition(interpolatedPosition);
     g_render->draw(tankShape);
 
     sf::RectangleShape cannonShape;
     cannonShape.setFillColor(sf::Color::Yellow);
-    cannonShape.setSize(sf::Vector2f(14.0f, 22.0f));
-    cannonShape.setOrigin(sf::Vector2f(7.0f, 20.0f));
+    cannonShape.setSize(sf::Vector2f(0.4f, 0.8f));
+    cannonShape.setOrigin(sf::Vector2f(0.2f, 0.6f));
     cannonShape.setPosition(interpolatedPosition);
     
     if(m_facingDirection == sf::Vector2f(1.0f, 0.0f))
