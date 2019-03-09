@@ -51,6 +51,12 @@ bool Application::initialize()
 
 void Application::handleEvent(const sf::Event& event)
 {
+    // Close application on F10 press.
+    if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F10)
+    {
+        g_window->close();
+    }
+
     // Handle player controller input.
     m_playerController->onEvent(event);
 }

@@ -44,6 +44,11 @@ bool Window::initialize()
     return true;
 }
 
+void Window::close()
+{
+    m_window.close();
+}
+
 bool Window::pollEvent(sf::Event& event)
 {
     if(m_window.pollEvent(event))

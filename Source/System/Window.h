@@ -9,6 +9,7 @@ public:
     ~Window();
 
     bool initialize();
+    void close();
 
     bool pollEvent(sf::Event& event);
     void beginRender();
