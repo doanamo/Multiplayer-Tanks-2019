@@ -105,7 +105,7 @@ Handle World::addObject(Object* object)
     // Allocate a new object entry if there are no free ones.
     if(freeEntry == nullptr)
     {
-        m_objects.emplace_back(m_objects.size());
+        m_objects.emplace_back((int)m_objects.size());
         freeEntry = &m_objects.back();
     }
 

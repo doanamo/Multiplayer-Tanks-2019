@@ -2,11 +2,11 @@
 echo -- Generating CMake project...
 
 rem Create empty project directory.
-mkdir "CMake-Example-VS2017" >nul 2>&1
-cd "CMake-Example-VS2017"
+mkdir "CMake-VS2017-x86" >nul 2>&1
+cd "CMake-VS2017-x86"
 
 rem Generate solution files.
-cmake -G "Visual Studio 15" "CMake-Example-VS2017" "../../"
+cmake -G "Visual Studio 15" "CMake-VS2017-x86" "../../"
 
 if %ERRORLEVEL% NEQ 0 (
     pause
