@@ -27,6 +27,15 @@ set(SOURCE_FILES
     "Source/Game/Projectile.cpp"
 )
 
+# Create missing source files.
+foreach(SOURCE_FILE ${SOURCE_FILES})
+    set(SOURCE_FILE_PATH "${CMAKE_CURRENT_SOURCE_DIR}/${SOURCE_FILE}")
+
+    if(NOT EXISTS ${SOURCE_FILE_PATH})
+        file(GENERATE OUTPUT ${SOURCE_FILE_PATH} CONTENT "")
+    endif()
+endforeach()
+
 # Specify available build configuration types.
 set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 
