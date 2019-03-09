@@ -6,7 +6,8 @@
 #include "Game/Tank.hpp"
 
 Application::Application() :
-    m_playerMovement(PlayerMovement::None)
+    m_world(nullptr),
+    m_playerController(nullptr)
 {
 }
 
@@ -16,7 +17,7 @@ Application::~Application()
 
 bool Application::initialize()
 {
-    // Create game state instance.
+    // Create world instance.
     m_world = new World;
 
     if(!m_world->initialize())
@@ -25,16 +26,32 @@ bool Application::initialize()
         return false;
     }
 
-    // Add tank object to the world.
+    // Create player controller.
+    m_playerController = new PlayerController;
+
+    if(!m_playerController->initialize(m_world))
+    {
+        shutdown();
+        return false;
+    }
+
+    // Create player tank object.
     Tank* tankObject = new Tank();
-    m_player = m_world->addObject(tankObject);
+    Handle playerHandle = m_world->addObject(tankObject);
+    m_playerController->control(playerHandle);
 
     return true;
 }
 
 void Application::shutdown()
 {
-    // Destroy game state instance.
+    // Shutdown objects in reverse order.
+    if(m_playerController)
+    {
+        delete m_playerController;
+        m_playerController = nullptr;
+    }
+
     if(m_world)
     {
         delete m_world;
@@ -44,71 +61,17 @@ void Application::shutdown()
 
 void Application::handleEvent(const sf::Event& event)
 {
-    // Handle player tank input.
-    Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_player));
-
-    if(event.type == sf::Event::KeyPressed)
-    {
-        switch(event.key.code)
-        {
-        case sf::Keyboard::Key::Space:
-            playerTank->shootProjectile();
-            break;
-
-        case sf::Keyboard::Key::Up:
-            m_playerMovement = PlayerMovement::Up;
-            break;
-
-        case sf::Keyboard::Key::Down:
-            m_playerMovement = PlayerMovement::Down;
-            break;
-
-        case sf::Keyboard::Key::Left:
-            m_playerMovement = PlayerMovement::Left;
-            break;
-
-        case sf::Keyboard::Key::Right:
-            m_playerMovement = PlayerMovement::Right;
-            break;
-        }
-    }
+    // Handle player controller input.
+    m_playerController->onEvent(event);
 }
 
 void Application::update(float timeDelta)
 {
-    // Update the world.
+    // Update player controller.
+    m_playerController->onUpdate(timeDelta);
+
+    // Update world instance.
     m_world->update(timeDelta);
-
-    // Handle player movement input.
-    Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_player));
-
-    if(playerTank)
-    {
-        if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up) && (m_playerMovement == PlayerMovement::Up || m_playerMovement == PlayerMovement::None))
-        {
-            playerTank->setMovementInput(sf::Vector2f(0.0f, -1.0f));
-            m_playerMovement = PlayerMovement::Up;
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down) && (m_playerMovement == PlayerMovement::Down || m_playerMovement == PlayerMovement::None))
-        {
-            playerTank->setMovementInput(sf::Vector2f(.0f, 1.0f));
-            m_playerMovement = PlayerMovement::Down;
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left) && (m_playerMovement == PlayerMovement::Left || m_playerMovement == PlayerMovement::None))
-        {
-            playerTank->setMovementInput(sf::Vector2f(-1.0f, 0.0f));
-            m_playerMovement = PlayerMovement::Left;
-        }
-        else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right) && (m_playerMovement == PlayerMovement::Right || m_playerMovement == PlayerMovement::None))
-        {
-            playerTank->setMovementInput(sf::Vector2f(1.0f, 0.0f));
-            m_playerMovement = PlayerMovement::Right;
-        }
-        else
-        {
-            m_playerMovement = PlayerMovement::None;
-        }
-    }
 }
 
 void Application::draw(float updateAlpha)

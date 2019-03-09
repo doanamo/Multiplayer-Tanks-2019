@@ -25,6 +25,8 @@ set(SOURCE_FILES
     "Source/Game/Tank.cpp"
     "Source/Game/Projectile.hpp"
     "Source/Game/Projectile.cpp"
+    "Source/Game/PlayerController.hpp"
+    "Source/Game/PlayerController.cpp"
 )
 
 # Create missing source files.

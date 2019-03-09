@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 #include "Game/Handle.hpp"
+#include "Game/PlayerController.hpp"
 
 class World;
 
@@ -22,15 +23,6 @@ public:
     // Game world.
     World* m_world;
 
-    // Player handle.
-    Handle m_player;
-
-    enum class PlayerMovement
-    {
-        None,
-        Up,
-        Down,
-        Left,
-        Right,
-    } m_playerMovement;
+    // Local player controller.
+    PlayerController* m_playerController;
 };
