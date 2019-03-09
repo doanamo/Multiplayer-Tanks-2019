@@ -1,5 +1,6 @@
 #include "Precompiled.hpp"
 #include "Game/Projectile.hpp"
+#include "System/AssetManager.h"
 
 Projectile::Projectile() :
     m_currentPosition(0.0, 0.0f),
@@ -7,6 +8,7 @@ Projectile::Projectile() :
     m_facingDirection(0.0f, -1.0f),
     m_remainingLifetime(2.0f)
 {
+    m_texture = g_assetManager->loadTexture("Data/Sprites/projectile_base.png");
 }
 
 Projectile::~Projectile()
@@ -29,7 +31,7 @@ void Projectile::onUpdate(float timeDelta)
     m_previousPosition = m_currentPosition;
 
     // Move in facing direction.
-    m_currentPosition = m_currentPosition + m_facingDirection * 16.0f * timeDelta;
+    m_currentPosition = m_currentPosition + m_facingDirection * 6.0f * timeDelta;
 
     // Destroy projectile at the end of its lifetime.
     m_remainingLifetime = std::max(0.0f, m_remainingLifetime - timeDelta);
@@ -42,13 +44,33 @@ void Projectile::onUpdate(float timeDelta)
 
 void Projectile::onDraw(float updateAlpha)
 {
-    // Draw bullet shape.
+    // Draw projectile.
     sf::Vector2f interpolatedPosition((1.0f - updateAlpha) * m_previousPosition + updateAlpha * m_currentPosition);
 
-    sf::RectangleShape projectileShape;
-    projectileShape.setFillColor(sf::Color::Red);
-    projectileShape.setSize(sf::Vector2f(0.3f, 0.3f));
-    projectileShape.setOrigin(sf::Vector2f(0.15f, 0.15f));
-    projectileShape.setPosition(interpolatedPosition);
-    g_render->draw(projectileShape);
+    sf::RectangleShape projectileSprite;
+    projectileSprite.setSize(sf::Vector2f(0.3f, 0.3f));
+    projectileSprite.setOrigin(projectileSprite.getSize() / 2.0f);
+    projectileSprite.setPosition(interpolatedPosition);
+    projectileSprite.setTexture(m_texture.get());
+
+    if(m_facingDirection == sf::Vector2f(0.0f, -1.0f))
+    {
+        projectileSprite.setRotation(0.0f);
+    }
+    if(m_facingDirection == sf::Vector2f(1.0f, 0.0f))
+    {
+        projectileSprite.setRotation(90.0f);
+    }
+    else if(m_facingDirection == sf::Vector2f(0.0f, 1.0f))
+    {
+        projectileSprite.setRotation(180.0f);
+    }
+    else if(m_facingDirection == sf::Vector2f(-1.0f, 0.0f))
+    {
+        projectileSprite.setRotation(270.0f);
+    }
+
+    projectileSprite.setPosition(projectileSprite.getPosition() + sf::Vector2f(0.0f, -0.05f));
+
+    g_render->draw(projectileSprite);
 }

@@ -20,4 +20,6 @@ private:
     sf::Vector2f m_previousPosition;
     sf::Vector2f m_facingDirection;
     sf::Vector2f m_movementDirection;
+
+    std::shared_ptr<sf::Texture> m_texture;
 };

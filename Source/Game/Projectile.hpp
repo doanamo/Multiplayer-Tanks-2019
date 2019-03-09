@@ -19,4 +19,6 @@ private:
     sf::Vector2f m_currentPosition;
     sf::Vector2f m_previousPosition;
     float m_remainingLifetime;
+
+    std::shared_ptr<sf::Texture> m_texture;
 };
