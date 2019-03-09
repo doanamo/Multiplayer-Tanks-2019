@@ -23,7 +23,7 @@ void Tank::shootProjectile()
     Projectile* projectile = new Projectile();
     projectile->setPosition(m_currentPosition + m_facingDirection * 0.4f);
     projectile->setDirection(m_facingDirection);
-    GetWorld()->addObject(projectile);
+    getWorld()->addObject(projectile);
 }
 
 void Tank::setMovementInput(sf::Vector2f movement)

@@ -46,7 +46,7 @@ Handle Object::GetHandle() const
     return m_handle;
 }
 
-World* Object::GetWorld() const
+World* Object::getWorld() const
 {
     // Calling this before being added to a world does not make sense.
     assert(m_world != nullptr && "Retrieving world from an object that was not added to a world!");

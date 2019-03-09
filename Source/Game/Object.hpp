@@ -33,10 +33,10 @@ public:
     virtual void onDestroy();
 
     // Gets handle to this object.
-    Handle GetHandle() const;
+    Handle getHandle() const;
 
     // Get world that owns this object.
-    World* GetWorld() const;
+    World* getWorld() const;
 
 private:
     // Handle to self.
