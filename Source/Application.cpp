@@ -66,7 +66,7 @@ void Application::update(float timeDelta)
 
 void Application::draw(float updateAlpha)
 {
-    // Calculate render target view size and aspect ration.
+    // Calculate render target view size and aspect ratio.
     float horizontalAspectRatio = (float)g_window->getWidth() / (float)g_window->getHeight();
     float verticalAspectRatio = (float)g_window->getHeight() / (float)g_window->getWidth();
 

@@ -45,12 +45,10 @@ void Projectile::onUpdate(float timeDelta)
 void Projectile::onDraw(float updateAlpha)
 {
     // Draw projectile.
-    sf::Vector2f interpolatedPosition((1.0f - updateAlpha) * m_previousPosition + updateAlpha * m_currentPosition);
-
     sf::RectangleShape projectileSprite;
     projectileSprite.setSize(sf::Vector2f(0.3f, 0.3f));
     projectileSprite.setOrigin(projectileSprite.getSize() / 2.0f);
-    projectileSprite.setPosition(interpolatedPosition);
+    projectileSprite.setPosition(Lerp(m_previousPosition, m_currentPosition, updateAlpha));
     projectileSprite.setTexture(m_texture.get());
 
     if(m_facingDirection == sf::Vector2f(0.0f, -1.0f))

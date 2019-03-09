@@ -51,12 +51,10 @@ void Tank::onUpdate(float timeDelta)
 void Tank::onDraw(float updateAlpha)
 {
     // Draw tank.
-    sf::Vector2f interpolatedPosition((1.0f - updateAlpha) * m_previousPosition + updateAlpha * m_currentPosition);
-
     sf::RectangleShape tankSprite;
     tankSprite.setSize(sf::Vector2f(1.0f, 1.0f));
     tankSprite.setOrigin(tankSprite.getSize() / 2.0f);
-    tankSprite.setPosition(interpolatedPosition);
+    tankSprite.setPosition(Lerp(m_previousPosition, m_currentPosition, updateAlpha));
     tankSprite.setTexture(m_texture.get());
 
     if(m_facingDirection == sf::Vector2f(0.0f, -1.0f))
