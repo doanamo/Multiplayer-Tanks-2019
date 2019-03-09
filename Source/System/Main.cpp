@@ -1,6 +1,7 @@
 #include "Precompiled.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.h"
+#include "System/AssetManager.h"
 #include "Application.hpp"
 
 int main()
@@ -42,6 +43,9 @@ int main()
         g_window->beginRender();
         g_application->draw(updateAlpha);
         g_window->endRender();
+
+        // Release unused resources.
+        g_assetManager->releaseUnused();
     }
 
     // Shutdown globals.

@@ -9,14 +9,15 @@ public:
     ~AssetManager();
 
     bool initialize();
+    void releaseUnused();
 
-    void loadTexture(std::string textureName, std::string pathAndFilename);
-    sf::Texture& getTexture(std::string textureName);
-
-    void loadFont(std::string fontName, std::string pathAndFilename);
-    sf::Font& getFont(std::string fontName);
+    std::shared_ptr<sf::Texture> loadTexture(std::string assetPath);
+    std::shared_ptr<sf::Font> loadFont(std::string assetPath);
 
 private:
-    std::map<std::string, sf::Texture> _textures;
-    std::map<std::string, sf::Font> _fonts;
+    std::shared_ptr<sf::Texture> m_defaultTexture;
+    std::shared_ptr<sf::Font> m_defaultFont;
+
+    std::map<std::string, std::shared_ptr<sf::Texture>> m_textures;
+    std::map<std::string, std::shared_ptr<sf::Font>> m_fonts;
 };
