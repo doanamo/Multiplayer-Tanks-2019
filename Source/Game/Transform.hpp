@@ -1,0 +1,33 @@
+#pragma once
+
+#include "Precompiled.hpp"
+
+class Transform
+{
+public:
+    Transform();
+    ~Transform();
+
+    void updateInterpolation();
+    void move(const sf::Vector2f& offset);
+    void rotate(float rotation);
+    void scale(float scaling);
+
+    void setPosition(const sf::Vector2f& position, bool ignoreInterpolation = false);
+    void setDirection(const sf::Vector2f& direction, bool ignoreInterpolation = false);
+    void setRotation(float rotation, bool ignoreInterpolation = false);
+    void setScale(float scale, bool ignoreInterpolation = false);
+
+    sf::Vector2f getPosition(float updateAlpha = 1.0f) const;
+    sf::Vector2f getDirection(float updateAlpha = 1.0f) const;
+    float getRotation(float updateAlpha = 1.0f) const;
+    float getScale(float updateAlpha = 1.0f) const;
+
+public:
+    sf::Vector2f m_currentPosition;
+    sf::Vector2f m_previousPosition;
+    float m_previousRotation;
+    float m_currentRotation;
+    float m_previousScale;
+    float m_currentScale;
+};

@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 #include "Game/Handle.hpp"
+#include "Game/Transform.hpp"
 #include "System/Globals.hpp"
 
 class World;
@@ -39,9 +40,13 @@ public:
     World* getWorld() const;
 
 private:
+    // Assigned world.
+    World* m_world;
+
     // Handle to self.
     Handle m_handle;
 
-    // Assigned world.
-    World* m_world;
+protected:
+    // Object transform.
+    Transform m_transform;
 };

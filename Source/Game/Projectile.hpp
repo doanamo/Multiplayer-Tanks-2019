@@ -15,10 +15,9 @@ public:
     void onDraw(float updateAlpha) override;
 
 private:
-    sf::Vector2f m_facingDirection;
-    sf::Vector2f m_currentPosition;
-    sf::Vector2f m_previousPosition;
+    // Remaining projectile lifetime.
     float m_remainingLifetime;
 
+    // Projectile sprite texture.
     std::shared_ptr<sf::Texture> m_texture;
 };

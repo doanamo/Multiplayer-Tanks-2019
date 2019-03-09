@@ -20,6 +20,8 @@ set(SOURCE_FILES
     "Source/System/AssetManager.h"
     "Source/System/AssetManager.cpp"
 
+    "Source/Game/Transform.hpp"
+    "Source/Game/Transform.cpp"
     "Source/Game/Handle.hpp"
     "Source/Game/Object.hpp"
     "Source/Game/Object.cpp"

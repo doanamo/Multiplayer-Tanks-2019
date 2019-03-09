@@ -16,10 +16,9 @@ public:
     void onDraw(float updateAlpha) override;
 
 private:
-    sf::Vector2f m_currentPosition;
-    sf::Vector2f m_previousPosition;
-    sf::Vector2f m_facingDirection;
-    sf::Vector2f m_movementDirection;
+    // Tank movement input.
+    sf::Vector2f m_movementInput;
 
+    // Tank sprite texture.
     std::shared_ptr<sf::Texture> m_texture;
 };

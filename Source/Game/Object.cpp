@@ -3,8 +3,8 @@
 #include "Game/World.hpp"
 
 Object::Object() :
-    m_handle(),
-    m_world(nullptr)
+    m_world(nullptr),
+    m_handle()
 {
 }
 
@@ -27,6 +27,8 @@ void Object::onExist()
 
 void Object::onUpdate(float timeDelta)
 {
+    // Update transform interpolation.
+    m_transform.updateInterpolation();
 }
 
 void Object::onDraw(float updateAlpha)
