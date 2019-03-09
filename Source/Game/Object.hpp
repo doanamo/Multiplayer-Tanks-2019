@@ -8,11 +8,15 @@ class World;
 
 class Object
 {
-public:
+protected:
+    // Allow world to set handle and world reference.
     friend World;
 
-public:
+    // Do not allow object to be instantiated directly.
     Object();
+
+public:
+    // Allow inheriting from this class.
     virtual ~Object();
 
     // Delete default copy constructors.
