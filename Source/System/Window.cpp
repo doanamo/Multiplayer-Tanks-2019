@@ -8,6 +8,10 @@ Window::Window() :
 
 Window::~Window()
 {
+    // Shutdown ImGui.
+    ImGui::SFML::Shutdown();
+
+    // Close window.
     m_window.close();
 }
 

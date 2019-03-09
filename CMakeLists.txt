@@ -8,6 +8,9 @@ set(SOURCE_FILES
     "Source/Application.hpp"
     "Source/Application.cpp"
 
+    "Source/Common/Debug.hpp"
+    "Source/Common/Debug.cpp"
+
     "Source/System/Main.cpp"
     "Source/System/Globals.hpp"
     "Source/System/Globals.cpp"

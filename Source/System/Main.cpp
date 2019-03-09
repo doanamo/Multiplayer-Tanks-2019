@@ -5,6 +5,9 @@
 
 int main()
 {
+    // Initialize debug.
+    initializeDebug();
+
     // Initialize globals.
     if(!initializeGlobals())
         return -1;

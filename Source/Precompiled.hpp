@@ -17,3 +17,6 @@
 #include <imconfig-SFML.h>
 #include <imgui.h>
 #include <imgui-SFML.h>
+
+// Project
+#include "Common/Debug.hpp"
