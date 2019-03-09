@@ -37,7 +37,7 @@ void Object::onDestroy()
 {
 }
 
-Handle Object::GetHandle() const
+Handle Object::getHandle() const
 {
     // Calling this before being added to a world does not make sense.
     assert(m_world != nullptr && "Attempting to get handle to an object that does not belong to a world!");
