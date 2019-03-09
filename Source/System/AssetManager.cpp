@@ -29,8 +29,8 @@ void AssetManager::releaseUnused()
     {
         if(it->second.use_count() <= 1)
         {
-            std::cout << "Releasing unused texture: " << it->first << std::endl;
             m_textures.erase(it++);
+            std::cout << "Released texture: " << it->first << std::endl;
         }
         else
         {
@@ -43,8 +43,8 @@ void AssetManager::releaseUnused()
     {
         if(it->second.use_count() <= 1)
         {
-            std::cout << "Releasing unused font: " << it->first << std::endl;
             m_fonts.erase(it++);
+            std::cout << "Released font: " << it->first << std::endl;
         }
         else
         {
