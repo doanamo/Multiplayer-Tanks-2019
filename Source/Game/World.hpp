@@ -8,9 +8,10 @@ class World
 {
 public:
     World();
+    ~World();
 
+    // Initializes the world.
     bool initialize();
-    void shutdown();
 
     // Updates all objects in the world.
     void update(float timeDelta);

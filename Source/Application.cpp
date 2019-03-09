@@ -37,7 +37,6 @@ void Application::shutdown()
     // Destroy game state instance.
     if(m_world)
     {
-        m_world->shutdown();
         delete m_world;
         m_world = nullptr;
     }

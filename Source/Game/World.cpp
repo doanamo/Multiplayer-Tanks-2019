@@ -5,12 +5,7 @@ World::World()
 {
 }
 
-bool World::initialize()
-{
-    return true;
-}
-
-void World::shutdown()
+World::~World()
 {
     // Delete all objects without calling on destroy methods.
     for(ObjectEntry& objectEntry : m_objects)
@@ -22,6 +17,11 @@ void World::shutdown()
     }
 
     m_objects.clear();
+}
+
+bool World::initialize()
+{
+    return true;
 }
 
 void World::update(float timeDelta)
