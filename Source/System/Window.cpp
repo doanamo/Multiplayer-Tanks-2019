@@ -25,6 +25,8 @@ bool Window::initialize()
         std::cout << "Could not create SFML window!" << std::endl;
         return false;
     }
+
+    m_window.setFramerateLimit(300);
     
     // Disable key repeats.
     m_window.setKeyRepeatEnabled(false);
