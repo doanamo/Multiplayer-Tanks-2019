@@ -9,7 +9,6 @@ public:
     ~AssetManager();
 
     bool initialize();
-    void shutdown();
 
     void loadTexture(std::string textureName, std::string pathAndFilename);
     sf::Texture& getTexture(std::string textureName);

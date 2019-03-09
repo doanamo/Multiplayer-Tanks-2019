@@ -8,9 +8,7 @@ public:
     Window();
     ~Window();
 
-public:
     bool initialize();
-    void shutdown();
 
     bool pollEvent(sf::Event& event);
     void beginRender();

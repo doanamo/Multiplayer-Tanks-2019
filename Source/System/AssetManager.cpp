@@ -8,19 +8,15 @@ AssetManager::AssetManager()
 
 AssetManager::~AssetManager()
 {
+    // Clear resource maps.
+    _textures.clear();
+    _fonts.clear();
 }
 
 bool AssetManager::initialize()
 {
     // Doan: We can initialize default resources here (e.g. for missing textures)
     return true;
-}
-
-void AssetManager::shutdown()
-{
-    // Clear resource maps.
-    _textures.clear();
-    _fonts.clear();
 }
 
 void AssetManager::loadTexture(std::string textureName, std::string pathAndFilename)

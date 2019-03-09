@@ -13,38 +13,6 @@ Application::Application() :
 
 Application::~Application()
 {
-}
-
-bool Application::initialize()
-{
-    // Create world instance.
-    m_world = new World;
-
-    if(!m_world->initialize())
-    {
-        shutdown();
-        return false;
-    }
-
-    // Create player controller.
-    m_playerController = new PlayerController;
-
-    if(!m_playerController->initialize(m_world))
-    {
-        shutdown();
-        return false;
-    }
-
-    // Create player tank object.
-    Tank* playerTank = new Tank();
-    Handle playerHandle = m_world->addObject(playerTank);
-    m_playerController->control(playerHandle);
-
-    return true;
-}
-
-void Application::shutdown() 
-{
     // Shutdown systems in reverse order.
     if(m_playerController)
     {
@@ -57,6 +25,28 @@ void Application::shutdown()
         delete m_world;
         m_world = nullptr;
     }
+}
+
+bool Application::initialize()
+{
+    // Create world instance.
+    m_world = new World;
+
+    if(!m_world->initialize())
+        return false;
+
+    // Create player controller.
+    m_playerController = new PlayerController;
+
+    if(!m_playerController->initialize(m_world))
+        return false;
+
+    // Create player tank object.
+    Tank* playerTank = new Tank();
+    Handle playerHandle = m_world->addObject(playerTank);
+    m_playerController->control(playerHandle);
+
+    return true;
 }
 
 void Application::handleEvent(const sf::Event& event)

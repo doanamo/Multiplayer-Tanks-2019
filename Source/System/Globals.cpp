@@ -49,28 +49,20 @@ void shutdownGlobals()
     // Shutdown in reverse order.
     if(g_application)
     {
-        g_application->shutdown();
         delete g_application;
         g_application = nullptr;
     }
 
     if(g_assetManager)
     {
-        g_assetManager->shutdown();
         delete g_assetManager;
         g_assetManager = nullptr;
     }
 
-    if(g_render)
-    {
-        // Managed by window instance.
-        g_render = nullptr;
-    }
-
     if(g_window)
     {
-        g_window->shutdown();
         delete g_window;
         g_window = nullptr;
+        g_render = nullptr;
     }
 }

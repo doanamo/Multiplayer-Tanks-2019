@@ -8,6 +8,7 @@ Window::Window() :
 
 Window::~Window()
 {
+    m_window.close();
 }
 
 bool Window::initialize()
@@ -35,11 +36,6 @@ bool Window::initialize()
     m_clock.restart();
 
     return true;
-}
-
-void Window::shutdown()
-{
-    m_window.close();
 }
 
 bool Window::pollEvent(sf::Event& event)

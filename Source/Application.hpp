@@ -13,7 +13,6 @@ public:
     ~Application();
 
     bool initialize();
-    void shutdown();
 
     void handleEvent(const sf::Event& event);
     void update(float timeDelta);
