@@ -88,7 +88,7 @@ void World::draw(float updateAlpha)
 Handle World::addObject(Object* object)
 {
     // Makes no sense to call this function with null.
-    assert(object != nullptr && "Object cannot be nullptr!");
+    assert(object != nullptr && "Cannot add nullptr object!");
 
     // Find a free entry that we can use to store our new object.
     ObjectEntry* freeEntry = nullptr;

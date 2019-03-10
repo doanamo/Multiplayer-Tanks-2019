@@ -35,11 +35,14 @@ public:
     virtual void onDraw(float updateAlpha);
     virtual void onDestroy();
 
+    // Get world that owns this object.
+    World* getWorld() const;
+
     // Gets handle to this object.
     Handle getHandle() const;
 
-    // Get world that owns this object.
-    World* getWorld() const;
+    // Gets transform reference.
+    Transform& getTransform();
 
 private:
     // Assigned world.

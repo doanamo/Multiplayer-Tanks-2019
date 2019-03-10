@@ -39,6 +39,15 @@ void Object::onDestroy()
 {
 }
 
+World* Object::getWorld() const
+{
+    // Calling this before being added to a world does not make sense.
+    assert(m_world != nullptr && "Retrieving world from an object that was not added to a world!");
+
+    // Return assigned world.
+    return m_world;
+}
+
 Handle Object::getHandle() const
 {
     // Calling this before being added to a world does not make sense.
@@ -48,11 +57,7 @@ Handle Object::getHandle() const
     return m_handle;
 }
 
-World* Object::getWorld() const
+Transform& Object::getTransform()
 {
-    // Calling this before being added to a world does not make sense.
-    assert(m_world != nullptr && "Retrieving world from an object that was not added to a world!");
-
-    // Return assigned world.
-    return m_world;
+    return m_transform;
 }
