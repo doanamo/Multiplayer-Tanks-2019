@@ -46,6 +46,11 @@ bool Application::initialize()
     Handle playerHandle = m_world->addObject(playerTank);
     m_playerController->control(playerHandle);
 
+    // Test instantiation from runtime type.
+    Object* enemyTank = Object::create(Tank::Type().getIdentifier());
+    enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
+    m_world->addObject(enemyTank);
+
     return true;
 }
 

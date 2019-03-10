@@ -37,6 +37,15 @@ void RuntimeTypes::registerType(TypeInfo& typeInfo)
     m_typeList.push_back(&typeInfo);
 }
 
+TypeInfo* RuntimeTypes::getTypeInfo(TypeInfo::IdentifierType type)
+{
+    // Make sure that type identifier is in valid range.
+    assert(type > 0 && type <= m_typeCounter && "Invalid type identifier index!");
+
+    // Return requested type identifier.
+    return m_typeList[type - 1];
+}
+
 void RuntimeTypes::recursivePrint(const std::vector<TypeInfo*>& typeList, int depth, bool baseOnly)
 {
     // Print base types and their children.
@@ -51,7 +60,7 @@ void RuntimeTypes::recursivePrint(const std::vector<TypeInfo*>& typeList, int de
             }
 
             // Print type info.
-            std::cout << typeInfo->getName() << " : " << typeInfo->getIdentifier() << std::endl;
+            std::cout << typeInfo->getIdentifier() << " : " << typeInfo->getName() << std::endl;
 
             // Iterate over children.
             recursivePrint(typeInfo->getDerived(), depth + 1, false);

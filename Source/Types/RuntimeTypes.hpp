@@ -9,7 +9,9 @@ public:
     ~RuntimeTypes();
 
     bool initialize();
+
     void registerType(TypeInfo& typeInfo);
+    TypeInfo* getTypeInfo(TypeInfo::IdentifierType type);
 
 private:
     // Prints type list and all its children recursively.
