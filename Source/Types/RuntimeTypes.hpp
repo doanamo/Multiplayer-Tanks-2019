@@ -15,12 +15,12 @@ public:
 
 private:
     // Prints type list and all its children recursively.
-    void recursivePrint(const std::vector<TypeInfo*>& typeList, int depth, bool baseOnly);
+    void recursivePrint(const TypeInfo::TypeList& typeList, int depth, bool baseOnly);
 
 private:
     //  Type counter for assigning IDs.
     TypeInfo::IdentifierType m_typeCounter;
 
     // List of runtime types.
-    std::vector<TypeInfo*> m_typeList;
+    TypeInfo::TypeList m_typeList;
 };

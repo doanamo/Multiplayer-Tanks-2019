@@ -14,6 +14,7 @@ public:
 
     // Identifier type.
     using IdentifierType = int;
+    using TypeList = std::vector<TypeInfo*>;
     using AllocateFunction = void*(*)(void);
 
 public:
@@ -33,7 +34,7 @@ public:
     const TypeInfo* getBase() const;
 
     // Gets list of derived types.
-    const std::vector<TypeInfo*>& getDerived() const;
+    const TypeList& getDerived() const;
 
     // Checks if specified type identifier is same as this type.
     bool isSame(IdentifierType typeIdentifier) const;
@@ -61,7 +62,7 @@ protected:
     TypeInfo* m_baseType;
 
     // List of derived types.
-    std::vector<TypeInfo*> m_derivedTypes;
+    TypeList m_derivedTypes;
 };
 
 // Utility macros.

@@ -46,7 +46,7 @@ TypeInfo* RuntimeTypes::getTypeInfo(TypeInfo::IdentifierType type)
     return m_typeList[type - 1];
 }
 
-void RuntimeTypes::recursivePrint(const std::vector<TypeInfo*>& typeList, int depth, bool baseOnly)
+void RuntimeTypes::recursivePrint(const TypeInfo::TypeList& typeList, int depth, bool baseOnly)
 {
     // Print base types and their children.
     for(auto& typeInfo : typeList)
