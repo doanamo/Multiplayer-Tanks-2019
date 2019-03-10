@@ -24,3 +24,4 @@
 // Project
 #include "Common/Debug.hpp"
 #include "Common/Math.hpp"
+#include "Types/TypeInfo.hpp"

@@ -9,6 +9,8 @@ class World;
 
 class Object
 {
+    TYPE_DECLARE(Object);
+
 protected:
     // Allow world to set handle and world reference.
     friend World;

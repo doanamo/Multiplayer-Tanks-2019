@@ -5,6 +5,8 @@
 
 class Tank : public Object
 {
+    TYPE_DECLARE(Tank, Object);
+
 public:
     Tank();
     ~Tank();

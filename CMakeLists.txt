@@ -12,6 +12,12 @@ set(SOURCE_FILES
     "Source/Common/Debug.cpp"
     "Source/Common/Math.hpp"
 
+    "Source/Types/RuntimeTypes.hpp"
+    "Source/Types/RuntimeTypes.cpp"
+    "Source/Types/TypeInfo.hpp"
+    "Source/Types/TypeInfo.cpp"
+    "Source/Types/TypeList.cpp"
+
     "Source/System/Main.cpp"
     "Source/System/Globals.hpp"
     "Source/System/Globals.cpp"

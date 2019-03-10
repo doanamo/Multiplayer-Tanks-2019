@@ -4,6 +4,8 @@
 
 class Projectile : public Object
 {
+    TYPE_DECLARE(Projectile, Object);
+
 public:
     Projectile();
     ~Projectile();
