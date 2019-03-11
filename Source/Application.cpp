@@ -4,6 +4,7 @@
 #include "System/Window.h"
 #include "Game/World.hpp"
 #include "Game/Tank.hpp"
+#include "Game/Level.hpp"
 
 Application::Application() :
     m_world(nullptr),
@@ -35,11 +36,15 @@ bool Application::initialize()
     if(!m_world->initialize())
         return false;
 
-    // Create player controller.
+    // Create player controller. 
     m_playerController = new PlayerController;
 
     if(!m_playerController->initialize(m_world))
         return false;
+
+    // Create level.
+    Level* level = new Level();
+    m_world->addObject(level);
 
     // Create player tank object.
     Tank* playerTank = new Tank();

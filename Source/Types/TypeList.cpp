@@ -5,6 +5,7 @@
 #include "Game/Object.hpp"
 #include "Game/Tank.hpp"
 #include "Game/Projectile.hpp"
+#include "Game/Level.hpp"
 
 bool registerTypes()
 {
@@ -13,6 +14,7 @@ bool registerTypes()
     g_runtimeTypes->registerType(Object::Type());
     g_runtimeTypes->registerType(Tank::Type());
     g_runtimeTypes->registerType(Projectile::Type());
+    g_runtimeTypes->registerType(Level::Type());
 
     return true;
 }

@@ -39,6 +39,8 @@ set(SOURCE_FILES
     "Source/Game/Projectile.cpp"
     "Source/Game/PlayerController.hpp"
     "Source/Game/PlayerController.cpp"
+    "Source/Game/Level.hpp"
+    "Source/Game/Level.cpp"
 )
 
 # Create missing source files.
