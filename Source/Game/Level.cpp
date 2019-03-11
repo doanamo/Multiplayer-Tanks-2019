@@ -42,11 +42,15 @@ void Level::onDraw(float updateAlpha)
     {
         for (int y = 0; y < mapHeight; y++)
         {
+            // calculates an offset for a map due to x0 y0 in center
+            float xOffset = mapWidth / 2;
+            float yOffset = mapHeight / 2;
+
             sf::RectangleShape mapTileSprite;
 
             mapTileSprite.setSize(sf::Vector2f(1.f, 1.f));
             mapTileSprite.setOrigin(mapTileSprite.getSize() / 2.0f);
-            mapTileSprite.setPosition(x-((int)(Level::mapWidth/2)), y-((int)(Level::mapHeight/2)));
+            mapTileSprite.setPosition((x-xOffset), y-(yOffset));
             
             switch (mapElements[x][y])
             {
@@ -63,7 +67,6 @@ void Level::onDraw(float updateAlpha)
                 mapTileSprite.setTexture(m_textureMissingTexture.get());
                 break;
             }
-            
             g_render->draw(mapTileSprite);
         }
     }
