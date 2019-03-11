@@ -50,7 +50,7 @@ void Level::onDraw(float updateAlpha)
 
             mapTileSprite.setSize(sf::Vector2f(1.f, 1.f));
             mapTileSprite.setOrigin(mapTileSprite.getSize() / 2.0f);
-            mapTileSprite.setPosition((x-xOffset), y-(yOffset));
+            mapTileSprite.setPosition(x-xOffset, y-yOffset);
             
             switch (mapElements[x][y])
             {
@@ -70,5 +70,4 @@ void Level::onDraw(float updateAlpha)
             g_render->draw(mapTileSprite);
         }
     }
-
 }

@@ -16,8 +16,8 @@ public:
 
 private:
     // Constants.
-    static const int mapWidth = 11;
-    static const int mapHeight = 11;
+    static const int mapWidth = 2;
+    static const int mapHeight = 2;
 
 private:
     // Map elements.
