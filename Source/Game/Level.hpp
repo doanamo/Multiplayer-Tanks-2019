@@ -15,9 +15,17 @@ public:
     void onDraw(float updateAlpha) override;
 
 private:
+    // Constants.
+    static const int mapWidth = 11;
+    static const int mapHeight = 11;
+
+private:
+    // Map elements.
+    int mapElements[mapWidth][mapHeight];
 
     // Map sprites textures.
     std::shared_ptr<sf::Texture> m_textureWater;
     std::shared_ptr<sf::Texture> m_textureGrass;
     std::shared_ptr<sf::Texture> m_textureBrickWall;
+    std::shared_ptr<sf::Texture> m_textureMissingTexture;
 };

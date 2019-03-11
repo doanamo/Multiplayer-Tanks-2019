@@ -9,6 +9,20 @@ Level::Level()
     m_textureWater = g_assetManager->loadTexture("Data/Sprites/water_base.png");
     m_textureGrass = g_assetManager->loadTexture("Data/Sprites/grass_base.png");
     m_textureBrickWall = g_assetManager->loadTexture("Data/Sprites/brickWall_base.png");
+    m_textureMissingTexture = g_assetManager->loadTexture("Data/Sprites/missingTexture_base.png");
+
+    // Load level TODO: Implement loading from file.
+    for (int x = 0; x < mapWidth; x++)
+    {
+        for (int y = 0; y < mapHeight; y++)
+        {
+            // some random stuff to fill a map
+            if (x % 4 == 0) mapElements[x][y] = 1;
+            else if (y % 5 == 0) mapElements[x][y] = 2;
+            else if (x == 6 && y == 6) mapElements[x][y] = 666; // missing txt test 
+            else mapElements[x][y] = 0;
+        }
+    }
 }
 
 Level::~Level()
@@ -23,29 +37,35 @@ void Level::onDraw(float updateAlpha)
 {
     Object::onDraw(updateAlpha);
 
-    // Draw map TEMP HACK.
-    sf::RectangleShape mapTileSprite;
+    // Draw map WIP.
+    for (int x = 0; x < mapWidth; x++)
+    {
+        for (int y = 0; y < mapHeight; y++)
+        {
+            sf::RectangleShape mapTileSprite;
 
-    mapTileSprite.setSize(sf::Vector2f(1.f, 1.f));
-    mapTileSprite.setOrigin(mapTileSprite.getSize() / 2.0f);
-    mapTileSprite.setPosition(0, 0);
-    mapTileSprite.setTexture(m_textureWater.get());
+            mapTileSprite.setSize(sf::Vector2f(1.f, 1.f));
+            mapTileSprite.setOrigin(mapTileSprite.getSize() / 2.0f);
+            mapTileSprite.setPosition(x-((int)(Level::mapWidth/2)), y-((int)(Level::mapHeight/2)));
+            
+            switch (mapElements[x][y])
+            {
+            case 0:
+                mapTileSprite.setTexture(m_textureWater.get());
+                break;
+            case 1:
+                mapTileSprite.setTexture(m_textureGrass.get());
+                break;
+            case 2:
+                mapTileSprite.setTexture(m_textureBrickWall.get());
+                break;
+            default:
+                mapTileSprite.setTexture(m_textureMissingTexture.get());
+                break;
+            }
+            
+            g_render->draw(mapTileSprite);
+        }
+    }
 
-    sf::RectangleShape mapTileSprite2;
-
-    mapTileSprite2.setSize(sf::Vector2f(1.f, 1.f));
-    mapTileSprite2.setOrigin(mapTileSprite2.getSize() / 2.0f);
-    mapTileSprite2.setPosition(1, 1);
-    mapTileSprite2.setTexture(m_textureBrickWall.get());
-
-    sf::RectangleShape mapTileSprite3;
-
-    mapTileSprite3.setSize(sf::Vector2f(1.f, 1.f));
-    mapTileSprite3.setOrigin(mapTileSprite3.getSize() / 2.0f);
-    mapTileSprite3.setPosition(2, 2);
-    mapTileSprite3.setTexture(m_textureGrass.get());
-
-    g_render->draw(mapTileSprite);
-    g_render->draw(mapTileSprite2);
-    g_render->draw(mapTileSprite3);
 }
