@@ -38,20 +38,6 @@ void MemoryBuffer::writeWord(uint64_t value)
     m_index += sizeof(uint64_t);
 }
 
-void MemoryBuffer::writeFloat(float value)
-{
-    m_buffer.resize(m_index + sizeof(float));
-    *((float*)&m_buffer[m_index]) = value;
-    m_index += sizeof(float);
-}
-
-void MemoryBuffer::writeDouble(double value)
-{
-    m_buffer.resize(m_index + sizeof(double));
-    *((double*)&m_buffer[m_index]) = value;
-    m_index += sizeof(double);
-}
-
 uint8_t MemoryBuffer::readByte()
 {
     assert(m_index + sizeof(uint8_t) <= m_buffer.size());
@@ -81,21 +67,5 @@ uint64_t MemoryBuffer::readWord()
     assert(m_index + sizeof(uint64_t) <= m_buffer.size());
     uint64_t value = *((uint64_t*)&m_buffer[m_index]);
     m_index += sizeof(uint64_t);
-    return value;
-}
-
-float MemoryBuffer::readFloat()
-{
-    assert(m_index + sizeof(float) <= m_buffer.size());
-    float value = *((float*)&m_buffer[m_index]);
-    m_index += sizeof(float);
-    return value;
-}
-
-double MemoryBuffer::readDouble()
-{
-    assert(m_index + sizeof(double) <= m_buffer.size());
-    double value = *((double*)&m_buffer[m_index]);
-    m_index += sizeof(double);
     return value;
 }

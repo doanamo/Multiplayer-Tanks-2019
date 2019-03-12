@@ -21,7 +21,8 @@ set(SOURCE_FILES
     "Source/Serialization/MemoryBuffer.hpp"
     "Source/Serialization/MemoryBuffer.cpp"
     "Source/Serialization/Serializable.hpp"
-    
+    "Source/Serialization/Serialization.hpp"
+
     "Source/System/Main.cpp"
     "Source/System/Globals.hpp"
     "Source/System/Globals.cpp"
