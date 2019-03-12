@@ -13,9 +13,8 @@ public:
 
     bool initialize(World* world);
     void control(Handle handle);
-
-    void onEvent(const sf::Event& event);
-    void onUpdate(float elpasedTime);
+    void handleEvent(const sf::Event& event);
+    void update(float elpasedTime);
 
 private:
     // Controlled object.

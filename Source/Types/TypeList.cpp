@@ -14,7 +14,6 @@ bool registerTypes()
     g_runtimeTypes->registerType(Object::Type());
     g_runtimeTypes->registerType(Tank::Type());
     g_runtimeTypes->registerType(Projectile::Type());
-    g_runtimeTypes->registerType(Level::Type());
 
     return true;
 }

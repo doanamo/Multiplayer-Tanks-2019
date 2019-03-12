@@ -1,18 +1,16 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Game/Object.hpp"
 
-class Level : public Object
+class Level
 {
-    TYPE_DECLARE(Level, Object);
-
 public:
     Level();
     ~Level();
 
-    void onUpdate(float timeDelta) override;
-    void onDraw(float updateAlpha) override;
+    bool initialize();
+    void update(float timeDelta);
+    void draw(float updateAlpha);
 
 private:
     // Constants.

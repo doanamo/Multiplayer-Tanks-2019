@@ -30,10 +30,6 @@ bool Application::initialize()
     if(!m_gameInstance->initialize())
         return false;
 
-    // Create level.
-    Level* level = new Level();
-    m_gameInstance->getWorld()->addObject(level);
-
     // Create player tank object.
     Tank* playerTank = new Tank();
     Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank);

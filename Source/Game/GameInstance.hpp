@@ -3,6 +3,7 @@
 #include "Precompiled.hpp"
 
 class World;
+class Level;
 class PlayerController;
 
 class GameInstance
@@ -17,11 +18,15 @@ public:
     void draw(float updateAlpha);
 
     World* getWorld();
+    Level* getLevel();
     PlayerController* getPlayerController();
 
 private:
     // Game world.
     World* m_world;
+
+    // Game level.
+    Level* m_level;
 
     // Local player controller.
     PlayerController* m_playerController;

@@ -27,7 +27,7 @@ void PlayerController::control(Handle object)
     m_object = object;
 }
 
-void PlayerController::onEvent(const sf::Event& event)
+void PlayerController::handleEvent(const sf::Event& event)
 {
     // Get player tank object.
     Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_object));
@@ -61,7 +61,7 @@ void PlayerController::onEvent(const sf::Event& event)
     }
 }
 
-void PlayerController::onUpdate(float elpasedTime)
+void PlayerController::update(float elpasedTime)
 {
     // Get player tank object.
     Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_object));
