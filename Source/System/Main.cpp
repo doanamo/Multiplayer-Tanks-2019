@@ -43,9 +43,6 @@ int main()
         g_window->beginRender();
         g_application->draw(updateAlpha);
         g_window->endRender();
-
-        // Release unused resources.
-        g_assetManager->releaseUnused();
     }
 
     // Shutdown globals.
