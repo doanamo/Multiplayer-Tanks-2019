@@ -18,6 +18,8 @@ set(SOURCE_FILES
     "Source/Types/TypeInfo.cpp"
     "Source/Types/TypeList.cpp"
 
+    "Source/Serialization/Serializable.hpp"
+    
     "Source/System/Main.cpp"
     "Source/System/Globals.hpp"
     "Source/System/Globals.cpp"
