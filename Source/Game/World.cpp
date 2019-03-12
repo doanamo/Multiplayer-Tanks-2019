@@ -8,8 +8,10 @@ World::World()
 World::~World()
 {
     // Delete all objects without calling on destroy methods.
-    for(ObjectEntry& objectEntry : m_objects)
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
     {
+        ObjectEntry& objectEntry = m_objects[i];
+
         if(objectEntry.object != nullptr)
         {
             delete objectEntry.object;
@@ -27,8 +29,10 @@ bool World::initialize()
 void World::update(float timeDelta)
 {
     // Destroy objects marked for destruction.
-    for(ObjectEntry& objectEntry : m_objects)
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
     {
+        ObjectEntry& objectEntry = m_objects[i];
+
         if(objectEntry.destroy)
         {
             assert(objectEntry.object != nullptr && "Object entry marked for destruction does not have an object set!");
@@ -47,8 +51,10 @@ void World::update(float timeDelta)
     }
 
     // Bring created objects to existence.
-    for(ObjectEntry& objectEntry : m_objects)
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
     {
+        ObjectEntry& objectEntry = m_objects[i];
+
         if(!objectEntry.exists && objectEntry.object != nullptr)
         {
             // Mark object as existing.
@@ -60,8 +66,10 @@ void World::update(float timeDelta)
     }
 
     // Update all objects.
-    for(ObjectEntry& objectEntry : m_objects)
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
     {
+        ObjectEntry& objectEntry = m_objects[i];
+
         if(objectEntry.exists)
         {
             assert(objectEntry.object != nullptr && "Existing object entry does not have an object set!");
@@ -75,10 +83,14 @@ void World::update(float timeDelta)
 void World::draw(float updateAlpha)
 {
     // Draw all objects.
-    for(ObjectEntry& objectEntry : m_objects)
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
     {
-        if(objectEntry.exists && objectEntry.object != nullptr)
+        ObjectEntry& objectEntry = m_objects[i];
+
+        if(objectEntry.exists)
         {
+            assert(objectEntry.object != nullptr && "Existing object entry does not have an object set!");
+
             // Call on update method.
             objectEntry.object->onDraw(updateAlpha);
         }
@@ -93,8 +105,10 @@ Handle World::addObject(Object* object)
     // Find a free entry that we can use to store our new object.
     ObjectEntry* freeEntry = nullptr;
 
-    for(ObjectEntry& objectEntry : m_objects)
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
     {
+        ObjectEntry& objectEntry = m_objects[i];
+
         if(objectEntry.object == nullptr)
         {
             freeEntry = &objectEntry;
