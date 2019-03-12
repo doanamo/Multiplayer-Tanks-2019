@@ -31,6 +31,10 @@ set(SOURCE_FILES
     "Source/System/AssetManager.h"
     "Source/System/AssetManager.cpp"
 
+    "Source/Game/GameInstance.hpp"
+    "Source/Game/GameInstance.cpp"
+    "Source/Game/PlayerController.hpp"
+    "Source/Game/PlayerController.cpp"
     "Source/Game/Transform.hpp"
     "Source/Game/Transform.cpp"
     "Source/Game/Handle.hpp"
@@ -42,8 +46,6 @@ set(SOURCE_FILES
     "Source/Game/Tank.cpp"
     "Source/Game/Projectile.hpp"
     "Source/Game/Projectile.cpp"
-    "Source/Game/PlayerController.hpp"
-    "Source/Game/PlayerController.cpp"
     "Source/Game/Level.hpp"
     "Source/Game/Level.cpp"
 )

@@ -2,59 +2,47 @@
 #include "Application.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.h"
+#include "Game/GameInstance.hpp"
+#include "Game/PlayerController.hpp"
 #include "Game/World.hpp"
 #include "Game/Tank.hpp"
 #include "Game/Level.hpp"
 
 Application::Application() :
-    m_world(nullptr),
-    m_playerController(nullptr)
+    m_gameInstance(nullptr)
 {
 }
 
 Application::~Application()
 {
-    // Shutdown systems in reverse order.
-    if(m_playerController)
+    // Shutdown game instance.
+    if(m_gameInstance)
     {
-        delete m_playerController;
-        m_playerController = nullptr;
-    }
-
-    if(m_world)
-    {
-        delete m_world;
-        m_world = nullptr;
+        delete m_gameInstance;
+        m_gameInstance = nullptr;
     }
 }
 
 bool Application::initialize()
 {
-    // Create world instance.
-    m_world = new World;
-
-    if(!m_world->initialize())
-        return false;
-
-    // Create player controller. 
-    m_playerController = new PlayerController;
-
-    if(!m_playerController->initialize(m_world))
+    // Initialize game instance.
+    m_gameInstance = new GameInstance();
+    if(!m_gameInstance->initialize())
         return false;
 
     // Create level.
     Level* level = new Level();
-    m_world->addObject(level);
+    m_gameInstance->getWorld()->addObject(level);
 
     // Create player tank object.
     Tank* playerTank = new Tank();
-    Handle playerHandle = m_world->addObject(playerTank);
-    m_playerController->control(playerHandle);
+    Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank);
+    m_gameInstance->getPlayerController()->control(playerHandle);
 
     // Test instantiation from runtime type.
     Object* enemyTank = Object::create(Tank::Type().getIdentifier());
     enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
-    m_world->addObject(enemyTank);
+    m_gameInstance->getWorld()->addObject(enemyTank);
 
     return true;
 }
@@ -67,17 +55,14 @@ void Application::handleEvent(const sf::Event& event)
         g_window->close();
     }
 
-    // Handle player controller input.
-    m_playerController->onEvent(event);
+    // Handle events by game instance.
+    m_gameInstance->handleEvent(event);
 }
 
 void Application::update(float timeDelta)
 {
-    // Update player controller.
-    m_playerController->onUpdate(timeDelta);
-
-    // Update world instance.
-    m_world->update(timeDelta);
+    // Update game instance.
+    m_gameInstance->update(timeDelta);
 }
 
 void Application::draw(float updateAlpha)
@@ -105,8 +90,8 @@ void Application::draw(float updateAlpha)
     viewport.setSize(viewportSize);
     g_window->render.setView(viewport);
 
-    // Draw world objects.
-    m_world->draw(updateAlpha);
+    // Draw game instance.
+    m_gameInstance->draw(updateAlpha);
 
     // Draw demo ImGui window.
     //ImGui::ShowDemoWindow();

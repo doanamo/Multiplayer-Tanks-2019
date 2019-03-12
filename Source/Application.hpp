@@ -1,10 +1,8 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Game/Handle.hpp"
-#include "Game/PlayerController.hpp"
 
-class World;
+class GameInstance;
 
 class Application
 {
@@ -13,15 +11,11 @@ public:
     ~Application();
 
     bool initialize();
-
     void handleEvent(const sf::Event& event);
     void update(float timeDelta);
     void draw(float updateAlpha);
 
 public:
-    // Game world.
-    World* m_world;
-
-    // Local player controller.
-    PlayerController* m_playerController;
+    // Game instance.
+    GameInstance* m_gameInstance;
 };
