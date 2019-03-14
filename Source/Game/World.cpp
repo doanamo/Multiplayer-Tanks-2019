@@ -231,6 +231,8 @@ bool World::onDeserialize(MemoryBuffer& buffer)
             return false;
 
         Object* object = Object::create(objectType);
+        assert(object != nullptr && "Runtime type allocation returned null!");
+
         if(!deserialize(buffer, object))
             return false;
 

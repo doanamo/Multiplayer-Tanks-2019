@@ -4,6 +4,7 @@
 #include <cmath>
 #include <cstdint>
 #include <iostream>
+#include <fstream>
 #include <memory>
 #include <vector>
 #include <map>

@@ -81,3 +81,24 @@ bool MemoryBuffer::readWord(uint64_t* value)
 
     return true;
 }
+
+void MemoryBuffer::resize(std::size_t size)
+{
+    assert(m_index == 0 && "Resizing buffer that is being written or read from!");
+    m_buffer.resize(size);
+}
+
+std::size_t MemoryBuffer::getSize() const
+{
+    return m_buffer.size();
+}
+
+const char* MemoryBuffer::getData() const
+{
+    return &m_buffer[0];
+}
+
+char* MemoryBuffer::getData()
+{
+    return &m_buffer[0];
+}

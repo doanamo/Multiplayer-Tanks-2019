@@ -78,6 +78,8 @@ void Tank::onDraw(float updateAlpha)
 
 bool Tank::onSerialize(MemoryBuffer& buffer)
 {
+    Object::onSerialize(buffer);
+
     if(!serialize(buffer, m_movementInput))
         return false;
 
@@ -86,6 +88,8 @@ bool Tank::onSerialize(MemoryBuffer& buffer)
 
 bool Tank::onDeserialize(MemoryBuffer& buffer)
 {
+    Object::onDeserialize(buffer);
+
     if(!deserialize(buffer, &m_movementInput))
         return false;
 

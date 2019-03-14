@@ -20,6 +20,12 @@ public:
     bool readInteger(uint32_t* value);
     bool readWord(uint64_t* value);
 
+    // Buffer manipulation.
+    void resize(std::size_t size);
+    std::size_t getSize() const;
+    const char* getData() const;
+    char* getData();
+
 private:
     // Resizable stream buffer.
     std::vector<char> m_buffer;

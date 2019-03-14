@@ -58,6 +58,8 @@ void Projectile::onDraw(float updateAlpha)
 
 bool Projectile::onSerialize(MemoryBuffer& buffer)
 {
+    Object::onSerialize(buffer);
+
     if(!serialize(buffer, m_remainingLifetime))
         return false;
 
@@ -66,6 +68,8 @@ bool Projectile::onSerialize(MemoryBuffer& buffer)
 
 bool Projectile::onDeserialize(MemoryBuffer& buffer)
 {
+    Object::onDeserialize(buffer);
+
     if(!deserialize(buffer, &m_remainingLifetime))
         return false;
 

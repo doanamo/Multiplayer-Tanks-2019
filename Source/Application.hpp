@@ -15,6 +15,9 @@ public:
     void update(float timeDelta);
     void draw(float updateAlpha);
 
+    bool saveSnapshot();
+    bool loadSnaphot();
+
 public:
     // Game instance.
     GameInstance* m_gameInstance;

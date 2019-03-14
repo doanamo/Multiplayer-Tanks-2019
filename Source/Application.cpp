@@ -45,10 +45,23 @@ bool Application::initialize()
 
 void Application::handleEvent(const sf::Event& event)
 {
-    // Close application on F10 press.
-    if(event.type == sf::Event::KeyPressed && event.key.code == sf::Keyboard::F10)
+    // Handle keyboard input.
+    if(event.type == sf::Event::KeyPressed)
     {
-        g_window->close();
+        switch(event.key.code)
+        {
+        case sf::Keyboard::F5:
+            this->saveSnapshot();
+            break;
+
+        case sf::Keyboard::F8:
+            this->loadSnaphot();
+            break;
+
+        case sf::Keyboard::F10:
+            g_window->close();
+            break;
+        }
     }
 
     // Handle events by game instance.
@@ -91,4 +104,80 @@ void Application::draw(float updateAlpha)
 
     // Draw demo ImGui window.
     //ImGui::ShowDemoWindow();
+}
+
+bool Application::saveSnapshot()
+{
+    if(!m_gameInstance)
+        return false;
+
+    // Serialize game instance to memory buffer.
+    MemoryBuffer memoryBuffer;
+    if(!serialize(memoryBuffer, *m_gameInstance))
+        return false;
+
+    // Write buffer to disc.
+    std::ofstream file("snapshot.save", std::ios::binary | std::ios::trunc);
+    
+    if(!file.is_open())
+    {
+        std::cout << "Could not open snapshot file for writing!" << std::endl;
+        return false;
+    }
+
+    file.write(memoryBuffer.getData(), memoryBuffer.getSize());
+    file.close();
+
+    // Success!
+    std::cout << "Snapshot file has been saved!" << std::endl;
+
+    return true;
+}
+
+bool Application::loadSnaphot()
+{
+    // Open and read file into memory buffer.
+    std::ifstream file("snapshot.save", std::ios::binary | std::ios::ate);
+
+    if(!file.is_open())
+    {
+        std::cout << "Could not open snapshot file for reading!" << std::endl;
+        return false;
+    }
+
+    std::size_t size = (std::size_t)file.tellg();
+    file.seekg(0, std::ios::beg);
+
+    // Read snapshot data into memory buffer.
+    MemoryBuffer memoryBuffer;
+    memoryBuffer.resize(size);
+
+    if(!file.read(memoryBuffer.getData(), size))
+    {
+        std::cout << "Could not read snapshot file!" << std::endl;
+        return false;
+    }
+
+    file.close();
+
+    // Shutdown current game instance.
+    if(m_gameInstance)
+    {
+        delete m_gameInstance;
+        m_gameInstance = nullptr;
+    }
+
+    // Create new game instance.
+    m_gameInstance = new GameInstance();
+    if(!m_gameInstance->initialize())
+        return false;
+
+    // Deserialize game instance from memory buffer.
+    if(!deserialize(memoryBuffer, m_gameInstance))
+        return false;
+
+    // Success!
+    std::cout << "Snapshot file has been loaded!" << std::endl;
+
+    return true;
 }
