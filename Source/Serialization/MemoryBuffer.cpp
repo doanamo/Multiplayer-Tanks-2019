@@ -10,31 +10,31 @@ MemoryBuffer::~MemoryBuffer()
 {
 }
 
-void MemoryBuffer::writeByte(uint8_t value)
+void MemoryBuffer::writeByte(uint8_t* value)
 {
     m_buffer.resize(m_index + sizeof(uint8_t));
-    *((uint8_t*)&m_buffer[m_index]) = value;
+    *((uint8_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint8_t);
 }
 
-void MemoryBuffer::writeShort(uint16_t value)
+void MemoryBuffer::writeShort(uint16_t* value)
 {
     m_buffer.resize(m_index + sizeof(uint16_t));
-    *((uint16_t*)&m_buffer[m_index]) = value;
+    *((uint16_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint16_t);
 }
 
-void MemoryBuffer::writeInteger(uint32_t value)
+void MemoryBuffer::writeInteger(uint32_t* value)
 {
     m_buffer.resize(m_index + sizeof(uint32_t));
-    *((uint32_t*)&m_buffer[m_index]) = value;
+    *((uint32_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint32_t);
 }
 
-void MemoryBuffer::writeWord(uint64_t value)
+void MemoryBuffer::writeWord(uint64_t* value)
 {
     m_buffer.resize(m_index + sizeof(uint64_t));
-    *((uint64_t*)&m_buffer[m_index]) = value;
+    *((uint64_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint64_t);
 }
 

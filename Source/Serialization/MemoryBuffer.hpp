@@ -9,10 +9,10 @@ public:
     ~MemoryBuffer();
 
     // Writing methods.
-    void writeByte(uint8_t value);
-    void writeShort(uint16_t value);
-    void writeInteger(uint32_t value);
-    void writeWord(uint64_t value);
+    void writeByte(uint8_t* value);
+    void writeShort(uint16_t* value);
+    void writeInteger(uint32_t* value);
+    void writeWord(uint64_t* value);
 
     // Reading methods.
     bool readByte(uint8_t* value);
