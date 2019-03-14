@@ -5,6 +5,6 @@ class MemoryBuffer;
 class Serializable
 {
 public:
-    virtual bool serialize(MemoryBuffer& stream) = 0;
-    virtual bool deserialize(MemoryBuffer& stream) = 0;
+    virtual bool onSerialize(MemoryBuffer& stream) = 0;
+    virtual bool onDeserialize(MemoryBuffer& stream) = 0;
 };

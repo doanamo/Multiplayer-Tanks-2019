@@ -15,10 +15,10 @@ public:
     void writeWord(uint64_t value);
 
     // Reading methods.
-    uint8_t readByte();
-    uint16_t readShort();
-    uint32_t readInteger();
-    uint64_t readWord();
+    bool readByte(uint8_t* value);
+    bool readShort(uint16_t* value);
+    bool readInteger(uint32_t* value);
+    bool readWord(uint64_t* value);
 
 private:
     // Resizable stream buffer.

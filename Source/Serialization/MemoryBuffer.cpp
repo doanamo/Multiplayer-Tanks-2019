@@ -38,34 +38,46 @@ void MemoryBuffer::writeWord(uint64_t value)
     m_index += sizeof(uint64_t);
 }
 
-uint8_t MemoryBuffer::readByte()
+bool MemoryBuffer::readByte(uint8_t* value)
 {
-    assert(m_index + sizeof(uint8_t) <= m_buffer.size());
-    uint8_t value = *((uint8_t*)&m_buffer[m_index]);
+    if(m_index + sizeof(uint8_t) > m_buffer.size())
+        return false;
+
+    *value = *((uint8_t*)&m_buffer[m_index]);
     m_index += sizeof(uint8_t);
+
     return value;
 }
 
-uint16_t MemoryBuffer::readShort()
+bool MemoryBuffer::readShort(uint16_t* value)
 {
-    assert(m_index + sizeof(uint16_t) <= m_buffer.size());
-    uint16_t value = *((uint16_t*)&m_buffer[m_index]);
+    if(m_index + sizeof(uint16_t) > m_buffer.size())
+        return false;
+
+    *value = *((uint16_t*)&m_buffer[m_index]);
     m_index += sizeof(uint16_t);
-    return value;
+
+    return true;
 }
 
-uint32_t MemoryBuffer::readInteger()
+bool MemoryBuffer::readInteger(uint32_t* value)
 {
-    assert(m_index + sizeof(uint32_t) <= m_buffer.size());
-    uint32_t value = *((uint32_t*)&m_buffer[m_index]);
+    if(m_index + sizeof(uint32_t) > m_buffer.size())
+        return false;
+
+    *value = *((uint32_t*)&m_buffer[m_index]);
     m_index += sizeof(uint32_t);
-    return value;
+
+    return true;
 }
 
-uint64_t MemoryBuffer::readWord()
+bool MemoryBuffer::readWord(uint64_t* value)
 {
-    assert(m_index + sizeof(uint64_t) <= m_buffer.size());
-    uint64_t value = *((uint64_t*)&m_buffer[m_index]);
+    if(m_index + sizeof(uint64_t) > m_buffer.size())
+        return false;
+
+    *value = *((uint64_t*)&m_buffer[m_index]);
     m_index += sizeof(uint64_t);
-    return value;
+
+    return true;
 }
