@@ -70,6 +70,12 @@ protected:
 #define TYPE_DECLARE_STRINGIFY(type) #type
 #define TYPE_DECLARE_DEDUCE(arg1, arg2, arg3, ...) arg3
 
+#define TYPE_DECLARE_DETERMINE(type) \
+    virtual TypeInfo& getType() const \
+    { \
+        return type::Type(); \
+    }
+
 #define TYPE_DECLARE_ALLOCATE(type) \
     static void* allocate() \
     { \
@@ -102,6 +108,7 @@ protected:
             static TypeInfo typeInfo(TYPE_DECLARE_STRINGIFY(type), &type::allocate); \
             return typeInfo; \
         } \
+        TYPE_DECLARE_DETERMINE(type) \
         TYPE_DECLARE_ALLOCATE(type) \
         TYPE_DECLARE_CREATE(type)
 
@@ -112,6 +119,7 @@ protected:
             static TypeInfo typeInfo(TYPE_DECLARE_STRINGIFY(type), &type::allocate, &base::Type()); \
             return typeInfo; \
         }\
+        TYPE_DECLARE_DETERMINE(type) \
         TYPE_DECLARE_ALLOCATE(type) \
         TYPE_DECLARE_CREATE(type)
 
