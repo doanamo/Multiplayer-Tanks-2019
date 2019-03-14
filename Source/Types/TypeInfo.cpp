@@ -93,7 +93,8 @@ bool TypeInfo::isDerived(IdentifierType typeIdentifier) const
         }
         else
         {
-            return derivedType->isDerived(typeIdentifier);
+            if(derivedType->isDerived(typeIdentifier))
+                return true;
         }
     }
 
