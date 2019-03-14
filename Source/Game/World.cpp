@@ -86,7 +86,7 @@ Handle World::addObject(Object* object)
     // Allocate a new object entry if there are no free ones.
     if(freeEntry == nullptr)
     {
-        m_objects.emplace_back((int)m_objects.size());
+        m_objects.emplace_back((int)m_objects.size() + 1);
         freeEntry = &m_objects.back();
     }
 
@@ -112,11 +112,11 @@ Handle World::addObject(Object* object)
 Object* World::getObject(Handle handle)
 {
     // Make sure identifier is within objects array range and return null otherwise.
-    if(handle.identifier < 0 && handle.identifier >= (int)m_objects.size())
+    if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
         return nullptr;
 
     // Make sure versions are matching.
-    ObjectEntry& objectEntry = m_objects[handle.identifier];
+    ObjectEntry& objectEntry = m_objects[handle.identifier - 1];
 
     if(handle.version == objectEntry.handle.version)
     {
@@ -131,11 +131,11 @@ Object* World::getObject(Handle handle)
 void World::destroyObject(Handle handle)
 {
     // Make sure identifier is within objects array range and do nothing otherwise.
-    if(handle.identifier < 0 && handle.identifier >= (int)m_objects.size())
+    if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
         return;
 
     // Mark object entry for destruction.
-    ObjectEntry& objectEntry = m_objects[handle.identifier];
+    ObjectEntry& objectEntry = m_objects[handle.identifier - 1];
 
     if(handle.version == objectEntry.handle.version)
     {
@@ -191,8 +191,6 @@ bool World::onSerialize(MemoryBuffer& buffer)
     // Function for checking if object is eligible for serialization.
     auto ShouldSerializeObject = [](const ObjectEntry& entry)
     {
-        assert(entry.exists && "Pending object were not been flushed before serialization!");
-        assert(!entry.destroy && "Pending object were not been flushed before serialization!");
         return entry.object != nullptr;
     };
 
