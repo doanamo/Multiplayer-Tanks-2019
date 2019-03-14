@@ -2,7 +2,7 @@
 
 #include "Precompiled.hpp"
 
-class Level
+class Level : public Serializable
 {
 public:
     Level();
@@ -11,6 +11,11 @@ public:
     bool initialize();
     void update(float timeDelta);
     void draw(float updateAlpha);
+
+protected:
+    // Serialization methods.
+    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onDeserialize(MemoryBuffer& buffer) override;
 
 private:
     // Constants.

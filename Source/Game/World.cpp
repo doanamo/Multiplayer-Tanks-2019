@@ -28,42 +28,8 @@ bool World::initialize()
 
 void World::update(float timeDelta)
 {
-    // Destroy objects marked for destruction.
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
-    {
-        ObjectEntry& objectEntry = m_objects[i];
-
-        if(objectEntry.destroy)
-        {
-            assert(objectEntry.object != nullptr && "Object entry marked for destruction does not have an object set!");
-
-            // Call on destroy method.
-            objectEntry.object->onDestroy();
-
-            // Delete object from memory.
-            delete objectEntry.object;
-            objectEntry.object = nullptr;
-
-            // Reset object entry state.
-            objectEntry.exists = false;
-            objectEntry.destroy = false;
-        }
-    }
-
-    // Bring created objects to existence.
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
-    {
-        ObjectEntry& objectEntry = m_objects[i];
-
-        if(!objectEntry.exists && objectEntry.object != nullptr)
-        {
-            // Mark object as existing.
-            objectEntry.exists = true;
-
-            // Call on exist method.
-            objectEntry.object->onExist();
-        }
-    }
+    // Process objects waiting for creation and destruction.
+    processPendingObjects();
 
     // Update all objects.
     for(std::size_t i = 0; i < m_objects.size(); ++i)
@@ -71,6 +37,7 @@ void World::update(float timeDelta)
         ObjectEntry& objectEntry = m_objects[i];
 
         if(objectEntry.exists)
+    
         {
             assert(objectEntry.object != nullptr && "Existing object entry does not have an object set!");
 
@@ -174,4 +141,103 @@ void World::destroyObject(Handle handle)
     {
         objectEntry.destroy = true;
     }
+}
+
+void World::processPendingObjects()
+{
+    // Destroy objects marked for destruction.
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
+    {
+        ObjectEntry& objectEntry = m_objects[i];
+
+        if(objectEntry.destroy)
+        {
+            assert(objectEntry.object != nullptr && "Object entry marked for destruction does not have an object set!");
+
+            // Call on destroy method.
+            objectEntry.object->onDestroy();
+
+            // Delete object from memory.
+            delete objectEntry.object;
+            objectEntry.object = nullptr;
+
+            // Reset object entry state.
+            objectEntry.exists = false;
+            objectEntry.destroy = false;
+        }
+    }
+
+    // Bring created objects to existence.
+    for(std::size_t i = 0; i < m_objects.size(); ++i)
+    {
+        ObjectEntry& objectEntry = m_objects[i];
+
+        if(!objectEntry.exists && objectEntry.object != nullptr)
+        {
+            // Mark object as existing.
+            objectEntry.exists = true;
+
+            // Call on exist method.
+            objectEntry.object->onExist();
+        }
+    }
+}
+
+bool World::onSerialize(MemoryBuffer& buffer)
+{
+    // Process pending objects before serialization.
+    processPendingObjects();
+
+    // Function for checking if object is eligible for serialization.
+    auto ShouldSerializeObject = [](const ObjectEntry& entry)
+    {
+        assert(entry.exists && "Pending object were not been flushed before serialization!");
+        assert(!entry.destroy && "Pending object were not been flushed before serialization!");
+        return entry.object != nullptr;
+    };
+
+    // Count object that are going to be written.
+    int objectCount = std::count_if(m_objects.begin(), m_objects.end(), ShouldSerializeObject);
+
+    if(!serialize(buffer, objectCount))
+        return false;
+
+    // Serialize existing objects.
+    // All objects marked for destruction should be already flushed at this point.
+    // All created objects should be already marked as existing at this point.
+    for(ObjectEntry& objectEntry : m_objects)
+    {
+        if(!ShouldSerializeObject(objectEntry))
+            continue;
+
+        if(!serialize(buffer, objectEntry.object->getType().getIdentifier()))
+            return false;
+
+        if(!serialize(buffer, *objectEntry.object))
+            return false;
+    }
+
+    return true;
+}
+
+bool World::onDeserialize(MemoryBuffer& buffer)
+{
+    uint32_t objectCount;
+    if(!deserialize(buffer, &objectCount))
+        return false;
+
+    for(uint32_t i = 0; i < objectCount; i++)
+    {
+        TypeInfo::IdentifierType objectType;
+        if(!deserialize(buffer, &objectType))
+            return false;
+
+        Object* object = Object::create(objectType);
+        if(!deserialize(buffer, object))
+            return false;
+
+        this->addObject(object);
+    }
+
+    return true;
 }

@@ -94,3 +94,31 @@ PlayerController* GameInstance::getPlayerController()
 {
     return m_playerController;
 }
+
+bool GameInstance::onSerialize(MemoryBuffer& buffer)
+{
+    if(!serialize(buffer, *m_world))
+        return false;
+
+    if(!serialize(buffer, *m_level))
+        return false;
+
+    if(!serialize(buffer, *m_playerController))
+        return false;
+
+    return true;
+}
+
+bool GameInstance::onDeserialize(MemoryBuffer& buffer)
+{
+    if(!deserialize(buffer, m_world))
+        return false;
+
+    if(!deserialize(buffer, m_level))
+        return false;
+
+    if(!deserialize(buffer, m_playerController))
+        return false;
+
+    return true;
+}

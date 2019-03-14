@@ -105,3 +105,17 @@ void PlayerController::update(float elpasedTime)
         m_playerMovement = MovementDirection::None;
     }
 }
+
+bool PlayerController::onSerialize(MemoryBuffer& buffer)
+{
+    return true;
+}
+
+bool PlayerController::onDeserialize(MemoryBuffer& buffer)
+{
+    // Temporary workaround since we cannot resolve handles yet.
+    m_object.identifier = 1;
+    m_object.version = 1;
+
+    return true;
+}

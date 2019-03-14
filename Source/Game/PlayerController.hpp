@@ -5,7 +5,7 @@
 
 class World;
 
-class PlayerController
+class PlayerController : public Serializable
 {
 public:
     PlayerController();
@@ -15,6 +15,11 @@ public:
     void control(Handle handle);
     void handleEvent(const sf::Event& event);
     void update(float elpasedTime);
+
+protected:
+    // Serialization methods.
+    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onDeserialize(MemoryBuffer& buffer) override;
 
 private:
     // Controlled object.

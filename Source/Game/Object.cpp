@@ -61,3 +61,19 @@ Transform& Object::getTransform()
 {
     return m_transform;
 }
+
+bool Object::onSerialize(MemoryBuffer& buffer)
+{
+    if(!serialize(buffer, m_transform))
+        return false;
+
+    return true;
+}
+
+bool Object::onDeserialize(MemoryBuffer& buffer)
+{
+    if(!deserialize(buffer, &m_transform))
+        return false;
+
+    return true;
+}

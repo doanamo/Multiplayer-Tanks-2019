@@ -17,6 +17,11 @@ public:
     void onUpdate(float timeDelta) override;
     void onDraw(float updateAlpha) override;
 
+protected:
+    // Serialization methods.
+    virtual bool onSerialize(MemoryBuffer& buffer) override;
+    virtual bool onDeserialize(MemoryBuffer& buffer) override;
+
 private:
     // Tank movement input.
     sf::Vector2f m_movementInput;

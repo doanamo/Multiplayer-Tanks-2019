@@ -75,3 +75,19 @@ void Tank::onDraw(float updateAlpha)
 
     g_render->draw(tankSprite);
 }
+
+bool Tank::onSerialize(MemoryBuffer& buffer)
+{
+    if(!serialize(buffer, m_movementInput))
+        return false;
+
+    return true;
+}
+
+bool Tank::onDeserialize(MemoryBuffer& buffer)
+{
+    if(!deserialize(buffer, &m_movementInput))
+        return false;
+
+    return true;
+}

@@ -55,3 +55,19 @@ void Projectile::onDraw(float updateAlpha)
 
     g_render->draw(projectileSprite);
 }
+
+bool Projectile::onSerialize(MemoryBuffer& buffer)
+{
+    if(!serialize(buffer, m_remainingLifetime))
+        return false;
+
+    return true;
+}
+
+bool Projectile::onDeserialize(MemoryBuffer& buffer)
+{
+    if(!deserialize(buffer, &m_remainingLifetime))
+        return false;
+
+    return true;
+}

@@ -29,3 +29,6 @@ bool serialize(MemoryBuffer& buffer, float value);
 bool deserialize(MemoryBuffer& buffer, float* value);
 bool serialize(MemoryBuffer& buffer, double value);
 bool deserialize(MemoryBuffer& buffer, double* value);
+
+bool serialize(MemoryBuffer& buffer, const sf::Vector2f& value);
+bool deserialize(MemoryBuffer& buffer, sf::Vector2f* value);

@@ -2,7 +2,7 @@
 
 #include "Precompiled.hpp"
 
-class Transform
+class Transform : public Serializable
 {
 public:
     Transform();
@@ -23,11 +23,15 @@ public:
     float getRotation(float updateAlpha = 1.0f) const;
     float getScale(float updateAlpha = 1.0f) const;
 
+protected:
+    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onDeserialize(MemoryBuffer& buffer) override;
+
 public:
     sf::Vector2f m_currentPosition;
     sf::Vector2f m_previousPosition;
-    float m_previousRotation;
     float m_currentRotation;
-    float m_previousScale;
+    float m_previousRotation;
     float m_currentScale;
+    float m_previousScale;
 };

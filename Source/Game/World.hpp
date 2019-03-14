@@ -4,7 +4,7 @@
 #include "Game/Handle.hpp"
 #include "Game/Object.hpp"
 
-class World
+class World : public Serializable
 {
 public:
     World();
@@ -25,10 +25,18 @@ public:
     void destroyObject(Handle handle);
 
 private:
+    // Processes pending objects.
+    void processPendingObjects();
+
+    // Serialization methods.
+    virtual bool onSerialize(MemoryBuffer& buffer) override;
+    virtual bool onDeserialize(MemoryBuffer& buffer) override;
+
+private:
     // List of objects currently in the world.
     struct ObjectEntry
     {
-        ObjectEntry(int index) :
+        ObjectEntry(int index = 0) :
             handle(index),
             object(nullptr),
             exists(false),

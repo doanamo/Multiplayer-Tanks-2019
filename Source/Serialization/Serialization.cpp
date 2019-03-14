@@ -131,3 +131,25 @@ bool deserialize(MemoryBuffer& buffer, double* value)
     assert(value != nullptr);
     return buffer.readWord((uint64_t*)value);
 }
+
+bool serialize(MemoryBuffer& buffer, const sf::Vector2f& value)
+{
+    if(!serialize(buffer, value.x))
+        return false;
+
+    if(!serialize(buffer, value.y))
+        return false;
+
+    return true;
+}
+
+bool deserialize(MemoryBuffer& buffer, sf::Vector2f* value)
+{
+    if(!deserialize(buffer, &value->x))
+        return false;
+
+    if(!deserialize(buffer, &value->y))
+        return false;
+
+    return true;
+}

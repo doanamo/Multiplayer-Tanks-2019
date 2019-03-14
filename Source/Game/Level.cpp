@@ -75,3 +75,13 @@ void Level::draw(float updateAlpha)
         }
     }
 }
+
+bool Level::onSerialize(MemoryBuffer& buffer)
+{
+    return true;
+}
+
+bool Level::onDeserialize(MemoryBuffer& buffer)
+{
+    return true;
+}

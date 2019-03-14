@@ -7,7 +7,7 @@
 
 class World;
 
-class Object
+class Object : public Serializable
 {
     TYPE_DECLARE(Object);
 
@@ -43,6 +43,11 @@ public:
 
     // Gets transform reference.
     Transform& getTransform();
+
+protected:
+    // Serialization methods.
+    virtual bool onSerialize(MemoryBuffer& buffer) override;
+    virtual bool onDeserialize(MemoryBuffer& buffer) override;
 
 private:
     // Assigned world.

@@ -6,7 +6,7 @@ class World;
 class Level;
 class PlayerController;
 
-class GameInstance
+class GameInstance : public Serializable
 {
 public:
     GameInstance();
@@ -20,6 +20,11 @@ public:
     World* getWorld();
     Level* getLevel();
     PlayerController* getPlayerController();
+
+protected:
+    // Serialization methods.
+    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onDeserialize(MemoryBuffer& buffer) override;
 
 private:
     // Game world.
