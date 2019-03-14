@@ -120,19 +120,10 @@ bool Transform::onSerialize(MemoryBuffer& buffer)
     if(!serialize(buffer, m_currentPosition))
         return false;
 
-    if(!serialize(buffer, m_previousPosition))
-        return false;
-
     if(!serialize(buffer, m_currentRotation))
         return false;
 
-    if(!serialize(buffer, m_previousRotation))
-        return false;
-
     if(!serialize(buffer, m_currentScale))
-        return false;
-
-    if(!serialize(buffer, m_previousScale))
         return false;
 
     return true;
@@ -143,20 +134,15 @@ bool Transform::onDeserialize(MemoryBuffer& buffer)
     if(!deserialize(buffer, &m_currentPosition))
         return false;
 
-    if(!deserialize(buffer, &m_previousPosition))
-        return false;
-
     if(!deserialize(buffer, &m_currentRotation))
-        return false;
-
-    if(!deserialize(buffer, &m_previousRotation))
         return false;
 
     if(!deserialize(buffer, &m_currentScale))
         return false;
 
-    if(!deserialize(buffer, &m_previousScale))
-        return false;
+    m_previousPosition = m_currentPosition;
+    m_previousRotation = m_previousRotation;
+    m_previousScale = m_currentScale;
 
     return true;
 }
