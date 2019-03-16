@@ -195,7 +195,7 @@ bool World::onSerialize(MemoryBuffer& buffer)
     };
 
     // Count object that are going to be written.
-    int objectCount = std::count_if(m_objects.begin(), m_objects.end(), ShouldSerializeObject);
+    int objectCount = (int)std::count_if(m_objects.begin(), m_objects.end(), ShouldSerializeObject);
 
     if(!serialize(buffer, objectCount))
         return false;
