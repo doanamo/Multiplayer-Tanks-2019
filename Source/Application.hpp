@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 
+class Network;
 class GameInstance;
 
 class Application
@@ -19,6 +20,9 @@ public:
     bool loadSnaphot();
 
 public:
+    // Network interface.
+    Network* m_network;
+
     // Game instance.
     GameInstance* m_gameInstance;
 };

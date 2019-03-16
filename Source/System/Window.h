@@ -8,7 +8,7 @@ public:
     Window();
     ~Window();
 
-    bool initialize();
+    bool initialize(int width, int height, const char* name);
     void close();
 
     bool pollEvent(sf::Event& event);
@@ -19,14 +19,20 @@ public:
     int getWidth() const;
     int getHeight() const;
 
+    void setTitle(const sf::String title);
+    const sf::String& getInitialTitle() const;
+
 public:
+    // Alias for render target.
     sf::RenderTarget& render;
 
 private:
+    // Render window instance.
     sf::RenderWindow m_window;
+
+    // Internal window clock.
     sf::Clock m_clock;
 
-    const char* m_name = "Tanks Project";
-    const unsigned int m_widht = 1024;
-    const unsigned int m_height = 576;
+    // Current window title.
+    sf::String m_title;
 };

@@ -2,6 +2,8 @@
 #include "Application.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.h"
+#include "Network/Server.hpp"
+#include "Network/Client.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/PlayerController.hpp"
 #include "Game/World.hpp"
@@ -9,6 +11,7 @@
 #include "Game/Level.hpp"
 
 Application::Application() :
+    m_network(nullptr),
     m_gameInstance(nullptr)
 {
 }
@@ -21,10 +24,40 @@ Application::~Application()
         delete m_gameInstance;
         m_gameInstance = nullptr;
     }
+
+    if(m_network)
+    {
+        delete m_network;
+        m_network = nullptr;
+    }
 }
 
 bool Application::initialize()
 {
+    // Create network interface.
+    bool isServer = true;
+
+    if(isServer)
+    {
+        m_network = new Server();
+    }
+    else
+    {
+        m_network = new Client();
+    }
+
+    // Change window title to identify used network interface.
+#ifndef NDEBUG
+    if(isServer)
+    {
+        g_window->setTitle(g_window->getInitialTitle() + " - Server");
+    }
+    else
+    {
+        g_window->setTitle(g_window->getInitialTitle() + " - Client " + std::to_string(m_network->getClientIndex()));
+    }
+#endif
+
     // Initialize game instance.
     m_gameInstance = new GameInstance();
     if(!m_gameInstance->initialize())

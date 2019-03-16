@@ -25,7 +25,7 @@ bool initializeGlobals()
     // Initialize window.
     g_window = new Window;
 
-    if(!g_window->initialize())
+    if(!g_window->initialize(1024, 576, "Tanks Project"))
     {
         shutdownGlobals();
         return false;

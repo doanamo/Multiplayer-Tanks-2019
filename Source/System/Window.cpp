@@ -15,10 +15,10 @@ Window::~Window()
     m_window.close();
 }
 
-bool Window::initialize()
+bool Window::initialize(int width, int height, const char* title)
 {
     // Create SFML window.
-    m_window.create(sf::VideoMode(m_widht, m_height), m_name);
+    m_window.create(sf::VideoMode(width, height), title);
 
     if(!m_window.isOpen())
     {
@@ -26,6 +26,9 @@ bool Window::initialize()
         return false;
     }
 
+    m_title = title;
+
+    // Limit framerate which can reach really high values in e.g. menus.
     m_window.setFramerateLimit(300);
     
     // Disable key repeats.
@@ -93,4 +96,14 @@ int Window::getWidth() const
 int Window::getHeight() const
 {
     return m_window.getSize().y;
+}
+
+void Window::setTitle(const sf::String title)
+{
+    m_window.setTitle(title);
+}
+
+const sf::String& Window::getInitialTitle() const
+{
+    return m_title;
 }
