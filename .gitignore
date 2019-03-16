@@ -1,5 +1,6 @@
 # Ignore CMake build directories containing temporary files.
 Build/CMake-*/
 
-# Ignore ImGui config file.
+# Ignore certain files form Deploy folder.
 Deploy/ImGui.ini
+Deplot/snapshot.save
