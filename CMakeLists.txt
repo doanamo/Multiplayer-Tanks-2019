@@ -32,6 +32,14 @@ set(SOURCE_FILES
     "Source/System/AssetManager.h"
     "Source/System/AssetManager.cpp"
 
+    "Source/Network/Protocol.hpp"
+    "Source/Network/Protocol.cpp"
+    "Source/Network/Network.hpp"
+    "Source/Network/Server.hpp"
+    "Source/Network/Server.cpp"
+    "Source/Network/Client.hpp"
+    "Source/Network/Client.cpp"
+
     "Source/Game/GameInstance.hpp"
     "Source/Game/GameInstance.cpp"
     "Source/Game/PlayerController.hpp"
