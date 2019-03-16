@@ -21,8 +21,8 @@ public:
 
     // Object management methods.
     Handle addObject(Object* object);
-    Object* getObject(Handle handle);
     void destroyObject(Handle handle);
+    Object* getObject(Handle handle);
 
 private:
     // Processes pending objects.
@@ -39,14 +39,14 @@ private:
         ObjectEntry(int index = 0) :
             handle(index),
             object(nullptr),
-            exists(false),
+            created(false),
             destroy(false)
         {
         }
 
         Handle handle;
         Object* object;
-        bool exists;
+        bool created;
         bool destroy;
     };
 

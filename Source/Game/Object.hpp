@@ -30,7 +30,7 @@ public:
     void destroy();
 
     // Object callback virtual methods.
-    virtual void onExist();
+    virtual void onCreate();
     virtual void onUpdate(float timeDelta);
     virtual void onDraw(float updateAlpha);
     virtual void onDestroy();

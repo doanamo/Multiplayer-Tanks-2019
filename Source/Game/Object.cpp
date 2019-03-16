@@ -21,7 +21,7 @@ void Object::destroy()
     m_world->destroyObject(m_handle);
 }
 
-void Object::onExist()
+void Object::onCreate()
 {
 }
 

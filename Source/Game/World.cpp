@@ -8,10 +8,8 @@ World::World()
 World::~World()
 {
     // Delete all objects without calling on destroy methods.
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
+    for(ObjectEntry& objectEntry : m_objects)
     {
-        ObjectEntry& objectEntry = m_objects[i];
-
         if(objectEntry.object != nullptr)
         {
             delete objectEntry.object;
@@ -32,14 +30,14 @@ void World::update(float timeDelta)
     processPendingObjects();
 
     // Update all objects.
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
+    std::size_t index = 0;
+    while(index < m_objects.size())
     {
-        ObjectEntry& objectEntry = m_objects[i];
+        ObjectEntry& objectEntry = m_objects[index++];
 
-        if(objectEntry.exists)
-    
+        if(objectEntry.created)
         {
-            assert(objectEntry.object != nullptr && "Existing object entry does not have an object set!");
+            assert(objectEntry.object != nullptr && "Created object entry does not have an object set!");
 
             // Call on update method.
             objectEntry.object->onUpdate(timeDelta);
@@ -50,13 +48,14 @@ void World::update(float timeDelta)
 void World::draw(float updateAlpha)
 {
     // Draw all objects.
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
+    std::size_t index = 0;
+    while(index < m_objects.size())
     {
-        ObjectEntry& objectEntry = m_objects[i];
+        ObjectEntry& objectEntry = m_objects[index++];
 
-        if(objectEntry.exists)
+        if(objectEntry.created)
         {
-            assert(objectEntry.object != nullptr && "Existing object entry does not have an object set!");
+            assert(objectEntry.object != nullptr && "Created object entry does not have an object set!");
 
             // Call on update method.
             objectEntry.object->onDraw(updateAlpha);
@@ -72,10 +71,8 @@ Handle World::addObject(Object* object)
     // Find a free entry that we can use to store our new object.
     ObjectEntry* freeEntry = nullptr;
 
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
+    for(ObjectEntry& objectEntry : m_objects)
     {
-        ObjectEntry& objectEntry = m_objects[i];
-
         if(objectEntry.object == nullptr)
         {
             freeEntry = &objectEntry;
@@ -90,7 +87,7 @@ Handle World::addObject(Object* object)
         freeEntry = &m_objects.back();
     }
 
-    assert(!freeEntry->exists && "Free object entry should not be marked as existing yet!");
+    assert(!freeEntry->created && "Free object entry should not be marked as already created!");
     assert(!freeEntry->destroy && "Free object entry should not be marked as pending destruction!");
 
     // Increment handle version.
@@ -107,6 +104,21 @@ Handle World::addObject(Object* object)
 
     // Return object handle.
     return freeEntry->handle;
+}
+
+void World::destroyObject(Handle handle)
+{
+    // Make sure identifier is within objects array range and do nothing otherwise.
+    if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
+        return;
+
+    // Mark object entry for destruction.
+    ObjectEntry& objectEntry = m_objects[handle.identifier - 1];
+
+    if(handle.version == objectEntry.handle.version)
+    {
+        objectEntry.destroy = true;
+    }
 }
 
 Object* World::getObject(Handle handle)
@@ -128,57 +140,48 @@ Object* World::getObject(Handle handle)
     }
 }
 
-void World::destroyObject(Handle handle)
-{
-    // Make sure identifier is within objects array range and do nothing otherwise.
-    if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
-        return;
-
-    // Mark object entry for destruction.
-    ObjectEntry& objectEntry = m_objects[handle.identifier - 1];
-
-    if(handle.version == objectEntry.handle.version)
-    {
-        objectEntry.destroy = true;
-    }
-}
-
 void World::processPendingObjects()
 {
     // Destroy objects marked for destruction.
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
     {
-        ObjectEntry& objectEntry = m_objects[i];
-
-        if(objectEntry.destroy)
+        std::size_t index = 0;
+        while(index < m_objects.size())
         {
-            assert(objectEntry.object != nullptr && "Object entry marked for destruction does not have an object set!");
+            ObjectEntry& objectEntry = m_objects[index++];
 
-            // Call on destroy method.
-            objectEntry.object->onDestroy();
+            if(objectEntry.destroy)
+            {
+                assert(objectEntry.object != nullptr && "Object entry marked for destruction does not have an object set!");
 
-            // Delete object from memory.
-            delete objectEntry.object;
-            objectEntry.object = nullptr;
+                // Call on destroy method.
+                objectEntry.object->onDestroy();
 
-            // Reset object entry state.
-            objectEntry.exists = false;
-            objectEntry.destroy = false;
+                // Delete object from memory.
+                delete objectEntry.object;
+                objectEntry.object = nullptr;
+
+                // Reset object entry state.
+                objectEntry.created = false;
+                objectEntry.destroy = false;
+            }
         }
     }
-
-    // Bring created objects to existence.
-    for(std::size_t i = 0; i < m_objects.size(); ++i)
+    
+    // Mark objects added last frame as created.
     {
-        ObjectEntry& objectEntry = m_objects[i];
-
-        if(!objectEntry.exists && objectEntry.object != nullptr)
+        std::size_t index = 0;
+        while(index < m_objects.size())
         {
-            // Mark object as existing.
-            objectEntry.exists = true;
+            ObjectEntry& objectEntry = m_objects[index++];
 
-            // Call on exist method.
-            objectEntry.object->onExist();
+            if(!objectEntry.created && objectEntry.object != nullptr)
+            {
+                // Mark object as created.
+                objectEntry.created = true;
+
+                // Call on create method.
+                objectEntry.object->onCreate();
+            }
         }
     }
 }
@@ -200,9 +203,9 @@ bool World::onSerialize(MemoryBuffer& buffer)
     if(!serialize(buffer, objectCount))
         return false;
 
-    // Serialize existing objects.
+    // Serialize created objects.
     // All objects marked for destruction should be already flushed at this point.
-    // All created objects should be already marked as existing at this point.
+    // All created objects should be already marked as created at this point.
     for(ObjectEntry& objectEntry : m_objects)
     {
         if(!ShouldSerializeObject(objectEntry))
