@@ -3,4 +3,4 @@ Build/CMake-*/
 
 # Ignore certain files form Deploy folder.
 Deploy/ImGui.ini
-Deplot/snapshot.save
+Deploy/snapshot.save
