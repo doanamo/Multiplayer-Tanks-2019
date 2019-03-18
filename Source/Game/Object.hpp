@@ -32,7 +32,8 @@ public:
     // Object callback virtual methods.
     virtual void onCreate();
     virtual void onUpdate(float timeDelta);
-    virtual void onDraw(float updateAlpha);
+    virtual void onTick(float timeDelta);
+    virtual void onDraw(float timeAlpha);
     virtual void onDestroy();
 
     // Get world that owns this object.

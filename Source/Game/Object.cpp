@@ -27,11 +27,15 @@ void Object::onCreate()
 
 void Object::onUpdate(float timeDelta)
 {
-    // Update transform interpolation.
-    m_transform.updateInterpolation();
 }
 
-void Object::onDraw(float updateAlpha)
+void Object::onTick(float timeDelta)
+{
+    // Update transform interpolation.
+    m_transform.resetInterpolation();
+}
+
+void Object::onDraw(float timeAlpha)
 {
 }
 

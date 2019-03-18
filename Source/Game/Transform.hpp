@@ -8,7 +8,7 @@ public:
     Transform();
     ~Transform();
 
-    void updateInterpolation();
+    void resetInterpolation();
     void move(const sf::Vector2f& offset);
     void rotate(float rotation);
     void scale(float scaling);
@@ -18,10 +18,10 @@ public:
     void setRotation(float rotation, bool ignoreInterpolation = false);
     void setScale(float scale, bool ignoreInterpolation = false);
 
-    sf::Vector2f getPosition(float updateAlpha = 1.0f) const;
-    sf::Vector2f getDirection(float updateAlpha = 1.0f) const;
-    float getRotation(float updateAlpha = 1.0f) const;
-    float getScale(float updateAlpha = 1.0f) const;
+    sf::Vector2f getPosition(float timeAlpha = 1.0f) const;
+    sf::Vector2f getDirection(float timeAlpha = 1.0f) const;
+    float getRotation(float timeAlpha = 1.0f) const;
+    float getScale(float timeAlpha = 1.0f) const;
 
 protected:
     bool onSerialize(MemoryBuffer& buffer) override;

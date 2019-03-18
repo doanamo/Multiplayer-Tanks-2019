@@ -13,10 +13,11 @@ int main()
     if(!initializeGlobals())
         return -1;
 
-    // Prepare update clock.
-    const float updateRate = 1.0f / 20.0f;
-    float updateAccumulator = updateRate;
-    sf::Clock updateClock;
+    // Prepare timer.
+    sf::Clock timer;
+
+    const float tickRate = 1.0f / 20.0f;
+    float tickAccumulator = tickRate;
 
     // Run main loop.
     while(g_window->isOpen())
@@ -29,19 +30,24 @@ int main()
         }
 
         // Update application.
-        updateAccumulator += updateClock.restart().asSeconds();
+        float timeDelta = timer.restart().asSeconds();
 
-        while(updateAccumulator >= updateRate)
+        g_application->update(timeDelta);
+
+        // Tick application.
+        tickAccumulator += timeDelta;
+
+        while(tickAccumulator >= tickRate)
         {
-            g_application->update(updateRate);
-            updateAccumulator -= updateRate;
+            g_application->tick(tickRate);
+            tickAccumulator -= tickRate;
         }
 
         // Render application.
-        float updateAlpha = updateAccumulator / updateRate;
+        float timeAlpha = tickAccumulator / tickRate;
 
         g_window->beginRender();
-        g_application->draw(updateAlpha);
+        g_application->draw(timeAlpha);
         g_window->endRender();
     }
 

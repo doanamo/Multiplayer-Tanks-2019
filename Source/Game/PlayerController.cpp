@@ -61,7 +61,7 @@ void PlayerController::handleEvent(const sf::Event& event)
     }
 }
 
-void PlayerController::update(float elpasedTime)
+void PlayerController::tick(float timeDelta)
 {
     // Get player tank object.
     Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_object));

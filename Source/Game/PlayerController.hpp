@@ -14,7 +14,7 @@ public:
     bool initialize(World* world);
     void control(Handle handle);
     void handleEvent(const sf::Event& event);
-    void update(float elpasedTime);
+    void tick(float timeDelta);
 
 protected:
     // Serialization methods.

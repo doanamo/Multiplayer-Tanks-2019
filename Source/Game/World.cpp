@@ -26,9 +26,6 @@ bool World::initialize()
 
 void World::update(float timeDelta)
 {
-    // Process objects waiting for creation and destruction.
-    processPendingObjects();
-
     // Update all objects.
     std::size_t index = 0;
     while(index < m_objects.size())
@@ -45,7 +42,28 @@ void World::update(float timeDelta)
     }
 }
 
-void World::draw(float updateAlpha)
+void World::tick(float timeDelta)
+{
+    // Process objects waiting for creation and destruction.
+    processPendingObjects();
+
+    // Tick all objects.
+    std::size_t index = 0;
+    while(index < m_objects.size())
+    {
+        ObjectEntry& objectEntry = m_objects[index++];
+
+        if(objectEntry.created)
+        {
+            assert(objectEntry.object != nullptr && "Created object entry does not have an object set!");
+
+            // Call on tick method.
+            objectEntry.object->onTick(timeDelta);
+        }
+    }
+}
+
+void World::draw(float timeAlpha)
 {
     // Draw all objects.
     std::size_t index = 0;
@@ -58,7 +76,7 @@ void World::draw(float updateAlpha)
             assert(objectEntry.object != nullptr && "Created object entry does not have an object set!");
 
             // Call on update method.
-            objectEntry.object->onDraw(updateAlpha);
+            objectEntry.object->onDraw(timeAlpha);
         }
     }
 }

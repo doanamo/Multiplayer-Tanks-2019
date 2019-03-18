@@ -61,23 +61,29 @@ void GameInstance::handleEvent(const sf::Event& event)
 
 void GameInstance::update(float timeDelta)
 {
-    // Update game level.
-    m_level->update(timeDelta);
-
-    // Update player controller.
-    m_playerController->update(timeDelta);
-
     // Update world instance.
     m_world->update(timeDelta);
 }
 
-void GameInstance::draw(float updateAlpha)
+void GameInstance::tick(float timeDelta)
+{
+    // Tick game level.
+    m_level->tick(timeDelta);
+
+    // Tick player controller.
+    m_playerController->tick(timeDelta);
+
+    // Tick world instance.
+    m_world->tick(timeDelta);
+}
+
+void GameInstance::draw(float timeAlpha)
 {
     // Draw game level.
-    m_level->draw(updateAlpha);
+    m_level->draw(timeAlpha);
 
     // Draw world objects.
-    m_world->draw(updateAlpha);
+    m_world->draw(timeAlpha);
 }
 
 World* GameInstance::getWorld()

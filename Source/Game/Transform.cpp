@@ -17,7 +17,7 @@ Transform::~Transform()
 {
 }
 
-void Transform::updateInterpolation()
+void Transform::resetInterpolation()
 {
     // Clamp rotation angle to positive 360 degrees.
     m_currentRotation = std::fmod(m_currentRotation, 360.0f);
@@ -83,14 +83,14 @@ void Transform::setScale(float scale, bool ignoreInterpolation)
     }
 }
 
-sf::Vector2f Transform::getPosition(float updateAlpha) const
+sf::Vector2f Transform::getPosition(float timeAlpha) const
 {
-    return lerp(m_previousPosition, m_currentPosition, updateAlpha);
+    return lerp(m_previousPosition, m_currentPosition, timeAlpha);
 }
 
-sf::Vector2f Transform::getDirection(float updateAlpha) const
+sf::Vector2f Transform::getDirection(float timeAlpha) const
 {
-    float rotation = toRadians(getRotation(updateAlpha));
+    float rotation = toRadians(getRotation(timeAlpha));
 
     sf::Vector2f output;
     output.x = ForwardVector.x * std::cos(rotation) - ForwardVector.y * std::sin(rotation);
@@ -98,9 +98,9 @@ sf::Vector2f Transform::getDirection(float updateAlpha) const
     return output;
 }
 
-float Transform::getRotation(float updateAlpha) const
+float Transform::getRotation(float timeAlpha) const
 {
-    float angle = std::fmod(lerp(m_previousRotation, m_currentRotation, updateAlpha), 360.0f);
+    float angle = std::fmod(lerp(m_previousRotation, m_currentRotation, timeAlpha), 360.0f);
 
     if(angle < 0.0f)
     {
@@ -110,9 +110,9 @@ float Transform::getRotation(float updateAlpha) const
     return angle;
 }
 
-float Transform::getScale(float updateAlpha) const
+float Transform::getScale(float timeAlpha) const
 {
-    return lerp(m_previousScale, m_currentScale, updateAlpha);
+    return lerp(m_previousScale, m_currentScale, timeAlpha);
 }
 
 bool Transform::onSerialize(MemoryBuffer& buffer)

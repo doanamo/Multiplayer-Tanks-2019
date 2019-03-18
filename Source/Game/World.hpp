@@ -13,11 +13,14 @@ public:
     // Initializes the world.
     bool initialize();
 
-    // Updates all objects in the world.
+    // Update all objects in the world.
     void update(float timeDelta);
 
+    // Ticks all objects in the world.
+    void tick(float timeDelta);
+
     // Draws all objects in the world.
-    void draw(float updateAlpha);
+    void draw(float timeAlpha);
 
     // Object management methods.
     Handle addObject(Object* object);

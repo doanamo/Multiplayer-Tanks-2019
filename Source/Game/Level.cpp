@@ -35,11 +35,11 @@ bool Level::initialize()
     return true;
 }
 
-void Level::update(float timeDelta)
+void Level::tick(float timeDelta)
 {
 }
 
-void Level::draw(float updateAlpha)
+void Level::draw(float timeAlpha)
 {
     // Draw map WIP.
     for (int x = 0; x < mapWidth; x++)

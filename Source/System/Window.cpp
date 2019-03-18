@@ -72,8 +72,8 @@ bool Window::pollEvent(sf::Event& event)
 
 void Window::beginRender()
 {
-    sf::Time elapsedTime = m_clock.restart();
-    ImGui::SFML::Update(m_window, elapsedTime);
+    sf::Time timeDelta = m_clock.restart();
+    ImGui::SFML::Update(m_window, timeDelta);
     m_window.clear();
 }
 

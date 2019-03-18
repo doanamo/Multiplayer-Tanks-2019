@@ -14,8 +14,8 @@ public:
     void shootProjectile();
     void setMovementInput(sf::Vector2f movement);
 
-    void onUpdate(float timeDelta) override;
-    void onDraw(float updateAlpha) override;
+    void onTick(float timeDelta) override;
+    void onDraw(float timeAlpha) override;
 
 protected:
     // Serialization methods.

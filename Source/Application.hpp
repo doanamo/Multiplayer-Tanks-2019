@@ -14,7 +14,8 @@ public:
     bool initialize();
     void handleEvent(const sf::Event& event);
     void update(float timeDelta);
-    void draw(float updateAlpha);
+    void tick(float timeDelta);
+    void draw(float timeAlpha);
 
     bool saveSnapshot();
     bool loadSnaphot();

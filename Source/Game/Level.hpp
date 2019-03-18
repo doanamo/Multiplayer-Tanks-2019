@@ -9,8 +9,8 @@ public:
     ~Level();
 
     bool initialize();
-    void update(float timeDelta);
-    void draw(float updateAlpha);
+    void tick(float timeDelta);
+    void draw(float timeAlpha);
 
 protected:
     // Serialization methods.

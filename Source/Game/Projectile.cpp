@@ -23,9 +23,9 @@ void Projectile::setDirection(const sf::Vector2f& direction)
     m_transform.setDirection(direction, true);
 }
 
-void Projectile::onUpdate(float timeDelta)
+void Projectile::onTick(float timeDelta)
 {
-    Object::onUpdate(timeDelta);
+    Object::onTick(timeDelta);
 
     // Move projectile forward.
     m_transform.move(m_transform.getDirection() * 6.0f * timeDelta);
@@ -39,15 +39,15 @@ void Projectile::onUpdate(float timeDelta)
     }
 }
 
-void Projectile::onDraw(float updateAlpha)
+void Projectile::onDraw(float timeAlpha)
 {
-    Object::onDraw(updateAlpha);
+    Object::onDraw(timeAlpha);
 
     // Draw projectile.
     sf::RectangleShape projectileSprite;
     projectileSprite.setSize(sf::Vector2f(0.3f, 0.3f));
     projectileSprite.setOrigin(projectileSprite.getSize() / 2.0f);
-    projectileSprite.setPosition(m_transform.getPosition(updateAlpha));
+    projectileSprite.setPosition(m_transform.getPosition(timeAlpha));
     projectileSprite.setRotation(m_transform.getRotation());
     projectileSprite.setTexture(m_texture.get());
 

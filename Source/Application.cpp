@@ -107,7 +107,13 @@ void Application::update(float timeDelta)
     m_gameInstance->update(timeDelta);
 }
 
-void Application::draw(float updateAlpha)
+void Application::tick(float timeDelta)
+{
+    // Tick game instance.
+    m_gameInstance->tick(timeDelta);
+}
+
+void Application::draw(float timeAlpha)
 {
     // Calculate render target view size and aspect ratio.
     float horizontalAspectRatio = (float)g_window->getWidth() / (float)g_window->getHeight();
@@ -133,7 +139,7 @@ void Application::draw(float updateAlpha)
     g_window->render.setView(viewport);
 
     // Draw game instance.
-    m_gameInstance->draw(updateAlpha);
+    m_gameInstance->draw(timeAlpha);
 
     // Draw demo ImGui window.
     //ImGui::ShowDemoWindow();

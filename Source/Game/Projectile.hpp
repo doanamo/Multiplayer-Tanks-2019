@@ -13,8 +13,8 @@ public:
     void setPosition(const sf::Vector2f& position);
     void setDirection(const sf::Vector2f& direction);
 
-    void onUpdate(float timeDelta) override;
-    void onDraw(float updateAlpha) override;
+    void onTick(float timeDelta) override;
+    void onDraw(float timeAlpha) override;
 
 protected:
     // Serialization methods.

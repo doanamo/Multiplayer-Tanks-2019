@@ -29,9 +29,9 @@ void Tank::setMovementInput(sf::Vector2f movement)
     m_movementInput = movement;
 }
 
-void Tank::onUpdate(float timeDelta)
+void Tank::onTick(float timeDelta)
 {
-    Object::onUpdate(timeDelta);
+    Object::onTick(timeDelta);
 
     // Move player in direction.
     if(m_movementInput != sf::Vector2f(0.0f, 0.0f))
@@ -45,15 +45,15 @@ void Tank::onUpdate(float timeDelta)
     }
 }
 
-void Tank::onDraw(float updateAlpha)
+void Tank::onDraw(float timeAlpha)
 {
-    Object::onDraw(updateAlpha);
+    Object::onDraw(timeAlpha);
 
     // Draw tank.
     sf::RectangleShape tankSprite;
     tankSprite.setSize(sf::Vector2f(1.0f, 1.0f));
     tankSprite.setOrigin(tankSprite.getSize() / 2.0f);
-    tankSprite.setPosition(m_transform.getPosition(updateAlpha));
+    tankSprite.setPosition(m_transform.getPosition(timeAlpha));
     tankSprite.setTexture(m_texture.get());
 
     if(m_transform.getRotation() == 0.0f)
