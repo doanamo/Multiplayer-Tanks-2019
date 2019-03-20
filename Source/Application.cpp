@@ -12,7 +12,8 @@
 
 Application::Application() :
     m_network(nullptr),
-    m_gameInstance(nullptr)
+    m_gameInstance(nullptr),
+    isViewportCentered(false)
 {
 }
 
@@ -133,8 +134,13 @@ void Application::draw(float timeAlpha)
     viewportSize.x = 10.0f * horizontalAspectRatio;
     viewportSize.y = 10.0f * verticalAspectRatio;
 
-    sf::View viewport;
-    viewport.setCenter(0.0f, 0.0f);
+    if (!isViewportCentered)
+    {
+        viewport.setCenter(0.0f, 0.0f);
+        isViewportCentered = true;
+        std::cout << "Application::draw - viewport centered.";
+    }
+
     viewport.setSize(viewportSize);
     g_window->render.setView(viewport);
 

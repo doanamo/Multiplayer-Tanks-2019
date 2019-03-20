@@ -26,4 +26,8 @@ public:
 
     // Game instance.
     GameInstance* m_gameInstance;
+
+private:
+    sf::View viewport;
+    bool isViewportCentered;
 };
