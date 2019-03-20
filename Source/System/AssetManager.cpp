@@ -64,7 +64,7 @@ std::shared_ptr<sf::Texture> AssetManager::loadTexture(std::string assetPath)
 
     if(!texture->loadFromFile(assetPath))
     {
-        LOG_ERROR("Failed to load texture: %s", assetPath.c_str());
+        LOG_WARNING("Failed to load texture: %s", assetPath.c_str());
         texture = m_defaultTexture;
     }
     else
@@ -89,7 +89,7 @@ std::shared_ptr<sf::Font> AssetManager::loadFont(std::string assetPath)
 
     if(!font->loadFromFile(assetPath))
     {
-        LOG_ERROR("Failed to load font: %s", assetPath.c_str());
+        LOG_WARNING("Failed to load font: %s", assetPath.c_str());
         font = m_defaultFont;
     }
     else
