@@ -96,10 +96,10 @@ void Logger::write(LogType type, const char* format, ...)
     stream << formatString(format, arguments);
     va_end(arguments);
 
-    // TEMP: Print to console.
+    // Print to console.
     std::cout << stream.str() << std::endl;
     
-    // Print to log file.
+    // Print to file.
     m_logFile << stream.str() << std::endl;
 
     // Print to debugger.
