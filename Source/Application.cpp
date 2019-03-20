@@ -144,6 +144,12 @@ void Application::draw(float timeAlpha)
     viewport.setSize(viewportSize);
     g_window->render.setView(viewport);
 
+    // Manual camera navigation.
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
+
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
 

@@ -19,8 +19,8 @@ protected:
 
 private:
     // Constants.
-    static const int mapWidth = 2;
-    static const int mapHeight = 2;
+    static const int mapWidth = 10;
+    static const int mapHeight = 10;
 
 private:
     // Map elements.
