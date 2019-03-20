@@ -11,6 +11,8 @@ set(SOURCE_FILES
     "Source/Common/Debug.hpp"
     "Source/Common/Debug.cpp"
     "Source/Common/Math.hpp"
+    "Source/Common/Utility.hpp"
+    "Source/Common/Utility.cpp"
 
     "Source/Types/RuntimeTypes.hpp"
     "Source/Types/RuntimeTypes.cpp"

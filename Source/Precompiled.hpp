@@ -26,5 +26,6 @@
 // Project
 #include "Common/Debug.hpp"
 #include "Common/Math.hpp"
+#include "Common/Utility.hpp"
 #include "Types/TypeInfo.hpp"
 #include "Serialization/Serialization.hpp"
