@@ -50,13 +50,13 @@ private:
 
     #define LOG(type, format, ...) \
         assert(g_logger != nullptr && "Logger has not been initialized!"); \
-        g_logger->write(type, format, __VA_ARGS__);
+        g_logger->write(type, format, ## __VA_ARGS__);
 
-    #define LOG_TRACE(format, ...) LOG(LogType::Trace, format, __VA_ARGS__);
-    #define LOG_INFO(format, ...) LOG(LogType::Info, format, __VA_ARGS__);
-    #define LOG_WARNING(format, ...) LOG(LogType::Warning, format, __VA_ARGS__);
-    #define LOG_ERROR(format, ...) LOG(LogType::Error, format, __VA_ARGS__);
-    #define LOG_FATAL(format, ...) LOG(LogType::Fatal, format, __VA_ARGS__);
+    #define LOG_TRACE(format, ...) LOG(LogType::Trace, format, ## __VA_ARGS__);
+    #define LOG_INFO(format, ...) LOG(LogType::Info, format, ## __VA_ARGS__);
+    #define LOG_WARNING(format, ...) LOG(LogType::Warning, format, ## __VA_ARGS__);
+    #define LOG_ERROR(format, ...) LOG(LogType::Error, format, ## __VA_ARGS__);
+    #define LOG_FATAL(format, ...) LOG(LogType::Fatal, format, ## __VA_ARGS__);
 #else
     #define LOG_INDENT(indent)
 
