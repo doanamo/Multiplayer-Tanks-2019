@@ -22,7 +22,7 @@ bool Window::initialize(int width, int height, const char* title)
 
     if(!m_window.isOpen())
     {
-        std::cout << "Could not create SFML window!" << std::endl;
+        LOG_FATAL("Could not create SFML window!");
         return false;
     }
 
@@ -37,7 +37,7 @@ bool Window::initialize(int width, int height, const char* title)
     // Initialize ImGui.
     if(!ImGui::SFML::Init(m_window))
     {
-        std::cout << "ImGui initialization error!" << std::endl;
+        LOG_FATAL("ImGui initialization error!");
         return false;
     }
 

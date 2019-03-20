@@ -3,11 +3,13 @@
 // Standard
 #include <cmath>
 #include <cstdint>
+#include <iomanip>
 #include <iostream>
 #include <fstream>
 #include <sstream>
 #include <memory>
 #include <vector>
+#include <queue>
 #include <map>
 
 // SFML
@@ -29,3 +31,5 @@
 #include "Common/Utility.hpp"
 #include "Types/TypeInfo.hpp"
 #include "Serialization/Serialization.hpp"
+#include "System/Logger.hpp"
+#include "System/Globals.hpp"

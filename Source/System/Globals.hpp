@@ -1,7 +1,6 @@
 #pragma once
 
-#include "Precompiled.hpp"
-
+extern class Logger* g_logger;
 extern class RuntimeTypes* g_runtimeTypes;
 extern class Window* g_window;
 extern sf::RenderTarget* g_render;

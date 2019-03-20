@@ -5,6 +5,7 @@
 #include "System/AssetManager.h"
 #include "Application.hpp"
 
+Logger* g_logger = nullptr;
 RuntimeTypes* g_runtimeTypes = nullptr;
 Window* g_window = nullptr;
 sf::RenderTarget* g_render = nullptr;
@@ -13,6 +14,15 @@ Application* g_application = nullptr;
 
 bool initializeGlobals()
 {
+    // Initialize logger.
+    g_logger = new Logger;
+
+    if(!g_logger->initialize())
+    {
+        shutdownGlobals();
+        return false;
+    }
+
     // Initialize runtime types.
     g_runtimeTypes = new RuntimeTypes;
 
@@ -81,5 +91,11 @@ void shutdownGlobals()
     {
         delete g_runtimeTypes;
         g_runtimeTypes = nullptr;
+    }
+
+    if(g_logger)
+    {
+        delete g_logger;
+        g_logger = nullptr;
     }
 }

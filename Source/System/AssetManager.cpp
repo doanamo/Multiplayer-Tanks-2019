@@ -8,9 +8,8 @@ AssetManager::AssetManager()
 
 AssetManager::~AssetManager()
 {
-    // Clear resource maps.
-    m_textures.clear();
-    m_fonts.clear();
+    // Release unused textures.
+    this->releaseUnused();
 }
 
 bool AssetManager::initialize()
@@ -29,7 +28,7 @@ void AssetManager::releaseUnused()
     {
         if(it->second.use_count() <= 1)
         {
-            std::cout << "Released texture: " << it->first << std::endl;
+            LOG_INFO("Released texture: %s", it->first.c_str());
             m_textures.erase(it++);
         }
         else
@@ -43,7 +42,7 @@ void AssetManager::releaseUnused()
     {
         if(it->second.use_count() <= 1)
         {
-            std::cout << "Released font: " << it->first << std::endl;
+            LOG_INFO("Released font: %s", it->first.c_str());
             m_fonts.erase(it++);
         }
         else
@@ -65,12 +64,12 @@ std::shared_ptr<sf::Texture> AssetManager::loadTexture(std::string assetPath)
 
     if(!texture->loadFromFile(assetPath))
     {
-        std::cout << "Failed to load texture: " << assetPath << std::endl;
+        LOG_ERROR("Failed to load texture: %s", assetPath.c_str());
         texture = m_defaultTexture;
     }
     else
     {
-        std::cout << "Loaded texture: " << assetPath << std::endl;
+        LOG_INFO("Loaded texture: %s", assetPath.c_str());
     }
  
     // Add texture to map and return it.
@@ -90,12 +89,12 @@ std::shared_ptr<sf::Font> AssetManager::loadFont(std::string assetPath)
 
     if(!font->loadFromFile(assetPath))
     {
-        std::cout << "Failed to load font: " << assetPath << std::endl;
+        LOG_ERROR("Failed to load font: %s", assetPath.c_str());
         font = m_defaultFont;
     }
     else
     {
-        std::cout << "Loaded font: " << assetPath << std::endl;
+        LOG_INFO("Loaded font: %s", assetPath.c_str());
     }
 
     // Add font to map and return it.

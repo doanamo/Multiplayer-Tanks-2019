@@ -19,7 +19,7 @@ bool RuntimeTypes::initialize()
         return false;
 
     // List all registered types.
-    std::cout << "Listing registered runtime types:" << std::endl;
+    LOG_INFO("Listing registered runtime types:");
     recursivePrint(m_typeList, 1, true);
 
     return true;
@@ -53,14 +53,9 @@ void RuntimeTypes::recursivePrint(const TypeInfo::TypeList& typeList, int depth,
     {
         if(typeInfo->getBase() == nullptr || !baseOnly)
         {
-            // Print indent.
-            for(int i = 0; i < depth; ++i)
-            {
-                std::cout << "  ";
-            }
-
             // Print type info.
-            std::cout << typeInfo->getIdentifier() << " : " << typeInfo->getName() << std::endl;
+            LOG_INDENT(depth);
+            LOG_INFO("%i : %s", typeInfo->getIdentifier(), typeInfo->getName());
 
             // Iterate over children.
             recursivePrint(typeInfo->getDerived(), depth + 1, false);

@@ -138,7 +138,7 @@ void Application::draw(float timeAlpha)
     {
         viewport.setCenter(0.0f, 0.0f);
         isViewportCentered = true;
-        std::cout << "Application::draw - viewport centered.";
+        LOG_TRACE("Application::draw - viewport centered.");
     }
 
     viewport.setSize(viewportSize);
@@ -168,11 +168,11 @@ bool Application::saveSnapshot()
         return false;
 
     // Write buffer to disc.
-    std::ofstream file("snapshot.save", std::ios::binary | std::ios::trunc);
+    std::ofstream file("Snapshot.save", std::ios::binary | std::ios::trunc);
     
     if(!file.is_open())
     {
-        std::cout << "Could not open snapshot file for writing!" << std::endl;
+        LOG_ERROR("Could not open snapshot file for writing!");
         return false;
     }
 
@@ -180,7 +180,7 @@ bool Application::saveSnapshot()
     file.close();
 
     // Success!
-    std::cout << "Snapshot file has been saved!" << std::endl;
+    LOG_INFO("Snapshot file has been saved!");
 
     return true;
 }
@@ -188,11 +188,11 @@ bool Application::saveSnapshot()
 bool Application::loadSnaphot()
 {
     // Open and read file into memory buffer.
-    std::ifstream file("snapshot.save", std::ios::binary | std::ios::ate);
+    std::ifstream file("Snapshot.save", std::ios::binary | std::ios::ate);
 
     if(!file.is_open())
     {
-        std::cout << "Could not open snapshot file for reading!" << std::endl;
+        LOG_ERROR("Could not open snapshot file for reading!");
         return false;
     }
 
@@ -205,7 +205,7 @@ bool Application::loadSnaphot()
 
     if(!file.read(memoryBuffer.getData(), size))
     {
-        std::cout << "Could not read snapshot file!" << std::endl;
+        LOG_ERROR("Could not read snapshot file!");
         return false;
     }
 
@@ -228,7 +228,7 @@ bool Application::loadSnaphot()
         return false;
 
     // Success!
-    std::cout << "Snapshot file has been loaded!" << std::endl;
+    LOG_INFO("Snapshot file has been loaded!");
 
     return true;
 }
