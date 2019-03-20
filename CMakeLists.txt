@@ -92,6 +92,11 @@ set_target_properties("Game" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_C
 
 # Use precompiled header for quicker compilation of static headers.
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    # Disable non standard warnings.
+    target_compile_definitions("Game" PUBLIC "_CRT_SECURE_NO_WARNINGS")
+    target_compile_definitions("Game" PUBLIC "_SCL_SECURE_NO_WARNINGS")
+
+    # Use precompiled headers.
     set_source_files_properties(${SOURCE_FILES} PROPERTIES
         COMPILE_FLAGS "/Yu\"Precompiled.hpp\" /Fp\"${CMAKE_CURRENT_BINARY_DIR}/Source/Precompiled-$(Configuration).pch\""
     )
