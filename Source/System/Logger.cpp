@@ -105,6 +105,7 @@ void Logger::write(LogType type, const char* format, ...)
     // Print to debugger.
 #ifdef WIN32
     OutputDebugString(stream.str().c_str());
+    OutputDebugString("\n");
 #endif
 
     // Add new message.
