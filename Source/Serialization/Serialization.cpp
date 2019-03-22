@@ -8,7 +8,7 @@ bool serialize(MemoryBuffer& buffer, Serializable& serializable)
 
 bool deserialize(MemoryBuffer& buffer, Serializable* serializable)
 {
-    assert(serializable != nullptr);
+    ASSERT(serializable != nullptr);
     return serializable->onDeserialize(buffer);
 }
 
@@ -20,7 +20,7 @@ bool serialize(MemoryBuffer& buffer, uint8_t value)
 
 bool deserialize(MemoryBuffer& buffer, uint8_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readByte(value);
 }
 
@@ -32,7 +32,7 @@ bool serialize(MemoryBuffer& buffer, uint16_t value)
 
 bool deserialize(MemoryBuffer& buffer, uint16_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readShort(value);
 }
 
@@ -44,7 +44,7 @@ bool serialize(MemoryBuffer& buffer, uint32_t value)
 
 bool deserialize(MemoryBuffer& buffer, uint32_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readInteger(value);
 }
 
@@ -56,7 +56,7 @@ bool serialize(MemoryBuffer& buffer, uint64_t value)
 
 bool deserialize(MemoryBuffer& buffer, uint64_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readWord(value);
 }
 
@@ -68,7 +68,7 @@ bool serialize(MemoryBuffer& buffer, int8_t value)
 
 bool deserialize(MemoryBuffer& buffer, int8_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readByte((uint8_t*)value);
 }
 
@@ -80,7 +80,7 @@ bool serialize(MemoryBuffer& buffer, int16_t value)
 
 bool deserialize(MemoryBuffer& buffer, int16_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readShort((uint16_t*)value);
 }
 
@@ -92,7 +92,7 @@ bool serialize(MemoryBuffer& buffer, int32_t value)
 
 bool deserialize(MemoryBuffer& buffer, int32_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readInteger((uint32_t*)value);
 }
 
@@ -104,7 +104,7 @@ bool serialize(MemoryBuffer& buffer, int64_t value)
 
 bool deserialize(MemoryBuffer& buffer, int64_t* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readWord((uint64_t*)value);
 }
 
@@ -116,7 +116,7 @@ bool serialize(MemoryBuffer& buffer, float value)
 
 bool deserialize(MemoryBuffer& buffer, float* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readInteger((uint32_t*)value);
 }
 
@@ -128,7 +128,7 @@ bool serialize(MemoryBuffer& buffer, double value)
 
 bool deserialize(MemoryBuffer& buffer, double* value)
 {
-    assert(value != nullptr);
+    ASSERT(value != nullptr);
     return buffer.readWord((uint64_t*)value);
 }
 

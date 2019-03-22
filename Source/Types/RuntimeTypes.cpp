@@ -28,7 +28,7 @@ bool RuntimeTypes::initialize()
 void RuntimeTypes::registerType(TypeInfo& typeInfo)
 {
     // Make sure that type info is not being registered twice.
-    assert(typeInfo.m_typeIdentifier == 0 && "Type info is already registered!");
+    ASSERT(typeInfo.m_typeIdentifier == 0, "Type info is already registered!");
 
     // Assign a new unique type info identifier.
     typeInfo.m_typeIdentifier = ++m_typeCounter;
@@ -40,7 +40,7 @@ void RuntimeTypes::registerType(TypeInfo& typeInfo)
 TypeInfo* RuntimeTypes::getTypeInfo(TypeInfo::IdentifierType type)
 {
     // Make sure that type identifier is in valid range.
-    assert(type > 0 && type <= m_typeCounter && "Invalid type identifier index!");
+    ASSERT(type > 0 && type <= m_typeCounter, "Invalid type identifier index!");
 
     // Return requested type identifier.
     return m_typeList[type - 1];

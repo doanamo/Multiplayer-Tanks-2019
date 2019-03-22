@@ -30,7 +30,7 @@ void Logger::setNextIndent(int indent)
 
 void Logger::write(LogType type, const char* format, ...)
 {
-    assert(format != nullptr);
+    ASSERT(format != nullptr);
 
     // Truncate message history.
     if(m_messages.size() == MaxMessageCount)
@@ -79,7 +79,7 @@ void Logger::write(LogType type, const char* format, ...)
         break;
 
     default:
-        assert(false && "Unknown log type!");
+        ASSERT(false, "Unknown log type!");
     }
 
     // Print current indent.

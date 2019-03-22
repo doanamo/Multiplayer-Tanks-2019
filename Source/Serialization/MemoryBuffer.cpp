@@ -84,7 +84,7 @@ bool MemoryBuffer::readWord(uint64_t* value)
 
 void MemoryBuffer::resize(std::size_t size)
 {
-    assert(m_index == 0 && "Resizing buffer that is being written or read from!");
+    ASSERT(m_index == 0, "Resizing buffer that is being written or read from!");
     m_buffer.resize(size);
 }
 

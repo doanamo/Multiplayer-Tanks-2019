@@ -34,7 +34,7 @@ void World::update(float timeDelta)
 
         if(objectEntry.created)
         {
-            assert(objectEntry.object != nullptr && "Created object entry does not have an object set!");
+            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
 
             // Call on update method.
             objectEntry.object->onUpdate(timeDelta);
@@ -55,7 +55,7 @@ void World::tick(float timeDelta)
 
         if(objectEntry.created)
         {
-            assert(objectEntry.object != nullptr && "Created object entry does not have an object set!");
+            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
 
             // Call on tick method.
             objectEntry.object->onTick(timeDelta);
@@ -73,7 +73,7 @@ void World::draw(float timeAlpha)
 
         if(objectEntry.created)
         {
-            assert(objectEntry.object != nullptr && "Created object entry does not have an object set!");
+            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
 
             // Call on update method.
             objectEntry.object->onDraw(timeAlpha);
@@ -84,7 +84,7 @@ void World::draw(float timeAlpha)
 Handle World::addObject(Object* object)
 {
     // Makes no sense to call this function with null.
-    assert(object != nullptr && "Cannot add nullptr object!");
+    ASSERT(object != nullptr, "Cannot add nullptr object!");
 
     // Find a free entry that we can use to store our new object.
     ObjectEntry* freeEntry = nullptr;
@@ -105,8 +105,8 @@ Handle World::addObject(Object* object)
         freeEntry = &m_objects.back();
     }
 
-    assert(!freeEntry->created && "Free object entry should not be marked as already created!");
-    assert(!freeEntry->destroy && "Free object entry should not be marked as pending destruction!");
+    ASSERT(!freeEntry->created, "Free object entry should not be marked as already created!");
+    ASSERT(!freeEntry->destroy, "Free object entry should not be marked as pending destruction!");
 
     // Increment handle version.
     freeEntry->handle.version++;
@@ -115,7 +115,7 @@ Handle World::addObject(Object* object)
     freeEntry->object = object;
 
     // Assign handle and world to new object.
-    assert(object->m_world == nullptr && "Object is already assigned to a world!");
+    ASSERT(object->m_world == nullptr, "Object is already assigned to a world!");
 
     object->m_handle = freeEntry->handle;
     object->m_world = this;
@@ -169,7 +169,7 @@ void World::processPendingObjects()
 
             if(objectEntry.destroy)
             {
-                assert(objectEntry.object != nullptr && "Object entry marked for destruction does not have an object set!");
+                ASSERT(objectEntry.object != nullptr, "Object entry marked for destruction does not have an object set!");
 
                 // Call on destroy method.
                 objectEntry.object->onDestroy();
@@ -252,7 +252,7 @@ bool World::onDeserialize(MemoryBuffer& buffer)
             return false;
 
         Object* object = Object::create(objectType);
-        assert(object != nullptr && "Runtime type allocation returned null!");
+        ASSERT(object != nullptr, "Runtime type allocation returned null!");
 
         if(!deserialize(buffer, object))
             return false;

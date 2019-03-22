@@ -15,7 +15,7 @@ PlayerController::~PlayerController()
 
 bool PlayerController::initialize(World* world)
 {
-    assert(world != nullptr && "Cannot initialize player controller without correct world!");
+    ASSERT(world != nullptr, "Cannot initialize player controller without correct world!");
 
     m_world = world;
 

@@ -9,55 +9,55 @@ TypeInfo::TypeInfo(const char* typeName, AllocateFunction allocateFunction, Type
     m_allocateFunction(allocateFunction),
     m_baseType(baseType)
 {
-    assert(allocateFunction != nullptr && "Allocation function cannot be nullptr!");
+    ASSERT(allocateFunction != nullptr, "Allocation function cannot be nullptr!");
 
     if(m_baseType != nullptr)
     {
-        assert(m_baseType->getIdentifier() != 0 && "Base type has not been registered yet!");
+        ASSERT(m_baseType->getIdentifier() != 0, "Base type has not been registered yet!");
         m_baseType->m_derivedTypes.emplace_back(this);
     }
 }
 
 int TypeInfo::getIdentifier() const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
     return m_typeIdentifier;
 }
 
 const char* TypeInfo::getName() const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
     return m_typeName;
 }
 
 TypeInfo::AllocateFunction TypeInfo::getAllocateFunction() const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
     return m_allocateFunction;
 }
 
 const TypeInfo* TypeInfo::getBase() const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
     return m_baseType;
 }
 
 const std::vector<TypeInfo*>& TypeInfo::getDerived() const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
     return m_derivedTypes;
 }
 
 bool TypeInfo::isSame(IdentifierType typeIdentifier) const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
     return m_typeIdentifier == typeIdentifier;
 }
 
 bool TypeInfo::isBase(IdentifierType typeIdentifier) const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
-    assert(typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
+    ASSERT(typeIdentifier != 0, "Type has not been registered yet!");
 
     const TypeInfo* baseType = this->getBase();
 
@@ -78,14 +78,14 @@ bool TypeInfo::isBase(IdentifierType typeIdentifier) const
 
 bool TypeInfo::isDerived(IdentifierType typeIdentifier) const
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
-    assert(typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been registered yet!");
+    ASSERT(typeIdentifier != 0, "Type has not been registered yet!");
 
     const std::vector<TypeInfo*>& derivedTypes = this->getDerived();
 
     for(auto& derivedType : derivedTypes)
     {
-        assert(derivedType != nullptr && "Derived type list contains a nullptr!");
+        ASSERT(derivedType != nullptr, "Derived type list contains a nullptr!");
 
         if(derivedType->getIdentifier() == typeIdentifier)
         {
@@ -103,8 +103,8 @@ bool TypeInfo::isDerived(IdentifierType typeIdentifier) const
 
 TypeInfo* TypeInfo::getTypeInfo(IdentifierType typeIdentifier)
 {
-    assert(m_typeIdentifier != 0 && "Type has not been registered yet!");
-    assert(typeIdentifier != 0 && "Type has not been registered yet!");
+    ASSERT(m_typeIdentifier != 0, "Type has not been rSegistered yet!");
+    ASSERT(typeIdentifier != 0, "Type has not been registered yet!");
 
     return g_runtimeTypes->getTypeInfo(typeIdentifier);
 }
