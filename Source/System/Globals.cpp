@@ -1,7 +1,8 @@
 #include "Precompiled.hpp"
 #include "System/Globals.hpp"
 #include "Types/RuntimeTypes.hpp"
-#include "System/Window.h"
+#include "System/Window.hpp"
+#include "System/Console.hpp"
 #include "System/AssetManager.h"
 #include "Application.hpp"
 
@@ -9,6 +10,7 @@ Logger* g_logger = nullptr;
 RuntimeTypes* g_runtimeTypes = nullptr;
 Window* g_window = nullptr;
 sf::RenderTarget* g_render = nullptr;
+Console* g_console = nullptr;
 AssetManager* g_assetManager = nullptr;
 Application* g_application = nullptr;
 
@@ -44,6 +46,15 @@ bool initializeGlobals()
     // Create render target pointer without exposing window.
     g_render = &g_window->render;
 
+    // Initialize console window.
+    g_console = new Console;
+
+    if(!g_console->initialize())
+    {
+        shutdownGlobals();
+        return false;
+    }
+
     // Initialize asset manager.
     g_assetManager = new AssetManager;
 
@@ -78,6 +89,12 @@ void shutdownGlobals()
     {
         delete g_assetManager;
         g_assetManager = nullptr;
+    }
+
+    if(g_console)
+    {
+        delete g_console;
+        g_console = nullptr;
     }
 
     if(g_window)

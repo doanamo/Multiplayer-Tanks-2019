@@ -31,10 +31,12 @@ set(SOURCE_FILES
     "Source/System/Globals.cpp"
     "Source/System/Logger.hpp"
     "Source/System/Logger.cpp"
-    "Source/System/Window.h"
+    "Source/System/Window.hpp"
     "Source/System/Window.cpp"
     "Source/System/AssetManager.h"
     "Source/System/AssetManager.cpp"
+    "Source/System/Console.hpp"
+    "Source/System/Console.cpp"
 
     "Source/Network/Protocol.hpp"
     "Source/Network/Protocol.cpp"
@@ -96,6 +98,9 @@ set_target_properties("Game" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_C
 
 # Use precompiled header for quicker compilation of static headers.
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
+    # Hide console window.
+    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+    
     # Disable non standard warnings.
     target_compile_definitions("Game" PUBLIC "_CRT_SECURE_NO_WARNINGS")
     target_compile_definitions("Game" PUBLIC "_SCL_SECURE_NO_WARNINGS")

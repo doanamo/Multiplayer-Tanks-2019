@@ -1,5 +1,5 @@
 #include "Precompiled.hpp"
-#include "Window.h"
+#include "Window.hpp"
 
 Window::Window() :
     render(m_window)
@@ -54,20 +54,32 @@ void Window::close()
 
 bool Window::pollEvent(sf::Event& event)
 {
-    if(m_window.pollEvent(event))
+    while(m_window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(event);
+        if(ImGui::SFML::ProcessEvent(event))
+        {
+            // Continue to next event if ImGui wants to consume input.
+            continue;
+        }
+
         if(event.type == sf::Event::Closed)
         {
             m_window.close();
         }
+        else if(event.type == sf::Event::Resized)
+        {
+            // Update ImGui display size.
+            ImGuiIO& io = ImGui::GetIO();
+            io.DisplaySize.x = (float)event.size.width;
+            io.DisplaySize.y = (float)event.size.height;
+
+            LOG_INFO("Window resized to %ix%i.", event.size.width, event.size.height);
+        }
 
         return true;
     }
-    else
-    {
-        return false;
-    }
+
+    return false;
 }
 
 void Window::beginRender()

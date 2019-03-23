@@ -10,6 +10,8 @@ set(IMGUI_FILES
     "imstb_rectpack.h"
     "imstb_textedit.h"
     "imstb_truetype.h"
+    "misc/cpp/imgui_stdlib.cpp"
+    "misc/cpp/imgui_stdlib.h"
 )
 
 # Create a static library.

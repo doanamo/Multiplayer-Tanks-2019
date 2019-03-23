@@ -200,7 +200,7 @@ bool Init(sf::RenderTarget& target, bool loadDefaultFont)
     return true;
 }
 
-void ProcessEvent(const sf::Event& event)
+bool ProcessEvent(const sf::Event& event)
 {
     ImGuiIO& io = ImGui::GetIO();
     if (s_windowHasFocus) {
@@ -208,7 +208,8 @@ void ProcessEvent(const sf::Event& event)
         {
             case sf::Event::MouseMoved:
                 s_mouseMoved = true;
-                break;
+                return io.WantCaptureMouse;
+
             case sf::Event::MouseButtonPressed: // fall-through
             case sf::Event::MouseButtonReleased:
                 {
@@ -218,7 +219,8 @@ void ProcessEvent(const sf::Event& event)
                         s_mousePressed[event.mouseButton.button] = true;
                     }
                 }
-                break;
+                return io.WantCaptureMouse;
+
             case sf::Event::TouchBegan: // fall-through
             case sf::Event::TouchEnded:
                 {
@@ -229,22 +231,26 @@ void ProcessEvent(const sf::Event& event)
                         s_touchDown[event.touch.finger] = true;
                     }
                 }
-                break;
+                return io.WantCaptureMouse;
+
             case sf::Event::MouseWheelMoved:
                 io.MouseWheel += static_cast<float>(event.mouseWheel.delta);
-                break;
+                return io.WantCaptureMouse;
+
             case sf::Event::KeyPressed: // fall-through
             case sf::Event::KeyReleased:
                 io.KeysDown[event.key.code] = (event.type == sf::Event::KeyPressed);
                 io.KeyCtrl = event.key.control;
                 io.KeyShift = event.key.shift;
                 io.KeyAlt = event.key.alt;
-                break;
+                return io.WantCaptureKeyboard;
+
             case sf::Event::TextEntered:
                 if (event.text.unicode > 0 && event.text.unicode < 0x10000) {
                     io.AddInputCharacter(static_cast<ImWchar>(event.text.unicode));
                 }
-                break;
+                return io.WantCaptureKeyboard;
+
             default:
                 break;
         }
@@ -261,6 +267,8 @@ void ProcessEvent(const sf::Event& event)
         default:
             break;
     }
+
+    return false;
 }
 
 void Update(sf::RenderWindow& window, sf::Time dt)

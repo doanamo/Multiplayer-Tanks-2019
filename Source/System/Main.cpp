@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 #include "System/Globals.hpp"
-#include "System/Window.h"
+#include "System/Window.hpp"
 #include "System/AssetManager.h"
 #include "Application.hpp"
 

@@ -35,7 +35,7 @@ void Logger::write(LogType type, const char* format, ...)
     // Truncate message history.
     if(m_messages.size() == MaxMessageCount)
     {
-        m_messages.pop();
+        m_messages.pop_front();
     }
 
     // Retrieve the current system time.
@@ -96,8 +96,8 @@ void Logger::write(LogType type, const char* format, ...)
     stream << formatString(format, arguments);
     va_end(arguments);
 
-    // Print to console.
-    std::cout << stream.str() << std::endl;
+    // Print to console (obsolete).
+    //std::cout << stream.str() << std::endl;
     
     // Print to file.
     m_logFile << stream.str() << std::endl;
@@ -113,5 +113,10 @@ void Logger::write(LogType type, const char* format, ...)
     message.type = type;
     message.text = stream.str();
 
-    m_messages.emplace(std::move(message));
+    m_messages.emplace_back(std::move(message));
+}
+
+const Logger::MessageList& Logger::getMessages() const
+{
+    return m_messages;
 }

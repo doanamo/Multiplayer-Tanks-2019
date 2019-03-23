@@ -23,6 +23,7 @@
 // ImGui
 #include <imconfig-SFML.h>
 #include <imgui.h>
+#include <misc/cpp/imgui_stdlib.h>
 #include <imgui-SFML.h>
 
 // Project
@@ -32,4 +33,3 @@
 #include "Types/TypeInfo.hpp"
 #include "Serialization/Serialization.hpp"
 #include "System/Logger.hpp"
-#include "System/Globals.hpp"

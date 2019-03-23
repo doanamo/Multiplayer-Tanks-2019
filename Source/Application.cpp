@@ -1,7 +1,8 @@
 #include "Precompiled.hpp"
 #include "Application.hpp"
 #include "System/Globals.hpp"
-#include "System/Window.h"
+#include "System/Window.hpp"
+#include "System/Console.hpp"
 #include "Network/Server.hpp"
 #include "Network/Client.hpp"
 #include "Game/GameInstance.hpp"
@@ -84,6 +85,10 @@ void Application::handleEvent(const sf::Event& event)
     {
         switch(event.key.code)
         {
+        case sf::Keyboard::Tilde:
+            g_console->toggle();
+            break;
+
         case sf::Keyboard::F5:
             this->saveSnapshot();
             break;
@@ -155,6 +160,9 @@ void Application::draw(float timeAlpha)
 
     // Draw demo ImGui window.
     //ImGui::ShowDemoWindow();
+
+    // Draw console.
+    g_console->display();
 }
 
 bool Application::saveSnapshot()
