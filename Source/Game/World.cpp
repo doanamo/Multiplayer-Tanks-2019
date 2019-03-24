@@ -145,16 +145,20 @@ void World::draw(float timeAlpha)
 
         for(const ObjectEntry& objectEntry : m_objects)
         {
-            if(objectEntry.object == nullptr)
-                continue;
-
-            if(!objectEntry.object->getName().empty())
+            if(objectEntry.object != nullptr)
             {
-                ImGui::BulletText("%i : %s (%s)", objectEntry.handle.identifier, objectEntry.object->getType().getName(), objectEntry.object->getName().c_str());
+                if(!objectEntry.object->getName().empty())
+                {
+                    ImGui::BulletText("%i/%i : %s (%s)", objectEntry.handle.identifier, objectEntry.handle.version, objectEntry.object->getType().getName(), objectEntry.object->getName().c_str());
+                }
+                else
+                {
+                    ImGui::BulletText("%i/%i : %s", objectEntry.handle.identifier, objectEntry.handle.version, objectEntry.object->getType().getName());
+                }
             }
             else
             {
-                ImGui::BulletText("%i : %s", objectEntry.handle.identifier, objectEntry.object->getType().getName());
+                ImGui::BulletText("%i/%i : -", objectEntry.handle.identifier, objectEntry.handle.version);
             }
         }
     }
