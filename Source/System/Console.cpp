@@ -47,7 +47,7 @@ void Console::display()
     consoleMinSize.y = 108.0f;
 
     ImVec2 consoleMaxSize = ImGui::GetIO().DisplaySize;
-    consoleMaxSize.y = std::max(ImGui::GetIO().DisplaySize.y - 40.0f, consoleMinSize.y);
+    consoleMaxSize.y = std::max(ImGui::GetIO().DisplaySize.y, consoleMinSize.y);
 
     ImGui::SetNextWindowPos(ImVec2(0.0f, 0.0f));
     ImGui::SetNextWindowSizeConstraints(consoleMinSize, consoleMaxSize);
