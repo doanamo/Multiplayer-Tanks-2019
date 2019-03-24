@@ -38,6 +38,9 @@ void World::processPendingObjects()
                 // Call on destroy method.
                 objectEntry.object->onDestroy();
 
+                // Invalidate object handle.
+                objectEntry.handle.version++;
+
                 // Delete object from memory.
                 delete objectEntry.object;
                 objectEntry.object = nullptr;
@@ -151,9 +154,6 @@ Handle World::addObject(Object* object)
 
     ASSERT(!freeEntry.created, "Free object entry should not be marked as already created!");
     ASSERT(!freeEntry.destroy, "Free object entry should not be marked as pending destruction!");
-
-    // Increment handle version.
-    freeEntry.handle.version++;
 
     // Assign new object to entry.
     freeEntry.object = object;
