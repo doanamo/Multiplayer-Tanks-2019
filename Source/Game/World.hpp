@@ -31,8 +31,7 @@ public:
     struct ObjectNameIndex
     {
         ObjectNameIndex(std::string name) :
-            name(name),
-            entryIndex(0)
+            name(name), entryIndex(0)
         {
         }
 
@@ -51,26 +50,34 @@ public:
     using NameRegistry = std::set<ObjectNameIndex, ObjectNameCompare>;
 
     // Object group registry.
+    using GroupEntrySet = std::set<std::size_t>;
+    using GroupEntrySetPtr = std::unique_ptr<GroupEntrySet>;
+
     struct ObjectGroupIndices
     {
         ObjectGroupIndices(std::string group) :
-            group(group)
+            group(group), entryIndices(nullptr)
+        {
+        }
+
+        ObjectGroupIndices(std::string group, GroupEntrySetPtr&& entrySet) :
+            group(group), entryIndices(std::move(entrySet))
         {
         }
 
         std::string group;
-        std::set<std::size_t> entryIndices;
+        GroupEntrySetPtr entryIndices;
     };
 
     struct ObjectGroupCompare
     {
-        bool operator()(const ObjectGroupIndices& first, const ObjectGroupIndices& second)
+        bool operator()(const ObjectGroupIndices& first, const ObjectGroupIndices& second) const
         {
             return first.group < second.group;
         }
     };
 
-    using GroupRegistry = std::set<ObjectGroupIndices>;
+    using GroupRegistry = std::set<ObjectGroupIndices, ObjectGroupCompare>;
 
 public:
     World();
@@ -98,7 +105,7 @@ public:
     bool setObjectName(Handle handle, std::string name, bool force = false);
 
     // Sets object's group name.
-    void setObjectGroup(Handle handle, std::string name);
+    void setObjectGroup(Handle handle, std::string group);
 
     // Gets object in world by handle.
     Object* getObjectByHandle(Handle handle);
