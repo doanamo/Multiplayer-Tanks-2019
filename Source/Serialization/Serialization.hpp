@@ -25,6 +25,8 @@ bool deserialize(MemoryBuffer& buffer, int32_t* value);
 bool serialize(MemoryBuffer& buffer, int64_t value);
 bool deserialize(MemoryBuffer& buffer, int64_t* value);
 
+bool serialize(MemoryBuffer& buffer, char value);
+bool deserialize(MemoryBuffer& buffer, char* value);
 bool serialize(MemoryBuffer& buffer, float value);
 bool deserialize(MemoryBuffer& buffer, float* value);
 bool serialize(MemoryBuffer& buffer, double value);
@@ -32,3 +34,6 @@ bool deserialize(MemoryBuffer& buffer, double* value);
 
 bool serialize(MemoryBuffer& buffer, const sf::Vector2f& value);
 bool deserialize(MemoryBuffer& buffer, sf::Vector2f* value);
+
+bool serialize(MemoryBuffer& buffer, const std::string& value);
+bool deserialize(MemoryBuffer& buffer, std::string* value);
