@@ -115,6 +115,9 @@ if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     )
 endif()
 
+# Add JSON library.
+target_include_directories("Game" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/External/JSON-3.6.1/include")
+
 # Add SFML library.
 set(BUILD_SHARED_LIBS FALSE)
 

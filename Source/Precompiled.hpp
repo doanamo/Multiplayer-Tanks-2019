@@ -12,6 +12,9 @@
 #include <queue>
 #include <map>
 
+// JSON
+#include <nlohmann/json.hpp>
+
 // SFML
 #include <SFML/Main.hpp>
 #include <SFML/System.hpp>
