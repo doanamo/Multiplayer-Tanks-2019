@@ -193,7 +193,7 @@ bool deserialize(MemoryBuffer& buffer, std::string* value)
     value->resize(length);
     for(int i = 0; i < length; ++i)
     {
-        if(!deserialize(buffer, &value[i]))
+        if(!deserialize(buffer, &(*value)[i]))
             return false;
     }
 
