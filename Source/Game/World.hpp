@@ -7,6 +7,28 @@
 class World : public Serializable
 {
 public:
+    // Object entry structure.
+    struct ObjectEntry
+    {
+        ObjectEntry(int index = 0) :
+            handle(index),
+            object(nullptr),
+            created(false),
+            destroy(false)
+        {
+        }
+
+        Handle handle;
+        Object* object;
+        bool created;
+        bool destroy;
+    };
+
+    // Type declarations.
+    using ObjectList = std::vector<ObjectEntry>;
+    using FreeList = std::queue<std::size_t>;
+
+public:
     World();
     ~World();
 
@@ -24,7 +46,11 @@ public:
 
     // Object management methods.
     Handle addObject(Object* object);
+
+    // Destroys object in world.
     void destroyObject(Handle handle);
+
+    // Gets object in world.
     Object* getObject(Handle handle);
 
 private:
@@ -37,21 +63,7 @@ private:
 
 private:
     // List of objects currently in the world.
-    struct ObjectEntry
-    {
-        ObjectEntry(int index = 0) :
-            handle(index),
-            object(nullptr),
-            created(false),
-            destroy(false)
-        {
-        }
+    ObjectList m_objects;
+    FreeList m_freeList;
 
-        Handle handle;
-        Object* object;
-        bool created;
-        bool destroy;
-    };
-
-    std::vector<ObjectEntry> m_objects;
 };

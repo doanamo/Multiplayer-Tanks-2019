@@ -15,13 +15,64 @@ World::~World()
             delete objectEntry.object;
         }
     }
-
-    m_objects.clear();
 }
 
 bool World::initialize()
 {
     return true;
+}
+
+void World::processPendingObjects()
+{
+    // Destroy objects marked for destruction.
+    {
+        std::size_t index = 0;
+        while(index < m_objects.size())
+        {
+            ObjectEntry& objectEntry = m_objects[index];
+
+            if(objectEntry.destroy)
+            {
+                ASSERT(objectEntry.object != nullptr, "Object entry marked for destruction does not have an object set!");
+
+                // Call on destroy method.
+                objectEntry.object->onDestroy();
+
+                // Delete object from memory.
+                delete objectEntry.object;
+                objectEntry.object = nullptr;
+
+                // Reset object entry state.
+                objectEntry.created = false;
+                objectEntry.destroy = false;
+
+                // Add entry index to free list.
+                m_freeList.push(index);
+            }
+
+            index++;
+        }
+    }
+    
+    // Mark objects added last frame as created.
+    {
+        std::size_t index = 0;
+        while(index < m_objects.size())
+        {
+            ObjectEntry& objectEntry = m_objects[index];
+
+            if(!objectEntry.created && objectEntry.object != nullptr)
+            {
+                // Mark object as created.
+                objectEntry.created = true;
+
+                // Call on create method.
+                objectEntry.object->onCreate();
+            }
+
+            index++;
+        }
+    }
 }
 
 void World::update(float timeDelta)
@@ -86,42 +137,35 @@ Handle World::addObject(Object* object)
     // Makes no sense to call this function with null.
     ASSERT(object != nullptr, "Cannot add nullptr object!");
 
-    // Find a free entry that we can use to store our new object.
-    ObjectEntry* freeEntry = nullptr;
-
-    for(ObjectEntry& objectEntry : m_objects)
+    // Create new object entry if free list is empty.
+    if(m_freeList.empty())
     {
-        if(objectEntry.object == nullptr)
-        {
-            freeEntry = &objectEntry;
-            break;
-        }
+        int handleIndex = (int)m_objects.size() + 1;
+        m_objects.emplace_back(handleIndex);
+        m_freeList.push(m_objects.size() - 1);
     }
 
-    // Allocate a new object entry if there are no free ones.
-    if(freeEntry == nullptr)
-    {
-        m_objects.emplace_back((int)m_objects.size() + 1);
-        freeEntry = &m_objects.back();
-    }
+    // Get free object entry from free list queue.
+    ObjectEntry& freeEntry = m_objects[m_freeList.front()];
+    m_freeList.pop();
 
-    ASSERT(!freeEntry->created, "Free object entry should not be marked as already created!");
-    ASSERT(!freeEntry->destroy, "Free object entry should not be marked as pending destruction!");
+    ASSERT(!freeEntry.created, "Free object entry should not be marked as already created!");
+    ASSERT(!freeEntry.destroy, "Free object entry should not be marked as pending destruction!");
 
     // Increment handle version.
-    freeEntry->handle.version++;
+    freeEntry.handle.version++;
 
     // Assign new object to entry.
-    freeEntry->object = object;
+    freeEntry.object = object;
 
     // Assign handle and world to new object.
     ASSERT(object->m_world == nullptr, "Object is already assigned to a world!");
 
-    object->m_handle = freeEntry->handle;
+    object->m_handle = freeEntry.handle;
     object->m_world = this;
 
     // Return object handle.
-    return freeEntry->handle;
+    return freeEntry.handle;
 }
 
 void World::destroyObject(Handle handle)
@@ -155,52 +199,6 @@ Object* World::getObject(Handle handle)
     else
     {
         return nullptr;
-    }
-}
-
-void World::processPendingObjects()
-{
-    // Destroy objects marked for destruction.
-    {
-        std::size_t index = 0;
-        while(index < m_objects.size())
-        {
-            ObjectEntry& objectEntry = m_objects[index++];
-
-            if(objectEntry.destroy)
-            {
-                ASSERT(objectEntry.object != nullptr, "Object entry marked for destruction does not have an object set!");
-
-                // Call on destroy method.
-                objectEntry.object->onDestroy();
-
-                // Delete object from memory.
-                delete objectEntry.object;
-                objectEntry.object = nullptr;
-
-                // Reset object entry state.
-                objectEntry.created = false;
-                objectEntry.destroy = false;
-            }
-        }
-    }
-    
-    // Mark objects added last frame as created.
-    {
-        std::size_t index = 0;
-        while(index < m_objects.size())
-        {
-            ObjectEntry& objectEntry = m_objects[index++];
-
-            if(!objectEntry.created && objectEntry.object != nullptr)
-            {
-                // Mark object as created.
-                objectEntry.created = true;
-
-                // Call on create method.
-                objectEntry.object->onCreate();
-            }
-        }
     }
 }
 
