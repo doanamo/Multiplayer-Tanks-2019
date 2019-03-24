@@ -42,7 +42,13 @@ public:
     // Gets handle to this object.
     Handle getHandle() const;
 
-    // Gets transform reference.
+    // Gets object's unique name.
+    const std::string& getName() const;
+
+    // Gets object's group name.
+    const std::string& getGroup() const;
+
+    // Gets object's transform.
     Transform& getTransform();
 
 protected:
@@ -56,6 +62,12 @@ private:
 
     // Handle to self.
     Handle m_handle;
+
+    // Unique name.
+    std::string m_name;
+
+    // Group name.
+    std::string m_group;
 
 protected:
     // Object transform.

@@ -7,7 +7,7 @@
 class World : public Serializable
 {
 public:
-    // Object entry structure.
+    // Object entry.
     struct ObjectEntry
     {
         ObjectEntry(int index = 0) :
@@ -24,9 +24,53 @@ public:
         bool destroy;
     };
 
-    // Type declarations.
     using ObjectList = std::vector<ObjectEntry>;
     using FreeList = std::queue<std::size_t>;
+
+    // Object name registry.
+    struct ObjectNameIndex
+    {
+        ObjectNameIndex(std::string name) :
+            name(name),
+            entryIndex(0)
+        {
+        }
+
+        std::string name;
+        std::size_t entryIndex;
+    };
+
+    struct ObjectNameCompare
+    {
+        bool operator()(const ObjectNameIndex& first, const ObjectNameIndex& second) const
+        {
+            return first.name < second.name;
+        }
+    };
+
+    using NameRegistry = std::set<ObjectNameIndex, ObjectNameCompare>;
+
+    // Object group registry.
+    struct ObjectGroupIndices
+    {
+        ObjectGroupIndices(std::string group) :
+            group(group)
+        {
+        }
+
+        std::string group;
+        std::set<std::size_t> entryIndices;
+    };
+
+    struct ObjectGroupCompare
+    {
+        bool operator()(const ObjectGroupIndices& first, const ObjectGroupIndices& second)
+        {
+            return first.group < second.group;
+        }
+    };
+
+    using GroupRegistry = std::set<ObjectGroupIndices>;
 
 public:
     World();
@@ -44,18 +88,33 @@ public:
     // Draws all objects in the world.
     void draw(float timeAlpha);
 
-    // Object management methods.
-    Handle addObject(Object* object);
+    // Adds object to world.
+    Handle addObject(Object* object, std::string name = "", std::string group = "");
 
     // Destroys object in world.
     void destroyObject(Handle handle);
 
-    // Gets object in world.
-    Object* getObject(Handle handle);
+    // Sets object's unique name.
+    bool setObjectName(Handle handle, std::string name, bool force = false);
+
+    // Sets object's group name.
+    void setObjectGroup(Handle handle, std::string name);
+
+    // Gets object in world by handle.
+    Object* getObjectByHandle(Handle handle);
+
+    // Gets object in world by name.
+    Object* getObjectByName(std::string name);
+
+    // Gets objects in world by group.
+    std::vector<Object*> getObjectsByGroup(std::string group);
 
 private:
     // Processes pending objects.
     void processPendingObjects();
+
+    // Gets object entry by handle.
+    ObjectEntry* GetEntryByHandle(Handle handle);
 
     // Serialization methods.
     virtual bool onSerialize(MemoryBuffer& buffer) override;
@@ -66,4 +125,7 @@ private:
     ObjectList m_objects;
     FreeList m_freeList;
 
+    // Registry of objects.
+    NameRegistry m_names;
+    GroupRegistry m_groups;
 };

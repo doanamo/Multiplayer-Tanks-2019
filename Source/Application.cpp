@@ -67,7 +67,7 @@ bool Application::initialize()
 
     // Create player tank object.
     Tank* playerTank = new Tank();
-    Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank);
+    Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank, "Player1_Tank");
     m_gameInstance->getPlayerController()->control(playerHandle);
 
     // Test instantiation from runtime type.

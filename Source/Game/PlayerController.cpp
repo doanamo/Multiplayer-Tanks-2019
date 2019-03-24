@@ -30,7 +30,7 @@ void PlayerController::control(Handle object)
 void PlayerController::handleEvent(const sf::Event& event)
 {
     // Get player tank object.
-    Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_object));
+    Tank* playerTank = dynamic_cast<Tank*>(m_world->getObjectByName("Player1_Tank"));
     if(playerTank == nullptr) return;
 
     // Handle player tank input.
@@ -64,7 +64,7 @@ void PlayerController::handleEvent(const sf::Event& event)
 void PlayerController::tick(float timeDelta)
 {
     // Get player tank object.
-    Tank* playerTank = dynamic_cast<Tank*>(m_world->getObject(m_object));
+    Tank* playerTank = dynamic_cast<Tank*>(m_world->getObjectByName("Player1_Tank"));
     if(playerTank == nullptr) return;
 
     // Handle player tank movement.

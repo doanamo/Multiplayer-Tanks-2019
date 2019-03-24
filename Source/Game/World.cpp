@@ -38,6 +38,10 @@ void World::processPendingObjects()
                 // Call on destroy method.
                 objectEntry.object->onDestroy();
 
+                // Reset object name and group to remove them from registry.
+                this->setObjectName(objectEntry.handle, "");
+                this->setObjectGroup(objectEntry.handle, "");
+
                 // Invalidate object handle.
                 objectEntry.handle.version++;
 
@@ -56,7 +60,7 @@ void World::processPendingObjects()
             index++;
         }
     }
-    
+
     // Mark objects added last frame as created.
     {
         std::size_t index = 0;
@@ -133,9 +137,31 @@ void World::draw(float timeAlpha)
             objectEntry.object->onDraw(timeAlpha);
         }
     }
+
+    // Draw ImGui window.
+    if(ImGui::Begin("World", nullptr))
+    {
+        ImGui::Text("List of objects:");
+
+        for(const ObjectEntry& objectEntry : m_objects)
+        {
+            if(objectEntry.object == nullptr)
+                continue;
+
+            if(!objectEntry.object->getName().empty())
+            {
+                ImGui::BulletText("%i : %s (%s)", objectEntry.handle.identifier, objectEntry.object->getType().getName(), objectEntry.object->getName().c_str());
+            }
+            else
+            {
+                ImGui::BulletText("%i : %s", objectEntry.handle.identifier, objectEntry.object->getType().getName());
+            }
+        }
+    }
+    ImGui::End();
 }
 
-Handle World::addObject(Object* object)
+Handle World::addObject(Object* object, std::string name, std::string group)
 {
     // Makes no sense to call this function with null.
     ASSERT(object != nullptr, "Cannot add nullptr object!");
@@ -149,23 +175,28 @@ Handle World::addObject(Object* object)
     }
 
     // Get free object entry from free list queue.
-    ObjectEntry& freeEntry = m_objects[m_freeList.front()];
+    std::size_t entryIndex = m_freeList.front();
+    ObjectEntry& objectEntry = m_objects[entryIndex];
     m_freeList.pop();
 
-    ASSERT(!freeEntry.created, "Free object entry should not be marked as already created!");
-    ASSERT(!freeEntry.destroy, "Free object entry should not be marked as pending destruction!");
+    ASSERT(!objectEntry.created, "Free object entry should not be marked as already created!");
+    ASSERT(!objectEntry.destroy, "Free object entry should not be marked as pending destruction!");
 
     // Assign new object to entry.
-    freeEntry.object = object;
+    objectEntry.object = object;
 
     // Assign handle and world to new object.
     ASSERT(object->m_world == nullptr, "Object is already assigned to a world!");
 
-    object->m_handle = freeEntry.handle;
+    object->m_handle = objectEntry.handle;
     object->m_world = this;
 
+    // Register object name and group.
+    this->setObjectName(objectEntry.handle, name);
+    //this->setObjectGroup(objectEntry.handle, name);
+
     // Return object handle.
-    return freeEntry.handle;
+    return objectEntry.handle;
 }
 
 void World::destroyObject(Handle handle)
@@ -183,7 +214,80 @@ void World::destroyObject(Handle handle)
     }
 }
 
-Object* World::getObject(Handle handle)
+bool World::setObjectName(Handle handle, std::string name, bool force)
+{
+    // Get object entry if handle is valid.
+    ObjectEntry* objectEntry = GetEntryByHandle(handle);
+
+    if(objectEntry == nullptr)
+    {
+        LOG_WARNING("Could not set \"%s\" object name because handle is no longer valid!", name.c_str());
+        return false;
+    }
+
+    // Erase current object name from registry.
+    ASSERT(objectEntry->object, "Object cannot be null if its handle is valid!");
+
+    if(!objectEntry->object->m_name.empty())
+    {
+        // Find and remove object from registry.
+        auto it = m_names.find(ObjectNameIndex(objectEntry->object->m_name));
+        ASSERT(it != m_names.end(), "Object with non empty name is not registered!");
+        m_names.erase(it);
+
+        // Clear current object name.
+        objectEntry->object->m_name = std::string();
+    }
+
+    // Proceed with name registration if new name is not empty.
+    if(name.empty())
+        return true;
+
+    // Erase existing name in registry if we want to force setting it to another object.
+    if(force)
+    {
+        // Find object using requested name.
+        auto it = m_names.find(ObjectNameIndex(name));
+
+        if(it != m_names.end())
+        {
+            // Reset existing object name.
+            ObjectEntry& registeredEntry = m_objects[it->entryIndex];
+            ASSERT(registeredEntry.object != nullptr, "Registered object with name is null!");
+            registeredEntry.object->m_name = std::string();
+
+            // Erase entry from name registry.
+            m_names.erase(it);
+        }
+    }
+
+    // Register new object name.
+    ObjectNameIndex objectNameIndex(name);
+    objectNameIndex.entryIndex = objectEntry->handle.identifier - 1;
+    
+    auto result = m_names.insert(objectNameIndex);
+    ASSERT(result.second || !force, "Object name insertion failed despite being forced!");
+
+    if(result.second)
+    {
+        // Update object's name after it has been successfully registered.
+        objectEntry->object->m_name = name;
+        return true;
+    }
+    else
+    {
+        // Display warning if requested name is already in use.
+        LOG_WARNING("Could not set \"%s\" object name because it is already used by existing object!", name.c_str());
+        return false;
+    }
+}
+
+void World::setObjectGroup(Handle handle, std::string name)
+{
+    // Doan: TODO
+}
+
+World::ObjectEntry* World::GetEntryByHandle(Handle handle)
 {
     // Make sure identifier is within objects array range and return null otherwise.
     if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
@@ -194,12 +298,49 @@ Object* World::getObject(Handle handle)
 
     if(handle.version == objectEntry.handle.version)
     {
-        return objectEntry.object;
+        return &objectEntry;
     }
     else
     {
         return nullptr;
     }
+}
+
+Object* World::getObjectByHandle(Handle handle)
+{
+    // Return object pointer if handle is valid.
+    ObjectEntry* objectEntry = GetEntryByHandle(handle);
+
+    if(objectEntry != nullptr)
+    {
+        return objectEntry->object;
+    }
+
+    return nullptr;
+}
+
+Object* World::getObjectByName(std::string name)
+{
+    // Find object using name registry.
+    auto it = m_names.find(ObjectNameIndex(name));
+    
+    if(it != m_names.end())
+    {
+        ObjectEntry& registeredEntry = m_objects[it->entryIndex];
+        ASSERT(registeredEntry.object != nullptr, "Registered object with name is null!");
+        return registeredEntry.object;
+    }
+    else
+    {
+        return nullptr;
+    }
+}
+
+std::vector<Object*> World::getObjectsByGroup(std::string group)
+{
+    // Doan: TODO
+
+    return std::vector<Object*>();
 }
 
 bool World::onSerialize(MemoryBuffer& buffer)
@@ -230,6 +371,12 @@ bool World::onSerialize(MemoryBuffer& buffer)
         if(!serialize(buffer, objectEntry.object->getType().getIdentifier()))
             return false;
 
+        if(!serialize(buffer, objectEntry.object->getName()))
+            return false;
+
+        if(!serialize(buffer, objectEntry.object->getGroup()))
+            return false;
+
         if(!serialize(buffer, *objectEntry.object))
             return false;
     }
@@ -249,13 +396,21 @@ bool World::onDeserialize(MemoryBuffer& buffer)
         if(!deserialize(buffer, &objectType))
             return false;
 
+        std::string name;
+        if(!deserialize(buffer, &name))
+            return false;
+
+        std::string group;
+        if(!deserialize(buffer, &group))
+            return false;
+
         Object* object = Object::create(objectType);
         ASSERT(object != nullptr, "Runtime type allocation returned null!");
 
         if(!deserialize(buffer, object))
             return false;
 
-        this->addObject(object);
+        this->addObject(object, name, group);
     }
 
     return true;

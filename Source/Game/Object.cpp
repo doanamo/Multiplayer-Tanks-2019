@@ -4,7 +4,9 @@
 
 Object::Object() :
     m_world(nullptr),
-    m_handle()
+    m_handle(),
+    m_name(),
+    m_group()
 {
 }
 
@@ -59,6 +61,16 @@ Handle Object::getHandle() const
 
     // Return handle to self.
     return m_handle;
+}
+
+const std::string& Object::getName() const
+{
+    return m_name;
+}
+
+const std::string& Object::getGroup() const
+{
+    return m_group;
 }
 
 Transform& Object::getTransform()
