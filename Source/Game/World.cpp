@@ -163,7 +163,7 @@ void World::draw(float timeAlpha)
     // Draw ImGui window.
     if(ImGui::Begin("World", nullptr))
     {
-        ImGui::Text("List of object entries:");
+        ImGui::Text("List of object entries (%i total):", m_objects.size());
 
         int groupedEntityCount = 0;
 
