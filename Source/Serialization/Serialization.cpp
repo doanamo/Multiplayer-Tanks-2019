@@ -173,7 +173,7 @@ bool serialize(MemoryBuffer& buffer, const std::string& value)
     if(!serialize(buffer, value.length()))
         return false;
 
-    for(int i = 0; i < value.length(); ++i)
+    for(std::size_t i = 0; i < value.length(); ++i)
     {
         if(!serialize(buffer, value[i]))
             return false;
@@ -191,7 +191,7 @@ bool deserialize(MemoryBuffer& buffer, std::string* value)
         return false;
 
     value->resize(length);
-    for(int i = 0; i < length; ++i)
+    for(std::size_t i = 0; i < length; ++i)
     {
         if(!deserialize(buffer, &(*value)[i]))
             return false;
