@@ -80,6 +80,7 @@ set(CMAKE_CONFIGURATION_TYPES "Debug;Release" CACHE STRING "" FORCE)
 # Create project target.
 project("Tanks")
 add_executable("Game" ${SOURCE_FILES})
+target_compile_features("Game" PRIVATE cxx_std_17)
 
 # Add source as include directory.
 target_include_directories("Game" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
