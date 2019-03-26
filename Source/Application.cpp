@@ -14,7 +14,8 @@
 Application::Application() :
     m_network(nullptr),
     m_gameInstance(nullptr),
-    isViewportCentered(false)
+    isViewportCentered(false),
+    isCameraAttachedToPlayer(true)
 {
 }
 
@@ -100,6 +101,11 @@ void Application::handleEvent(const sf::Event& event)
         case sf::Keyboard::F10:
             g_window->close();
             break;
+
+        case sf::Keyboard::O:
+            isCameraAttachedToPlayer = true;
+            LOG_TRACE("Camera has re-attached to the player's tank.");
+            break;
         }
     }
 
@@ -150,13 +156,55 @@ void Application::draw(float timeAlpha)
     g_window->render.setView(viewport);
 
     // Manual camera navigation.
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
+    {
+        if (isCameraAttachedToPlayer)
+        {
+            isCameraAttachedToPlayer = false;
+            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
+        }
+        viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
+    {
+        if (isCameraAttachedToPlayer)
+        {
+            isCameraAttachedToPlayer = false;
+            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
+        }
+        viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) 
+    {
+        if (isCameraAttachedToPlayer)
+        {
+            isCameraAttachedToPlayer = false;
+            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
+        }
+        viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
+    }
+
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) 
+    {
+        if (isCameraAttachedToPlayer)
+        {
+            isCameraAttachedToPlayer = false;
+            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
+        }
+        viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
+    }
 
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
+
+    if (isCameraAttachedToPlayer)
+    {
+        Tank* tank = dynamic_cast<Tank*>(m_gameInstance->getWorld()->getObjectByName("Player1_Tank"));
+        viewport.setCenter(tank->getPosition().x, tank->getPosition().y);
+        // LOG_TRACE("X: %f Y: %f", tank->getPosition().x, tank->getPosition().y);
+    }
 
     // Draw demo ImGui window.
     //ImGui::ShowDemoWindow();

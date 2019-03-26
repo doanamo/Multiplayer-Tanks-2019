@@ -50,7 +50,6 @@ void Tank::onDraw(float timeAlpha)
     Object::onDraw(timeAlpha);
 
     // Draw tank.
-    sf::RectangleShape tankSprite;
     tankSprite.setSize(sf::Vector2f(1.0f, 1.0f));
     tankSprite.setOrigin(tankSprite.getSize() / 2.0f);
     tankSprite.setPosition(m_transform.getPosition(timeAlpha));
@@ -74,6 +73,11 @@ void Tank::onDraw(float timeAlpha)
     }
 
     g_render->draw(tankSprite);
+}
+
+sf::Vector2f Tank::getPosition()
+{
+    return tankSprite.getPosition();
 }
 
 bool Tank::onSerialize(MemoryBuffer& buffer)

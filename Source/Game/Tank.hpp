@@ -17,6 +17,8 @@ public:
     void onTick(float timeDelta) override;
     void onDraw(float timeAlpha) override;
 
+    sf::Vector2f getPosition();
+
 protected:
     // Serialization methods.
     virtual bool onSerialize(MemoryBuffer& buffer) override;
@@ -28,4 +30,7 @@ private:
 
     // Tank sprite texture.
     std::shared_ptr<sf::Texture> m_texture;
+
+    // Tank sprite.
+    sf::RectangleShape tankSprite;
 };
