@@ -4,6 +4,16 @@
 #include "System/AssetManager.h"
 #include "Application.hpp"
 
+void exit(std::string arguments)
+{
+    if(g_window)
+    {
+        g_window->close();
+    }
+}
+
+ConsoleFunction cf_exit("exit", &exit);
+
 int main()
 {
     // Initialize debug.

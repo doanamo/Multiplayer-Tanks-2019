@@ -1,6 +1,8 @@
 #include "Precompiled.hpp"
 #include "World.hpp"
 
+ConsoleVariable<bool> cv_showWorldInfo("showWorldInfo", false);
+
 World::World()
 {
 }
@@ -138,86 +140,90 @@ void World::draw(float timeAlpha)
         }
     }
 
-    // Function lambda for printing objects.
-    auto PrintObjectEntry = [](const ObjectEntry* objectEntry)
+    // Display world info window.
+    if(cv_showWorldInfo.value)
     {
-        ASSERT(objectEntry != nullptr);
-
-        if(objectEntry->object != nullptr)
+        // Function lambda for printing objects.
+        auto PrintObjectEntry = [](const ObjectEntry* objectEntry)
         {
-            if(!objectEntry->object->getName().empty())
+            ASSERT(objectEntry != nullptr);
+
+            if(objectEntry->object != nullptr)
             {
-                ImGui::BulletText("%i/%i : %s (%s)", objectEntry->handle.identifier, objectEntry->handle.version, objectEntry->object->getType().getName(), objectEntry->object->getName().c_str());
+                if(!objectEntry->object->getName().empty())
+                {
+                    ImGui::BulletText("%i/%i : %s (%s)", objectEntry->handle.identifier, objectEntry->handle.version, objectEntry->object->getType().getName(), objectEntry->object->getName().c_str());
+                }
+                else
+                {
+                    ImGui::BulletText("%i/%i : %s", objectEntry->handle.identifier, objectEntry->handle.version, objectEntry->object->getType().getName());
+                }
             }
             else
             {
-                ImGui::BulletText("%i/%i : %s", objectEntry->handle.identifier, objectEntry->handle.version, objectEntry->object->getType().getName());
+                ImGui::BulletText("%i/%i : -", objectEntry->handle.identifier, objectEntry->handle.version);
             }
-        }
-        else
+        };
+
+        // Draw ImGui window.
+        if(ImGui::Begin("World Info", &cv_showWorldInfo.value))
         {
-            ImGui::BulletText("%i/%i : -", objectEntry->handle.identifier, objectEntry->handle.version);
-        }
-    };
+            ImGui::Text("List of object entries (%i total):", m_objects.size());
 
-    // Draw ImGui window.
-    if(ImGui::Begin("World", nullptr))
-    {
-        ImGui::Text("List of object entries (%i total):", m_objects.size());
+            int groupedEntityCount = 0;
 
-        int groupedEntityCount = 0;
-
-        for(const ObjectGroupIndices& groupEntry : m_groups)
-        {
-            ASSERT(groupEntry.entryIndices.get() != nullptr, "Group object set is null!");
-
-            if(ImGui::TreeNodeEx(groupEntry.group.c_str(), ImGuiTreeNodeFlags_DefaultOpen, "%s (%i)", groupEntry.group.c_str(), groupEntry.entryIndices->size()))
+            for(const ObjectGroupIndices& groupEntry : m_groups)
             {
-                const auto& objectEntries = groupEntry.entryIndices.get();
+                ASSERT(groupEntry.entryIndices.get() != nullptr, "Group object set is null!");
 
-                for(const auto& objectIndex : *objectEntries)
+                if(ImGui::TreeNodeEx(groupEntry.group.c_str(), ImGuiTreeNodeFlags_DefaultOpen, "%s (%i)", groupEntry.group.c_str(), groupEntry.entryIndices->size()))
                 {
-                    ObjectEntry& objectEntry = m_objects[objectIndex];
+                    const auto& objectEntries = groupEntry.entryIndices.get();
 
-                    PrintObjectEntry(&objectEntry);
+                    for(const auto& objectIndex : *objectEntries)
+                    {
+                        ObjectEntry& objectEntry = m_objects[objectIndex];
 
-                    groupedEntityCount++;
+                        PrintObjectEntry(&objectEntry);
+
+                        groupedEntityCount++;
+                    }
+
+                    ImGui::TreePop();
+                }
+            }
+
+            if(ImGui::TreeNodeEx("Ungrouped", ImGuiTreeNodeFlags_DefaultOpen, "Ungrouped (%i)", m_objects.size() - m_freeList.size() - groupedEntityCount))
+            {
+                for(const ObjectEntry& objectEntry : m_objects)
+                {
+                    if(objectEntry.object != nullptr)
+                    {
+                        if(objectEntry.object->getGroup().empty())
+                        {
+                            PrintObjectEntry(&objectEntry);
+                        }
+                    }
+                }
+
+                ImGui::TreePop();
+            }
+
+            if(ImGui::TreeNodeEx("Unused", ImGuiTreeNodeFlags_DefaultOpen, "Unused (%i)", m_freeList.size()))
+            {
+                for(const ObjectEntry& objectEntry : m_objects)
+                {
+                    if(objectEntry.object == nullptr)
+                    {
+                        PrintObjectEntry(&objectEntry);
+                    }
                 }
 
                 ImGui::TreePop();
             }
         }
-
-        if(ImGui::TreeNodeEx("Ungrouped", ImGuiTreeNodeFlags_DefaultOpen, "Ungrouped (%i)", m_objects.size() - m_freeList.size() - groupedEntityCount))
-        {
-            for(const ObjectEntry& objectEntry : m_objects)
-            {
-                if(objectEntry.object != nullptr)
-                {
-                    if(objectEntry.object->getGroup().empty())
-                    {
-                        PrintObjectEntry(&objectEntry);
-                    }
-                }
-            }
-
-            ImGui::TreePop();
-        }
-
-        if(ImGui::TreeNodeEx("Unused", ImGuiTreeNodeFlags_DefaultOpen, "Unused (%i)", m_freeList.size()))
-        {
-            for(const ObjectEntry& objectEntry : m_objects)
-            {
-                if(objectEntry.object == nullptr)
-                {
-                    PrintObjectEntry(&objectEntry);
-                }
-            }
-
-            ImGui::TreePop();
-        }
+        ImGui::End();
     }
-    ImGui::End();
 }
 
 Handle World::addObject(Object* object, std::string name, std::string group)

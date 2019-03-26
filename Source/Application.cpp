@@ -11,6 +11,8 @@
 #include "Game/Tank.hpp"
 #include "Game/Level.hpp"
 
+extern ConsoleVariable<bool> cv_showConsole;
+
 Application::Application() :
     m_network(nullptr),
     m_gameInstance(nullptr),
@@ -87,7 +89,7 @@ void Application::handleEvent(const sf::Event& event)
         switch(event.key.code)
         {
         case sf::Keyboard::Tilde:
-            g_console->toggle();
+            cv_showConsole.value = !cv_showConsole.value;
             break;
 
         case sf::Keyboard::F5:
@@ -181,9 +183,6 @@ void Application::draw(float timeAlpha)
         viewport.setCenter(tank->getPosition().x, tank->getPosition().y);
         // LOG_TRACE("X: %f Y: %f", tank->getPosition().x, tank->getPosition().y);
     }
-
-    // Draw demo ImGui window.
-    //ImGui::ShowDemoWindow();
 
     // Draw console.
     g_console->display();

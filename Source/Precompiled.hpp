@@ -2,6 +2,7 @@
 
 // Standard
 #include <cmath>
+#include <cctype>
 #include <cstdint>
 #include <iomanip>
 #include <iostream>
@@ -9,6 +10,7 @@
 #include <sstream>
 #include <memory>
 #include <vector>
+#include <functional>
 #include <queue>
 #include <map>
 
@@ -36,3 +38,4 @@
 #include "Types/TypeInfo.hpp"
 #include "Serialization/Serialization.hpp"
 #include "System/Logger.hpp"
+#include "System/Console.hpp"

@@ -1,6 +1,8 @@
 #include "Precompiled.hpp"
 #include "Window.hpp"
 
+ConsoleVariable<bool> cv_showImGuiDemo("showImGuiDemo", false);
+
 Window::Window() :
     render(m_window)
 {
@@ -84,14 +86,26 @@ bool Window::pollEvent(sf::Event& event)
 
 void Window::beginRender()
 {
+    // Update ImGui interface.
     sf::Time timeDelta = m_clock.restart();
     ImGui::SFML::Update(m_window, timeDelta);
+
+    // Clear render target.
     m_window.clear();
 }
 
 void Window::endRender()
 {
+    // Show ImGui demo window.
+    if(cv_showImGuiDemo.value)
+    {
+        ImGui::ShowDemoWindow(&cv_showImGuiDemo.value);
+    }
+
+    // Render ImGui interface.
     ImGui::SFML::Render(m_window);
+
+    // Display render target.
     m_window.display();
 }
 

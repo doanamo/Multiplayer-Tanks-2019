@@ -29,3 +29,15 @@ std::string formatString(const char* format, va_list arguments)
     return std::string(&dynamicBuffer[0], dynamicBuffer.size());
 }
 
+std::string lowerCaseString(const std::string& string)
+{
+    std::string result;
+
+    for(char character : string)
+    {
+        result.push_back(std::tolower(character));
+    }
+
+    return result;
+}
+
