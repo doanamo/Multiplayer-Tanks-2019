@@ -106,6 +106,17 @@ void Application::handleEvent(const sf::Event& event)
             isCameraAttachedToPlayer = true;
             LOG_TRACE("Camera has re-attached to the player's tank.");
             break;
+
+        case sf::Keyboard::I:
+        case sf::Keyboard::K:
+        case sf::Keyboard::J:
+        case sf::Keyboard::L:
+            if (isCameraAttachedToPlayer)
+            {
+                isCameraAttachedToPlayer = false;
+                LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
+            }
+            break;
         }
     }
 
@@ -156,46 +167,11 @@ void Application::draw(float timeAlpha)
     g_window->render.setView(viewport);
 
     // Manual camera navigation.
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I))
-    {
-        if (isCameraAttachedToPlayer)
-        {
-            isCameraAttachedToPlayer = false;
-            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
-        }
-        viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K))
-    {
-        if (isCameraAttachedToPlayer)
-        {
-            isCameraAttachedToPlayer = false;
-            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
-        }
-        viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) 
-    {
-        if (isCameraAttachedToPlayer)
-        {
-            isCameraAttachedToPlayer = false;
-            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
-        }
-        viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
-    }
-
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) 
-    {
-        if (isCameraAttachedToPlayer)
-        {
-            isCameraAttachedToPlayer = false;
-            LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
-        }
-        viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
-    }
-
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
+     
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
 
