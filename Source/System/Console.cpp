@@ -5,6 +5,16 @@
 
 ConsoleVariable<bool> cv_showConsole("showConsole", false);
 
+namespace
+{
+    void logFunction(std::string arguments)
+    {
+        LOG_INFO("Log: %s", arguments.c_str());
+    }
+}
+
+ConsoleFunction cf_log("log", &logFunction);
+
 ConsoleEntry::ConsoleEntry(std::string name) :
     m_name(name)
 {
@@ -24,6 +34,19 @@ ConsoleRegistry& ConsoleRegistry::getSingleton()
 
 void ConsoleRegistry::registerEntry(std::string name, ConsoleEntry& entry)
 {
+    // Check for invalid characters.
+    bool containsNonLetters = std::find_if(name.begin(), name.end(), [](const char& c)
+    {
+        return std::isalpha(c) == 0;
+    }) != name.end();
+
+    if(containsNonLetters)
+    {
+        LOG_ERROR("Could not add \"%s\" console entry due to invalid characters!", name.c_str());
+        return;
+    }
+
+    // Insert console entry.
     auto result = m_entries.emplace(lowerCaseString(name), entry);
 
     if(!result.second)
@@ -171,47 +194,61 @@ void Console::display()
             // Print entered console command.
             LOG_INFO("> %s", inputString.c_str());
 
-            // Parse command and arguments.
-            std::size_t delimeter = inputString.find_first_of(' ');
-            std::string command = inputString.substr(0, std::min(inputString.length(), delimeter));
-            std::string arguments = inputString.substr(std::min(command.length(), delimeter));
+            // Parse console input.
+            auto entryNameEnd = std::find_if_not(inputString.begin(), inputString.end(), 
+                [](char c) { return std::isalpha(c) != 0; });
 
-            // Remove leading arguments space.
-            if(!arguments.empty() && arguments[0] == ' ')
+            if(entryNameEnd != inputString.begin())
             {
-                arguments = arguments.substr(1);
-            }
+                // Get console entry by its name.
+                std::string entryName(inputString.begin(), entryNameEnd);
+                ConsoleEntry* consoleEntry = ConsoleRegistry::getSingleton().findEntry(entryName);
 
-            // Check if command is a function call.
-            bool functionalCall = false;
-
-            if(command.size() >= 3 && command[command.size() - 2] == '(' && command[command.size() - 1] == ')')
-            {
-                command = command.substr(0, command.size() - 2);
-                functionalCall = true;
-            }
-
-            // Find console entry.
-            ConsoleEntry* consoleEntry = ConsoleRegistry::getSingleton().findEntry(command);
-
-            if(consoleEntry)
-            {
-                if(functionalCall)
+                if(consoleEntry != nullptr)
                 {
-                    consoleEntry->call(arguments);
-                }
-                else if(!arguments.empty())
-                {
-                    consoleEntry->write(arguments);
+                    // Parse additional value or function call argument.
+                    auto valueBegin = std::find_if_not(entryNameEnd, inputString.end(), 
+                        [](char c) { return std::isspace(c) != 0; });
+
+                    if(entryNameEnd != inputString.end() && valueBegin != inputString.end())
+                    {
+                        if(*entryNameEnd == '(')
+                        {
+                            auto braceBegin = entryNameEnd;
+                            auto braceEnd = std::find(inputString.rbegin(), inputString.rend(), ')');
+
+                            if(braceEnd != inputString.rend())
+                            {
+                                std::string argumentString(braceBegin + 1, braceEnd.base() - 1);
+                                consoleEntry->call(argumentString);
+                            }
+                            else
+                            {
+                                LOG_ERROR("Missing closing brace for an apparent function call!");
+                            }
+                        }
+                        else
+                        {
+                            auto valueEnd = std::find_if_not(inputString.rbegin(), inputString.rend(),
+                                [](char c) { return std::isspace(c) != 0; }).base();
+
+                            std::string valueString(valueBegin, valueEnd);
+                            consoleEntry->write(valueString);
+                        }
+                    }
+                    else
+                    {
+                        consoleEntry->read();
+                    }
                 }
                 else
                 {
-                    consoleEntry->read();
+                    LOG_ERROR("Could not find \"%s\" console entry!", entryName.c_str());
                 }
             }
             else
             {
-                LOG_ERROR("Could not find \"%s\" console entry!", command.c_str());
+                LOG_ERROR("Could not parse console input for entry name!");
             }
 
             // Clear console input.

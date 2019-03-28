@@ -41,3 +41,31 @@ std::string lowerCaseString(const std::string& string)
     return result;
 }
 
+std::string trimLeadingString(const std::string& string, std::string characters)
+{
+    const auto it = string.find_first_not_of(characters);
+
+    if(it != std::string::npos)
+    {
+        return string.substr(it);
+    }
+    else
+    {
+        return "";
+    }
+}
+
+std::string trimTrailingString(const std::string& string, std::string characters)
+{
+    const auto it = string.find_last_not_of(characters);
+
+    if(it != std::string::npos)
+    {
+        return string.substr(0, it + 1);
+    }
+    else
+    {
+        return "";
+    }
+}
+
