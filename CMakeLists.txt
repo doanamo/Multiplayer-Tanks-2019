@@ -29,6 +29,8 @@ set(SOURCE_FILES
     "Source/System/Main.cpp"
     "Source/System/Globals.hpp"
     "Source/System/Globals.cpp"
+    "Source/System/CommandLine.hpp"
+    "Source/System/CommandLine.cpp"
     "Source/System/Logger.hpp"
     "Source/System/Logger.cpp"
     "Source/System/Window.hpp"

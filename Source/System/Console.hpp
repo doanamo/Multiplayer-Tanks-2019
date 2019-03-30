@@ -52,7 +52,6 @@ public:
 
     void write(std::string arguments) override
     {
-        // Set current value.
         if(arguments == "1" || arguments == "true")
         {
             value = true;
@@ -74,6 +73,29 @@ public:
 
 public:
     bool value;
+};
+
+template<>
+class ConsoleVariable<std::string> : public ConsoleEntry
+{
+public:
+    ConsoleVariable(std::string name, std::string value) :
+        ConsoleEntry(name), value(value)
+    {
+    }
+
+    void write(std::string arguments) override
+    {
+        value = arguments;
+    }
+
+    void read() const override
+    {
+        LOG_INFO("%s = %s", getName().c_str(), value.c_str());
+    }
+
+public:
+    std::string value;
 };
 
 class ConsoleFunction : public ConsoleEntry
@@ -129,7 +151,13 @@ public:
     Console();
     ~Console();
 
+    // Initializes the console.
     bool initialize();
+
+    // Parse console input.
+    void parseInput(std::string inputString, bool ignoreErrors = false);
+
+    // Displays console window if "showConsole" variable is true.
     void display();
 
 private:

@@ -1,5 +1,6 @@
 #include "Precompiled.hpp"
 #include "System/Globals.hpp"
+#include "System/CommandLine.hpp"
 #include "Types/RuntimeTypes.hpp"
 #include "System/Window.hpp"
 #include "System/Console.hpp"
@@ -7,6 +8,7 @@
 #include "Application.hpp"
 
 Logger* g_logger = nullptr;
+CommandLine* g_commandLine = nullptr;
 RuntimeTypes* g_runtimeTypes = nullptr;
 Window* g_window = nullptr;
 sf::RenderTarget* g_render = nullptr;
@@ -14,12 +16,21 @@ Console* g_console = nullptr;
 AssetManager* g_assetManager = nullptr;
 Application* g_application = nullptr;
 
-bool initializeGlobals()
+bool initializeGlobals(int argc, char* argv[])
 {
     // Initialize logger.
     g_logger = new Logger;
 
     if(!g_logger->initialize())
+    {
+        shutdownGlobals();
+        return false;
+    }
+
+    // Initialize command line.
+    g_commandLine = new CommandLine;
+
+    if(!g_commandLine->initialize(argc, argv))
     {
         shutdownGlobals();
         return false;
@@ -54,6 +65,9 @@ bool initializeGlobals()
         shutdownGlobals();
         return false;
     }
+
+    // Parse command line console variables.
+    g_commandLine->parseConsoleVariables();
 
     // Initialize asset manager.
     g_assetManager = new AssetManager;
@@ -108,6 +122,12 @@ void shutdownGlobals()
     {
         delete g_runtimeTypes;
         g_runtimeTypes = nullptr;
+    }
+
+    if(g_commandLine)
+    {
+        delete g_commandLine;
+        g_commandLine = nullptr;
     }
 
     if(g_logger)

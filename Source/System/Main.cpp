@@ -14,13 +14,13 @@ void exit(std::string arguments)
 
 ConsoleFunction cf_exit("exit", &exit);
 
-int main()
+int main(int argc, char* argv[])
 {
     // Initialize debug.
     initializeDebug();
 
     // Initialize globals.
-    if(!initializeGlobals())
+    if(!initializeGlobals(argc, argv))
         return -1;
 
     // Prepare timer.
