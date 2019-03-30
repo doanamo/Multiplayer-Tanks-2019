@@ -102,7 +102,7 @@ set_target_properties("Game" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_C
 # Use precompiled header for quicker compilation of static headers.
 if("${CMAKE_CXX_COMPILER_ID}" STREQUAL "MSVC")
     # Hide console window.
-    set(CMAKE_EXE_LINKER_FLAGS "${CMAKE_EXE_LINKER_FLAGS} /SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
+    set_target_properties("Game" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
     
     # Disable non standard warnings.
     target_compile_definitions("Game" PUBLIC "_CRT_SECURE_NO_WARNINGS")
