@@ -87,6 +87,9 @@ target_compile_features("Game" PRIVATE cxx_std_17)
 # Add source as include directory.
 target_include_directories("Game" PRIVATE "${CMAKE_CURRENT_SOURCE_DIR}/Source")
 
+# Set binary output directory.
+set_target_properties("Game" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BINARY_DIR}/Output")
+
 # Organize structure of source files.
 set_property(GLOBAL PROPERTY USE_FOLDERS ON)
 set_property(GLOBAL PROPERTY PREDEFINED_TARGETS_FOLDER "CMake")
@@ -95,7 +98,7 @@ source_group(TREE ${CMAKE_CURRENT_SOURCE_DIR} FILES ${SOURCE_FILES})
 
 # Set target as default project for Visual Studio.
 set_property(DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR} PROPERTY VS_STARTUP_PROJECT "Game")
- 
+
 # Set main build directory as the working directory.
 set_target_properties("Game" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Deploy/")
 
@@ -161,3 +164,8 @@ target_link_libraries("Game" "ImGui")
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/External/ImGui-1.68/sfml" "External/SFML-ImGui" EXCLUDE_FROM_ALL)
 set_property(TARGET "SFML-ImGui" PROPERTY FOLDER "External")
 target_link_libraries("Game" "SFML-ImGui")
+
+# Add launcher project.
+if(WIN32)
+    add_subdirectory("Source/Launcher")
+endif()
