@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 
+class Network;
 class World;
 class Level;
 class PlayerController;
@@ -28,6 +29,9 @@ protected:
     bool onDeserialize(MemoryBuffer& buffer) override;
 
 private:
+    // Network interface.
+    Network* m_network;
+
     // Game world.
     World* m_world;
 

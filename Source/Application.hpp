@@ -21,9 +21,6 @@ public:
     bool loadSnaphot();
 
 public:
-    // Network interface.
-    Network* m_network;
-
     // Game instance.
     GameInstance* m_gameInstance;
 
