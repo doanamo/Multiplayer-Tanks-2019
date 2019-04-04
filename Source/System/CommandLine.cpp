@@ -47,7 +47,7 @@ void CommandLine::parseConsoleVariables()
 
         if(!argumentString.empty())
         {
-            g_console->parseInput(argumentString);
+            g_console->parseInput(argumentString, true);
         }
 
         argumentBegin = argumentEnd;
