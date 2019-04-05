@@ -11,6 +11,7 @@
 
     // Override new operator to store additional info about allocations.
     #define DEBUG_NEW new(_NORMAL_BLOCK, __FILE__, __LINE__)
+    #define new DEBUG_NEW
 #endif
 
 // Initializes low level debug systems.

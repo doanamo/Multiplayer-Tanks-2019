@@ -14,8 +14,7 @@ bool deserialize(MemoryBuffer& buffer, Serializable* serializable)
 
 bool serialize(MemoryBuffer& buffer, uint8_t value)
 {
-    buffer.writeByte(&value);
-    return true;
+    return buffer.writeByte(&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, uint8_t* value)
@@ -26,8 +25,7 @@ bool deserialize(MemoryBuffer& buffer, uint8_t* value)
 
 bool serialize(MemoryBuffer& buffer, uint16_t value)
 {
-    buffer.writeShort(&value);
-    return true;
+    return buffer.writeShort(&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, uint16_t* value)
@@ -38,8 +36,7 @@ bool deserialize(MemoryBuffer& buffer, uint16_t* value)
 
 bool serialize(MemoryBuffer& buffer, uint32_t value)
 {
-    buffer.writeInteger(&value);
-    return true;
+    return buffer.writeInteger(&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, uint32_t* value)
@@ -50,8 +47,7 @@ bool deserialize(MemoryBuffer& buffer, uint32_t* value)
 
 bool serialize(MemoryBuffer& buffer, uint64_t value)
 {
-    buffer.writeWord(&value);
-    return true;
+    return buffer.writeWord(&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, uint64_t* value)
@@ -62,8 +58,7 @@ bool deserialize(MemoryBuffer& buffer, uint64_t* value)
 
 bool serialize(MemoryBuffer& buffer, int8_t value)
 {
-    buffer.writeByte((uint8_t*)&value);
-    return true;
+    return buffer.writeByte((uint8_t*)&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, int8_t* value)
@@ -74,8 +69,7 @@ bool deserialize(MemoryBuffer& buffer, int8_t* value)
 
 bool serialize(MemoryBuffer& buffer, int16_t value)
 {
-    buffer.writeShort((uint16_t*)&value);
-    return true;
+    return buffer.writeShort((uint16_t*)&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, int16_t* value)
@@ -86,8 +80,7 @@ bool deserialize(MemoryBuffer& buffer, int16_t* value)
 
 bool serialize(MemoryBuffer& buffer, int32_t value)
 {
-    buffer.writeInteger((uint32_t*)&value);
-    return true;
+    return buffer.writeInteger((uint32_t*)&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, int32_t* value)
@@ -98,8 +91,7 @@ bool deserialize(MemoryBuffer& buffer, int32_t* value)
 
 bool serialize(MemoryBuffer& buffer, int64_t value)
 {
-    buffer.writeWord((uint64_t*)&value);
-    return true;
+    return buffer.writeWord((uint64_t*)&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, int64_t* value)
@@ -110,8 +102,7 @@ bool deserialize(MemoryBuffer& buffer, int64_t* value)
 
 bool serialize(MemoryBuffer& buffer, char value)
 {
-    buffer.writeByte((uint8_t*)&value);
-    return true;
+    return buffer.writeByte((uint8_t*)&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, char* value)
@@ -122,8 +113,7 @@ bool deserialize(MemoryBuffer& buffer, char* value)
 
 bool serialize(MemoryBuffer& buffer, float value)
 {
-    buffer.writeInteger((uint32_t*)&value);
-    return true;
+    return buffer.writeInteger((uint32_t*)&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, float* value)
@@ -134,8 +124,7 @@ bool deserialize(MemoryBuffer& buffer, float* value)
 
 bool serialize(MemoryBuffer& buffer, double value)
 {
-    buffer.writeWord((uint64_t*)&value);
-    return true;
+    return buffer.writeWord((uint64_t*)&value);
 }
 
 bool deserialize(MemoryBuffer& buffer, double* value)
@@ -173,9 +162,9 @@ bool serialize(MemoryBuffer& buffer, const std::string& value)
     if(!serialize(buffer, value.length()))
         return false;
 
-    for(std::size_t i = 0; i < value.length(); ++i)
+    for(char i : value)
     {
-        if(!serialize(buffer, value[i]))
+        if(!serialize(buffer, i))
             return false;
     }
 

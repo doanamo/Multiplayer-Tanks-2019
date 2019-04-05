@@ -9,10 +9,10 @@ public:
     ~MemoryBuffer();
 
     // Writing methods.
-    void writeByte(uint8_t* value);
-    void writeShort(uint16_t* value);
-    void writeInteger(uint32_t* value);
-    void writeWord(uint64_t* value);
+    bool writeByte(uint8_t* value);
+    bool writeShort(uint16_t* value);
+    bool writeInteger(uint32_t* value);
+    bool writeWord(uint64_t* value);
 
     // Reading methods.
     bool readByte(uint8_t* value);
@@ -21,10 +21,15 @@ public:
     bool readWord(uint64_t* value);
 
     // Buffer manipulation.
+    void clear();
+    void reset();
     void resize(std::size_t size);
-    std::size_t getSize() const;
-    const char* getData() const;
-    char* getData();
+    void fill(const char* data, std::size_t size);
+
+    // Accessors.
+    std::size_t size() const;
+    const char* data() const;
+    char* data();
 
 private:
     // Resizable stream buffer.

@@ -174,7 +174,7 @@ bool Application::saveSnapshot()
         return false;
     }
 
-    file.write(memoryBuffer.getData(), memoryBuffer.getSize());
+    file.write(memoryBuffer.data(), memoryBuffer.size());
     file.close();
 
     // Success!
@@ -201,7 +201,7 @@ bool Application::loadSnaphot()
     MemoryBuffer memoryBuffer;
     memoryBuffer.resize(size);
 
-    if(!file.read(memoryBuffer.getData(), size))
+    if(!file.read(memoryBuffer.data(), size))
     {
         LOG_ERROR("Could not read snapshot file!");
         return false;

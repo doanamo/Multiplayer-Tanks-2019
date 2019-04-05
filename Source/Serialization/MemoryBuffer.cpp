@@ -10,32 +10,52 @@ MemoryBuffer::~MemoryBuffer()
 {
 }
 
-void MemoryBuffer::writeByte(uint8_t* value)
+bool MemoryBuffer::writeByte(uint8_t* value)
 {
+    if(m_index != m_buffer.size())
+        return false;
+
     m_buffer.resize(m_index + sizeof(uint8_t));
     *((uint8_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint8_t);
+
+    return true;
 }
 
-void MemoryBuffer::writeShort(uint16_t* value)
+bool MemoryBuffer::writeShort(uint16_t* value)
 {
+    if(m_index != m_buffer.size())
+        return false;
+
     m_buffer.resize(m_index + sizeof(uint16_t));
     *((uint16_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint16_t);
+
+    return true;
 }
 
-void MemoryBuffer::writeInteger(uint32_t* value)
+bool MemoryBuffer::writeInteger(uint32_t* value)
 {
+    if(m_index != m_buffer.size())
+        return false;
+
     m_buffer.resize(m_index + sizeof(uint32_t));
     *((uint32_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint32_t);
+
+    return true;
 }
 
-void MemoryBuffer::writeWord(uint64_t* value)
+bool MemoryBuffer::writeWord(uint64_t* value)
 {
+    if(m_index != m_buffer.size())
+        return false;
+
     m_buffer.resize(m_index + sizeof(uint64_t));
     *((uint64_t*)&m_buffer[m_index]) = *value;
     m_index += sizeof(uint64_t);
+
+    return true;
 }
 
 bool MemoryBuffer::readByte(uint8_t* value)
@@ -82,23 +102,42 @@ bool MemoryBuffer::readWord(uint64_t* value)
     return true;
 }
 
-void MemoryBuffer::resize(std::size_t size)
+void MemoryBuffer::clear()
 {
-    ASSERT(m_index == 0, "Resizing buffer that is being written or read from!");
-    m_buffer.resize(size);
+    m_buffer.clear();
+    m_index = 0;
 }
 
-std::size_t MemoryBuffer::getSize() const
+void MemoryBuffer::reset()
+{
+    m_index = 0;
+}
+
+void MemoryBuffer::resize(std::size_t size)
+{
+    m_buffer.resize(size, 0);
+}
+
+void MemoryBuffer::fill(const char* data, std::size_t size)
+{
+    m_buffer.clear();
+    m_index = 0;
+
+    m_buffer.resize(size);
+    memcpy(m_buffer.data(), data, size);
+}
+
+std::size_t MemoryBuffer::size() const
 {
     return m_buffer.size();
 }
 
-const char* MemoryBuffer::getData() const
+const char* MemoryBuffer::data() const
 {
     return &m_buffer[0];
 }
 
-char* MemoryBuffer::getData()
+char* MemoryBuffer::data()
 {
     return &m_buffer[0];
 }
