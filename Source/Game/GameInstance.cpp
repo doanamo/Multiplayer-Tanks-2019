@@ -6,7 +6,7 @@
 #include "Network/Server.hpp"
 #include "Network/Client.hpp"
 #include "System/CommandLine.hpp"
-#include "system/Window.hpp"
+#include "System/Window.hpp"
 
 GameInstance::GameInstance() :
     m_network(nullptr),
