@@ -58,6 +58,8 @@ bool GameInstance::initialize()
         g_window->setTitle(g_window->getInitialTitle() + " - Client");
     }
 
+    m_network->initialize();
+
     // Create world instance.
     m_world = new World;
     if(!m_world->initialize())
@@ -84,12 +86,24 @@ void GameInstance::handleEvent(const sf::Event& event)
 
 void GameInstance::update(float timeDelta)
 {
+    // Update network interface.
+    if(m_network)
+    {
+        m_network->onUpdate(timeDelta);
+    }
+
     // Update world instance.
     m_world->update(timeDelta);
 }
 
 void GameInstance::tick(float timeDelta)
 {
+    // Tick network interface.
+    if(m_network)
+    {
+        m_network->onTick(timeDelta);
+    }
+
     // Tick game level.
     m_level->tick(timeDelta);
 

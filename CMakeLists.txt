@@ -43,6 +43,7 @@ set(SOURCE_FILES
     "Source/Network/Protocol.hpp"
     "Source/Network/Protocol.cpp"
     "Source/Network/Network.hpp"
+    "Source/Network/Network.cpp"
     "Source/Network/Server.hpp"
     "Source/Network/Server.cpp"
     "Source/Network/Client.hpp"

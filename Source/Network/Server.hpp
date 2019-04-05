@@ -11,6 +11,7 @@ public:
 
     bool initialize() override;
     void onUpdate(float timeDelta) override;
+    void onTick(float timeDelta) override;
 
     bool isConnected() const override;
     bool isServer() const override;
@@ -18,5 +19,6 @@ public:
     int getClientIndex() const override;
 
 private:
-
+    // Server socket.
+    sf::UdpSocket m_socket;
 };
