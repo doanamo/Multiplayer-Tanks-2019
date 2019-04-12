@@ -58,7 +58,11 @@ bool GameInstance::initialize()
         g_window->setTitle(g_window->getInitialTitle() + " - Client");
     }
 
-    m_network->initialize();
+    if(m_network)
+    {
+        if(!m_network->initialize())
+            return false;
+    }
 
     // Create world instance.
     m_world = new World;

@@ -2,12 +2,16 @@
 
 #include "Precompiled.hpp"
 
-extern ConsoleVariable<std::string> cv_port;
-extern ConsoleVariable<std::string> cv_connect;
+bool ParseStringToPort(std::string text, unsigned short& port);
 
 class Network
 {
+protected:
+    Network();
+
 public:
+    virtual ~Network();
+
     virtual bool initialize() = 0;
     virtual void onUpdate(float timeDelta) = 0;
     virtual void onTick(float timeDelta) = 0;
@@ -16,4 +20,13 @@ public:
     virtual bool isServer() const = 0;
     virtual bool isClient() const = 0;
     virtual int getClientIndex() const = 0;
+
+protected:
+    // Initializes socket.
+    bool initializeSocket(std::string listenPort = "0");
+
+protected:
+    // Network socket.
+    sf::UdpSocket m_socket;
+    unsigned short m_listenPort;
 };

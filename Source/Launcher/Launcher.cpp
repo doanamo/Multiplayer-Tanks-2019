@@ -105,7 +105,7 @@ int main(int argc, char* argv[])
     std::cout << "Welcome to Tanks launcher!\n\n";
     std::cout << "Please select an option:\n";
     std::cout << "1. Start single instance as host (other players will be able to connect)\n";
-    std::cout << "2. Start single instance as client (you will be prompted to enter IP address)\n";
+    std::cout << "2. Start single instance as client (you will be prompted for server info)\n";
     std::cout << "3. Start two instances in local session (one host and one client)\n";
     std::cout << "4. Start four instances in local session (one host and three clients)\n";
     std::cout << "5. Start six instances in local session (one host and five client)\n";
@@ -120,20 +120,29 @@ int main(int argc, char* argv[])
     // Parse user input.
     int localPlayerCount = 0;
     bool firstPlayerHosts = true;
+
     std::string serverAddress = "127.0.0.1";
+    std::string serverPort = "2076";
 
     if(menuInput == "1")
     {
         localPlayerCount = 1;
         firstPlayerHosts = true;
+
+        std::cout << "Please enter listen port:";
+        std::cin >> serverPort;
+
     }
     else if(menuInput == "2")
     {
         localPlayerCount = 1;
         firstPlayerHosts = false;
 
-        std::cout << "Please enter IP address: ";
+        std::cout << "Please enter server IP address:";
         std::cin >> serverAddress;
+
+        std::cout << "Please enter server port:";
+        std::cin >> serverPort;
     }
     else if(menuInput == "3")
     {
@@ -173,11 +182,11 @@ int main(int argc, char* argv[])
         // Make the first player a host.
         if(i == 0 && firstPlayerHosts)
         {
-            gameProcesses[i].arguments += "-host ";
+            gameProcesses[i].arguments += "-host " + serverPort;
         }
         else
         {
-            gameProcesses[i].arguments += "-connect " + serverAddress + " ";
+            gameProcesses[i].arguments += "-connect " + serverAddress + ":" + serverPort;
         }
 
         // Spawn new thread.

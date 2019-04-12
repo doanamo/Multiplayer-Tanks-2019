@@ -1,8 +1,10 @@
 #include "Precompiled.hpp"
 #include "Network/Server.hpp"
+#include "Network/Protocol.hpp"
 
-Server::Server() :
-    m_socket()
+ConsoleVariable<std::string> cv_host("host", "2076");
+
+Server::Server()
 {
 }
 
@@ -12,38 +14,63 @@ Server::~Server()
 
 bool Server::initialize()
 {
-    // Get server port number.
-    unsigned int serverPort = std::stoi(cv_port.value);
-
-    if(serverPort > std::numeric_limits<unsigned short>::max())
-    {
-        LOG_ERROR("Server port number %i is outside of valid range!", serverPort);
+    // Initializes the base network interface.
+    if(!Network::initializeSocket(cv_host.value))
         return false;
-    }
-
-    // Bind socket to port.
-    if(m_socket.bind((unsigned short)serverPort) != sf::Socket::Done)
-        return false;
-
-    // Disable blocking mode.
-    m_socket.setBlocking(false);
 
     return true;
 }
 
 void Server::onUpdate(float timeDelta)
 {
+    // Receive packets.
     MemoryBuffer packetBuffer;
     packetBuffer.resize(sf::UdpSocket::MaxDatagramSize);
     std::size_t bytesReceived;
 
-    sf::IpAddress clientAddress;
-    unsigned short clientPort;
+    sf::IpAddress senderAddress;
+    unsigned short senderPort;
 
-    while(m_socket.receive(packetBuffer.data(), sf::UdpSocket::MaxDatagramSize,
-        bytesReceived, clientAddress, clientPort) == sf::Socket::Done)
     {
-        LOG_TRACE("Received packet from client.");
+
+    }
+
+    while(true)
+    {
+        // Check if we received any packets.
+        auto status = m_socket.receive(packetBuffer.data(),
+            sf::UdpSocket::MaxDatagramSize,
+            bytesReceived, senderAddress,
+            senderPort);
+
+        ASSERT(status != sf::Socket::Partial);
+        ASSERT(status != sf::Socket::Error);
+
+        if(status == sf::Socket::Disconnected)
+            break;
+
+        if(status == sf::Socket::NotReady)
+            break;
+        
+        if(status != sf::Socket::Done)
+            continue;
+
+        LOG_TRACE("Received packet from %s:%hu.", senderAddress.toString().c_str(), senderPort);
+
+        // Send response packet.
+        LOG_TRACE("Sending packet to %s:%hu.", senderAddress.toString().c_str(), senderPort);
+
+        PacketHeader packetHeader;
+        packetHeader.type = PacketType::Network_Heartbeat;
+
+        MemoryBuffer packetBuffer;
+        serialize(packetBuffer, packetHeader);
+
+        if(m_socket.send(packetBuffer.data(), packetBuffer.size(),
+            senderAddress, senderPort) != sf::Socket::Done)
+        {
+            LOG_ERROR("Sending packet resulted in an error!");
+        }
     }
 }
 

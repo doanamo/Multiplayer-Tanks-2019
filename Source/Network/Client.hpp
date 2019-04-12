@@ -3,6 +3,8 @@
 #include "Precompiled.hpp"
 #include "Network/Network.hpp"
 
+extern ConsoleVariable<std::string> cv_connect;
+
 class Client : public Network
 {
 public:
@@ -19,8 +21,7 @@ public:
     int getClientIndex() const override;
 
 private:
-    // Client socket.
-    sf::UdpSocket m_socket;
+    // Server info.
     sf::IpAddress m_serverAddress;
     unsigned short m_serverPort;
 
