@@ -118,7 +118,7 @@ void MemoryBuffer::resize(std::size_t size)
     m_buffer.resize(size, 0);
 }
 
-void MemoryBuffer::fill(const char* data, std::size_t size)
+void MemoryBuffer::copy(const char* data, std::size_t size)
 {
     m_buffer.clear();
     m_index = 0;

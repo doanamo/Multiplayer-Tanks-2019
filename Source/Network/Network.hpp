@@ -25,6 +25,12 @@ protected:
     // Initializes socket.
     bool initializeSocket(std::string listenPort = "0");
 
+    // Sends packet through socket.
+    bool sendPacket(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port);
+
+    // Receives packet from socket.
+    bool receivePacket(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port);
+
 protected:
     // Network socket.
     sf::UdpSocket m_socket;

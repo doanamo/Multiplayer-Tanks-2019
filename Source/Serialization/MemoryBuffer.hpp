@@ -24,7 +24,7 @@ public:
     void clear();
     void reset();
     void resize(std::size_t size);
-    void fill(const char* data, std::size_t size);
+    void copy(const char* data, std::size_t size);
 
     // Accessors.
     std::size_t size() const;

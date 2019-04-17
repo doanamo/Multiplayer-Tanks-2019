@@ -50,52 +50,24 @@ void Client::onUpdate(float timeDelta)
 
     if(m_hearbeatTimer == 0.0f)
     {
-        LOG_TRACE("Sending packet to %s:%hu.", m_serverAddress.toString().c_str(), m_serverPort);
-
         PacketHeader packetHeader;
         packetHeader.type = PacketType::Network_Heartbeat;
 
-        MemoryBuffer packetBuffer;
-        serialize(packetBuffer, packetHeader);
+        MemoryBuffer sendtPacket;
+        serialize(sendtPacket, packetHeader);
 
-        if(m_socket.send(packetBuffer.data(), packetBuffer.size(),
-            m_serverAddress, m_serverPort) != sf::Socket::Done)
-        {
-            LOG_ERROR("Sending packet resulted in an error!");
-        }
+        this->sendPacket(sendtPacket, m_serverAddress, m_serverPort);
 
         m_hearbeatTimer = 1.0f;
     }
 
     // Receive packets.
-    MemoryBuffer packetBuffer;
-    packetBuffer.resize(sf::UdpSocket::MaxDatagramSize);
-    std::size_t bytesReceived;
-
+    MemoryBuffer receivedPacket;
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(true)
+    while(this->receivePacket(receivedPacket, senderAddress, senderPort))
     {
-        // Check if we received any packets.
-        auto status = m_socket.receive(packetBuffer.data(),
-            sf::UdpSocket::MaxDatagramSize,
-            bytesReceived, senderAddress,
-            senderPort);
-
-        ASSERT(status != sf::Socket::Partial);
-        ASSERT(status != sf::Socket::Error);
-
-        if(status == sf::Socket::Disconnected)
-            break;
-
-        if(status == sf::Socket::NotReady)
-            break;
-
-        if(status != sf::Socket::Done)
-            continue;
-
-        LOG_TRACE("Received packet from %s:%hu.", senderAddress.toString().c_str(), senderPort);
     }
 }
 
