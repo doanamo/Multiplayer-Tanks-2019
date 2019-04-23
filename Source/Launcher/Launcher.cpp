@@ -129,9 +129,8 @@ int main(int argc, char* argv[])
         localPlayerCount = 1;
         firstPlayerHosts = true;
 
-        std::cout << "Please enter listen port:";
+        std::cout << "Please enter listen port: ";
         std::cin >> serverPort;
-
     }
     else if(menuInput == "2")
     {

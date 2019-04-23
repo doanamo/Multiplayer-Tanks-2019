@@ -69,3 +69,20 @@ std::string trimTrailingString(const std::string& string, std::string characters
     }
 }
 
+uint32_t stringHash(const std::string& string)
+{
+    // Small and simple hashing function for strings.
+    // May need to be replaced in case of collisions.
+    // Use only if you can detect possible collisions.
+    // It is not cryptographically secure.
+    const unsigned int prime = 257;
+    unsigned int hash = 0;
+
+    for(char c : string)
+    {
+        hash = hash * prime + c;
+    }
+
+    return hash;
+}
+

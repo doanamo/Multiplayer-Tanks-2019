@@ -4,23 +4,32 @@
 
 class RuntimeTypes
 {
-public:
+private:
     RuntimeTypes();
     ~RuntimeTypes();
 
-    bool initialize();
+public:
+    // Type declarations.
+    using TypeMap = std::map<TypeInfo::IdentifierType, TypeInfo*>;
 
+public:
+    // Returns singleton.
+    static RuntimeTypes& getSingletion();
+
+    // Registers type.
     void registerType(TypeInfo& typeInfo);
+
+    // Returns type info.
     TypeInfo* getTypeInfo(TypeInfo::IdentifierType type);
+
+    // Prints registered types.
+    void printTypes();
 
 private:
     // Prints type list and all its children recursively.
-    void recursivePrint(const TypeInfo::TypeList& typeList, int depth, bool baseOnly);
+    void recursivePrintDerived(const TypeInfo::TypeList& typeList, int depth);
 
 private:
-    //  Type counter for assigning IDs.
-    TypeInfo::IdentifierType m_typeCounter;
-
-    // List of runtime types.
-    TypeInfo::TypeList m_typeList;
+    // Map of runtime types.
+    TypeMap m_typeMap;
 };

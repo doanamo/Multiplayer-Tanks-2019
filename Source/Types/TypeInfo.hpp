@@ -13,7 +13,7 @@ public:
     friend RuntimeTypes;
 
     // Identifier type.
-    using IdentifierType = int;
+    using IdentifierType = uint32_t;
     using TypeList = std::vector<TypeInfo*>;
     using AllocateFunction = void*(*)(void);
 
