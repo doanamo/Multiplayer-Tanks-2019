@@ -14,9 +14,6 @@ TypeInfo::TypeInfo(const char* typeName, AllocateFunction allocateFunction, Type
     ASSERT(typeName != nullptr, "Type name cannot be nullptr!");
     ASSERT(allocateFunction != nullptr, "Allocation function cannot be nullptr!");
 
-    // Register type in runtime type system.
-    RuntimeTypes::getSingletion().registerType(*this);
-
     // Add derived class to base type.
     if(m_baseType != nullptr)
     {
@@ -109,8 +106,9 @@ bool TypeInfo::isDerived(IdentifierType typeIdentifier) const
 
 TypeInfo* TypeInfo::getTypeInfo(IdentifierType typeIdentifier)
 {
+    ASSERT(g_runtimeTypes != nullptr);
     ASSERT(m_typeIdentifier != InvalidIdentifier);
     ASSERT(typeIdentifier != InvalidIdentifier);
 
-    return RuntimeTypes::getSingletion().getTypeInfo(typeIdentifier);
+    return g_runtimeTypes->getTypeInfo(typeIdentifier);
 }

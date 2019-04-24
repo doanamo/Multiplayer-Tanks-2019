@@ -4,17 +4,16 @@
 
 class RuntimeTypes
 {
-private:
-    RuntimeTypes();
-    ~RuntimeTypes();
-
 public:
     // Type declarations.
     using TypeMap = std::map<TypeInfo::IdentifierType, TypeInfo*>;
 
 public:
-    // Returns singleton.
-    static RuntimeTypes& getSingletion();
+    RuntimeTypes();
+    ~RuntimeTypes();
+
+    // Initializes runtime type system.
+    bool initialize();
 
     // Registers type.
     void registerType(TypeInfo& typeInfo);

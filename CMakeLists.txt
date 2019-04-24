@@ -18,6 +18,7 @@ set(SOURCE_FILES
     "Source/Types/RuntimeTypes.cpp"
     "Source/Types/TypeInfo.hpp"
     "Source/Types/TypeInfo.cpp"
+    "Source/Types/TypeList.cpp"
 
     "Source/Serialization/MemoryBuffer.hpp"
     "Source/Serialization/MemoryBuffer.cpp"
