@@ -22,7 +22,7 @@ public:
     TypeInfo(const char* typeName, AllocateFunction allocateFunction, TypeInfo* baseType = nullptr);
 
     // Gets unique type identifier.
-    int getIdentifier() const;
+    IdentifierType getIdentifier() const;
     
     // Gets readable type name.
     const char* getName() const;
@@ -46,7 +46,7 @@ public:
     bool isDerived(IdentifierType typeIdentifier) const;
 
     // Gets type info of another identifier.
-    TypeInfo* getTypeInfo(IdentifierType typeIdentifier);
+    TypeInfo* findTypeInfo(IdentifierType typeIdentifier);
 
 protected:
     // Type identifier.
@@ -65,15 +65,43 @@ protected:
     TypeList m_derivedTypes;
 };
 
+// Utility functions.
+template<typename Type>
+TypeInfo& getTypeInfo()
+{
+    return Type::staticTypeInfo();
+}
+
+template<typename Type>
+TypeInfo& getTypeInfo(const Type& type)
+{
+    return type.getTypeInfo();
+}
+
+template<typename Type>
+TypeInfo::IdentifierType getTypeIdentifier()
+{
+    return Type::staticTypeInfo().getIdentifier();
+}
+
+template<typename Type>
+TypeInfo::IdentifierType getTypeIdentifier(const Type& type)
+{
+    return type.getTypeInfo().getIdentifier();
+}
+
 // Utility macros.
 #define TYPE_DECLARE_EXPAND(x) x
 #define TYPE_DECLARE_STRINGIFY(type) #type
 #define TYPE_DECLARE_DEDUCE(arg1, arg2, arg3, ...) arg3
 
+#define TYPE_DECLARE_SUPER(base) \
+    using Super = base;
+
 #define TYPE_DECLARE_DETERMINE(type) \
-    virtual TypeInfo& getType() const \
+    virtual TypeInfo& getTypeInfo() const \
     { \
-        return type::Type(); \
+        return type::staticTypeInfo(); \
     }
 
 #define TYPE_DECLARE_ALLOCATE(type) \
@@ -85,13 +113,13 @@ protected:
 #define TYPE_DECLARE_CREATE(type) \
     static type* create(TypeInfo::IdentifierType typeIdentifier) \
     { \
-        if(Type().isSame(typeIdentifier)) \
+        if(type::staticTypeInfo().isSame(typeIdentifier)) \
         { \
             return (type*)allocate(); \
         } \
-        else if(Type().isDerived(typeIdentifier)) \
+        else if(type::staticTypeInfo().isDerived(typeIdentifier)) \
         { \
-            TypeInfo* typeInfo = type::Type().getTypeInfo(typeIdentifier); \
+            TypeInfo* typeInfo = type::staticTypeInfo().findTypeInfo(typeIdentifier); \
             if(typeInfo != nullptr) \
             { \
                 TypeInfo::AllocateFunction allocate = typeInfo->getAllocateFunction(); \
@@ -103,7 +131,7 @@ protected:
 
 #define TYPE_DECLARE_BASE(type) \
     public: \
-        static TypeInfo& Type() \
+        static TypeInfo& staticTypeInfo() \
         { \
             static TypeInfo typeInfo(TYPE_DECLARE_STRINGIFY(type), &type::allocate); \
             return typeInfo; \
@@ -114,11 +142,12 @@ protected:
 
 #define TYPE_DECLARE_DERIVED(type, base) \
     public: \
-        static TypeInfo& Type() \
+        static TypeInfo& staticTypeInfo() \
         { \
-            static TypeInfo typeInfo(TYPE_DECLARE_STRINGIFY(type), &type::allocate, &base::Type()); \
+            static TypeInfo typeInfo(TYPE_DECLARE_STRINGIFY(type), &type::allocate, &base::staticTypeInfo()); \
             return typeInfo; \
         }\
+        TYPE_DECLARE_SUPER(base) \
         TYPE_DECLARE_DETERMINE(type) \
         TYPE_DECLARE_ALLOCATE(type) \
         TYPE_DECLARE_CREATE(type)

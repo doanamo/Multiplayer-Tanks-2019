@@ -5,8 +5,9 @@
 #include "Game/Tank.hpp"
 #include "Game/Projectile.hpp"
 #include "Game/Level.hpp"
+#include "Network/Protocol.hpp"
 
-#define REGISTER_TYPE(type) g_runtimeTypes->registerType(type::Type());
+#define REGISTER_TYPE(type) g_runtimeTypes->registerType(type::staticTypeInfo());
 
 bool registerTypes()
 {
@@ -17,6 +18,9 @@ bool registerTypes()
     REGISTER_TYPE(Object);
     REGISTER_TYPE(Tank);
     REGISTER_TYPE(Projectile);
+
+    REGISTER_TYPE(PacketBase);
+    REGISTER_TYPE(PacketMessage);
 
     return true;
 }

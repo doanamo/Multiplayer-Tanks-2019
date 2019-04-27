@@ -1,41 +1,93 @@
 #include "Precompiled.hpp"
 #include "Protocol.hpp"
 
-PacketHeader::PacketHeader() :
-    type(PacketType::Invalid)
+static const char MagicValue[] = "TanksXD";
+static const int MagicSize = staticArraySize(MagicValue);
+
+PacketHeader::PacketHeader()
 {
-    strcpy(&magic[0], "TanksXD");
+    type = stringHash("");
 }
 
-bool serialize(MemoryBuffer& buffer, const PacketHeader& header)
+PacketHeader::~PacketHeader()
 {
-    // Write packet magic.
-    for(char c : header.magic)
+}
+
+bool PacketHeader::onSerialize(MemoryBuffer& buffer)
+{
+    for(char magic : MagicValue)
     {
-        if(!serialize(buffer, c))
+        if(!serialize(buffer, magic))
             return false;
     }
 
-    // Write packet type.
-    if(!serialize(buffer, static_cast<std::underlying_type_t<PacketType>>(header.type)))
+    if(!serialize(buffer, type))
         return false;
 
     return true;
 }
 
-bool deserialize(MemoryBuffer& buffer, PacketHeader* header)
+bool PacketHeader::onDeserialize(MemoryBuffer& buffer)
 {
-    ASSERT(header != nullptr);
-
-    // Read packet magic.
-    for(char& c : header->magic)
+    for(char magic : MagicValue)
     {
-        if(!deserialize(buffer, &c))
+        char character = '\0';
+        if(!deserialize(buffer, &character))
+            return false;
+
+        if(character != magic)
             return false;
     }
 
-    // Read packet type.
-    if(!deserialize(buffer, reinterpret_cast<std::underlying_type_t<PacketType>*>(&header->type)))
+    if(!deserialize(buffer, &type))
+        return false;
+
+    return true;
+}
+
+PacketBase::PacketBase()
+{
+}
+
+PacketBase::~PacketBase()
+{
+}
+
+bool PacketBase::onSerialize(MemoryBuffer& buffer)
+{
+    return true;
+}
+
+bool PacketBase::onDeserialize(MemoryBuffer& buffer)
+{
+    return true;
+}
+
+PacketMessage::PacketMessage()
+{
+}
+
+PacketMessage::~PacketMessage()
+{
+}
+
+bool PacketMessage::onSerialize(MemoryBuffer& buffer)
+{
+    if(!Super::onSerialize(buffer))
+        return false;
+
+    if(!serialize(buffer, text))
+        return false;
+
+    return true;
+}
+
+bool PacketMessage::onDeserialize(MemoryBuffer& buffer)
+{
+    if(!Super::onDeserialize(buffer))
+        return false;
+
+    if(!deserialize(buffer, &text))
         return false;
 
     return true;

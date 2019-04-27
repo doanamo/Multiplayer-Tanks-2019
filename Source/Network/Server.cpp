@@ -24,20 +24,51 @@ bool Server::initialize()
 void Server::onUpdate(float timeDelta)
 {
     // Receive packets.
-    MemoryBuffer receivedPacket;
+    MemoryBuffer packetBuffer;
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(this->receivePacket(receivedPacket, senderAddress, senderPort))
+    while(this->receivePacket(packetBuffer, senderAddress, senderPort))
     {
-        // Send response packet.
         PacketHeader packetHeader;
-        packetHeader.type = PacketType::Network_Heartbeat;
+        if(deserialize(packetBuffer, &packetHeader))
+        {
+            if(packetHeader.type == getTypeIdentifier<PacketMessage>())
+            {
+                PacketMessage packetMessage;
+                if(deserialize(packetBuffer, &packetMessage))
+                {
+                    LOG_INFO("Received message packet with \"%s\" text.", packetMessage.text.c_str());
+                }
+            }
+            else
+            {
+                LOG_ERROR("Unknown packet type received!");
+            }
+        }
+        else
+        {
+            LOG_ERROR("Failed to deserialize packet!");
+        }
 
-        MemoryBuffer sentPacket;
-        serialize(sentPacket, packetHeader);
+        // Send response packet.
+        {
+            PacketMessage packetMessage;
+            packetMessage.text = "Hello client!";
 
-        this->sendPacket(sentPacket, senderAddress, senderPort);
+            PacketHeader packetHeader;
+            packetHeader.type = getTypeIdentifier<PacketMessage>();
+
+            MemoryBuffer packetBuffer;
+            if(serialize(packetBuffer, packetHeader) && serialize(packetBuffer, packetMessage))
+            {
+                this->sendPacket(packetBuffer, senderAddress, senderPort);
+            }
+            else
+            {
+                LOG_ERROR("Failed to serialize packet!");
+            }
+        }
     }
 }
 

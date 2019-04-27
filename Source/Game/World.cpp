@@ -152,16 +152,25 @@ void World::draw(float timeAlpha)
             {
                 if(!objectEntry->object->getName().empty())
                 {
-                    ImGui::BulletText("%i/%i : %s (%s)", objectEntry->handle.identifier, objectEntry->handle.version, objectEntry->object->getType().getName(), objectEntry->object->getName().c_str());
+                    ImGui::BulletText("%i/%i : %s (%s)",
+                        objectEntry->handle.identifier,
+                        objectEntry->handle.version,
+                        objectEntry->object->getTypeInfo().getName(),
+                        objectEntry->object->getName().c_str());
                 }
                 else
                 {
-                    ImGui::BulletText("%i/%i : %s", objectEntry->handle.identifier, objectEntry->handle.version, objectEntry->object->getType().getName());
+                    ImGui::BulletText("%i/%i : %s",
+                        objectEntry->handle.identifier,
+                        objectEntry->handle.version,
+                        objectEntry->object->getTypeInfo().getName());
                 }
             }
             else
             {
-                ImGui::BulletText("%i/%i : -", objectEntry->handle.identifier, objectEntry->handle.version);
+                ImGui::BulletText("%i/%i : -",
+                    objectEntry->handle.identifier,
+                    objectEntry->handle.version);
             }
         };
 
@@ -497,7 +506,7 @@ bool World::onSerialize(MemoryBuffer& buffer)
         if(!ShouldSerializeObject(objectEntry))
             continue;
 
-        if(!serialize(buffer, objectEntry.object->getType().getIdentifier()))
+        if(!serialize(buffer, objectEntry.object->getTypeInfo().getIdentifier()))
             return false;
 
         if(!serialize(buffer, objectEntry.object->getName()))

@@ -38,7 +38,7 @@ void RuntimeTypes::registerType(TypeInfo& typeInfo)
     ASSERT(result.second, "Failed to register new type info!");
 }
 
-TypeInfo* RuntimeTypes::getTypeInfo(TypeInfo::IdentifierType type)
+TypeInfo* RuntimeTypes::findTypeInfo(TypeInfo::IdentifierType type)
 {
     // Find type info by its identifier hash.
     auto it = m_typeMap.find(type);
@@ -58,7 +58,6 @@ void RuntimeTypes::printTypes()
 {
     // Print all base types and their derived children
     LOG_INFO("Listing registered runtime types:");
-    LOG_INDENT(1);
 
     for(auto& pair : m_typeMap)
     {
@@ -70,6 +69,7 @@ void RuntimeTypes::printTypes()
             continue;
 
         // Print type info.
+        LOG_INDENT(1);
         LOG_INFO("%0*u : %s", 10, typeInfo->getIdentifier(), typeInfo->getName());
 
         // Iterate over children.

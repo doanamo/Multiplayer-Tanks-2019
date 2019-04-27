@@ -19,7 +19,7 @@ public:
     void registerType(TypeInfo& typeInfo);
 
     // Returns type info.
-    TypeInfo* getTypeInfo(TypeInfo::IdentifierType type);
+    TypeInfo* findTypeInfo(TypeInfo::IdentifierType type);
 
     // Prints registered types.
     void printTypes();

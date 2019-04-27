@@ -22,7 +22,7 @@ TypeInfo::TypeInfo(const char* typeName, AllocateFunction allocateFunction, Type
     }
 }
 
-int TypeInfo::getIdentifier() const
+TypeInfo::IdentifierType TypeInfo::getIdentifier() const
 {
     ASSERT(m_typeIdentifier != InvalidIdentifier);
     return m_typeIdentifier;
@@ -104,11 +104,11 @@ bool TypeInfo::isDerived(IdentifierType typeIdentifier) const
     return false;
 }
 
-TypeInfo* TypeInfo::getTypeInfo(IdentifierType typeIdentifier)
+TypeInfo* TypeInfo::findTypeInfo(IdentifierType typeIdentifier)
 {
     ASSERT(g_runtimeTypes != nullptr);
     ASSERT(m_typeIdentifier != InvalidIdentifier);
     ASSERT(typeIdentifier != InvalidIdentifier);
 
-    return g_runtimeTypes->getTypeInfo(typeIdentifier);
+    return g_runtimeTypes->findTypeInfo(typeIdentifier);
 }
