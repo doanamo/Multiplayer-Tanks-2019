@@ -191,6 +191,10 @@ int main(int argc, char* argv[])
         // Spawn new thread.
         gameProcesses[i].hThreadArray = CreateThread(nullptr, 0, CreateGameProcess, &gameProcesses[i], 0, &gameProcesses[i].dwThreadIdArray);
         assert(gameProcesses[i].hThreadArray != nullptr);
+
+        // Wait a short time as spawning many threads
+        // and processes seems to trigger a breakpoint.
+        Sleep(200);
     }
 
     // Wait for threads to finish.
