@@ -53,48 +53,24 @@ void Client::onUpdate(float timeDelta)
         PacketMessage packetMessage;
         packetMessage.text = "Hello server!";
 
-        PacketHeader packetHeader;
-        packetHeader.type = getTypeIdentifier<PacketMessage>();
-
-        MemoryBuffer packetBuffer;
-        if(serialize(packetBuffer, packetHeader) && serialize(packetBuffer, packetMessage))
-        {
-            this->sendPacket(packetBuffer, m_serverAddress, m_serverPort);
-        }
-        else
-        {
-            LOG_ERROR("Failed to serialize packet!");
-        }
+        sendPacket(packetMessage, m_serverAddress, m_serverPort);
 
         m_hearbeatTimer = 1.0f;
     }
 
     // Receive packets.
-    MemoryBuffer packetBuffer;
+    std::unique_ptr<PacketBase> receivedPacket;
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(this->receivePacket(packetBuffer, senderAddress, senderPort))
+    while(receivePacket(receivedPacket, senderAddress, senderPort))
     {
-        PacketHeader packetHeader;
-        if(deserialize(packetBuffer, &packetHeader))
+        TypeInfo::IdentifierType packetType = getTypeIdentifier(*receivedPacket);
+
+        if(packetType == getTypeIdentifier<PacketMessage>())
         {
-            if(packetHeader.type == getTypeIdentifier<PacketMessage>())
-            {
-                PacketMessage packetMessage;
-                if(deserialize(packetBuffer, &packetMessage))
-                {
-                    LOG_INFO("Received message packet with \"%s\" text.", packetMessage.text.c_str());
-                }
-            }
-            else
-            {
-                LOG_ERROR("Unknown packet type received!");
-            }
-        }
-        else
-        {
-            LOG_ERROR("Failed to deserialize packet!");
+            PacketMessage* packetMessage = (PacketMessage*)receivedPacket.get();
+            LOG_INFO("Received message packet with \"%s\" text.", packetMessage->text.c_str());
         }
     }
 }

@@ -1,5 +1,6 @@
 #include "Precompiled.hpp"
 #include "Network/Network.hpp"
+#include "Network/PacketContainer.hpp"
 
 bool ParseStringToPort(std::string text, unsigned short& port)
 {
@@ -49,21 +50,71 @@ bool Network::initializeSocket(std::string listenPort)
     return true;
 }
 
-bool Network::sendPacket(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port)
+bool Network::sendPacket(PacketBase& packet, const sf::IpAddress& address, unsigned short port)
 {
-    LOG_TRACE("Sending packet to %s:%hu (%u size).", address.toString().c_str(), port, buffer.size());
+    // Create packet container.
+    PacketContainer packetContainer;
+    packetContainer.packetType = getTypeIdentifier(packet);
 
-    // Send packet read from memory buffer.
-    if(m_socket.send(buffer.data(), buffer.size(), address, port) != sf::Socket::Done)
+    if(!serialize(packetContainer.packetBuffer, packet))
     {
-        LOG_ERROR("Sending packet resulted in an error!");
+        LOG_ERROR("Failed to serialize packet!");
+        return false;
+    }
+
+    // Serialize packet container.
+    MemoryBuffer dataBuffer;
+    if(!serialize(dataBuffer, packetContainer))
+    {
+        LOG_ERROR("Failed to serialize network data!");
+        return false;
+    }
+
+    // Send data over network.
+    return sendData(dataBuffer, address, port);
+}
+
+bool Network::receivePacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port)
+{
+    // Receive data buffer from over network.
+    MemoryBuffer dataBuffer;
+    if(!receiveData(dataBuffer, address, port))
+        return false;
+    
+    // Deserialize packet container.
+    PacketContainer packetContainer;
+    if(!deserialize(dataBuffer, &packetContainer))
+    {
+        LOG_ERROR("Failed to deserialize received network data!");
+        return false;
+    }
+
+    // Allocate and deserialize packet.
+    packet = std::unique_ptr<PacketBase>(PacketBase::create(packetContainer.packetType));
+    if(!deserialize(packetContainer.packetBuffer, packet.get()))
+    {
+        LOG_ERROR("Failed to deserialize received packet!");
         return false;
     }
 
     return true;
 }
 
-bool Network::receivePacket(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port)
+bool Network::sendData(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port)
+{
+    LOG_TRACE("Sending network data to %s:%hu (%u size).", address.toString().c_str(), port, buffer.size());
+
+    // Send packet read from memory buffer.
+    if(m_socket.send(buffer.data(), buffer.size(), address, port) != sf::Socket::Done)
+    {
+        LOG_ERROR("Sending network data resulted in an error!");
+        return false;
+    }
+
+    return true;
+}
+
+bool Network::receiveData(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port)
 {
     // Receive packet and write it into memory buffer.
     char datagramBuffer[sf::UdpSocket::MaxDatagramSize] = { 0 };
@@ -74,11 +125,11 @@ bool Network::receivePacket(MemoryBuffer& buffer, sf::IpAddress& address, unsign
     switch(status)
     {
         case sf::Socket::Partial:
-            VERIFY(false, "Received partial packet while using UDP socket!");
+            VERIFY(false, "Received partial network data while using UDP socket!");
             return false;
 
         case sf::Socket::Error:
-            LOG_ERROR("Failed to receive packets from socket!");
+            LOG_ERROR("Failed to receive network data from socket!");
             return false;
 
         case sf::Socket::Disconnected:
@@ -86,10 +137,10 @@ bool Network::receivePacket(MemoryBuffer& buffer, sf::IpAddress& address, unsign
             return false;
     }
 
-    LOG_TRACE("Received packet from %s:%hu (%u size).", address.toString().c_str(), port, bytesReceived);
+    LOG_TRACE("Received network data from %s:%hu (%u size).", address.toString().c_str(), port, bytesReceived);
 
     // Write datagram buffer into provided memory buffer.
-    buffer.copy(&datagramBuffer[0], bytesReceived);
+    buffer.replace(&datagramBuffer[0], bytesReceived);
 
     return true;
 }

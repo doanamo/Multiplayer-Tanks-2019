@@ -1,8 +1,9 @@
 #pragma once
 
 #include "Precompiled.hpp"
+#include "Serialization/Serializable.hpp"
 
-class MemoryBuffer
+class MemoryBuffer : public Serializable
 {
 public:
     MemoryBuffer();
@@ -13,18 +14,24 @@ public:
     bool writeShort(uint16_t* value);
     bool writeInteger(uint32_t* value);
     bool writeWord(uint64_t* value);
+    bool writeData(const char* data, std::size_t size);
 
     // Reading methods.
     bool readByte(uint8_t* value);
     bool readShort(uint16_t* value);
     bool readInteger(uint32_t* value);
     bool readWord(uint64_t* value);
+    bool readData(char* data, std::size_t size);
 
     // Buffer manipulation.
     void clear();
     void reset();
     void resize(std::size_t size);
-    void copy(const char* data, std::size_t size);
+    void replace(const char* data, std::size_t size);
+
+    // Serialization methods.
+    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onDeserialize(MemoryBuffer& buffer) override;
 
     // Accessors.
     std::size_t size() const;

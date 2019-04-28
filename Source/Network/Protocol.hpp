@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Network/PacketHeader.hpp"
+#include "Network/PacketContainer.hpp"
 #include "Network/PacketBase.hpp"
 #include "Network/PacketMessage.hpp"
 

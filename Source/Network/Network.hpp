@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Precompiled.hpp"
+#include "Network/PacketBase.hpp"
 
 bool ParseStringToPort(std::string text, unsigned short& port);
 
@@ -25,11 +26,13 @@ protected:
     // Initializes socket.
     bool initializeSocket(std::string listenPort = "0");
 
-    // Sends packet through socket.
-    bool sendPacket(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port);
+    // Sending and receiving packets.
+    bool sendPacket(PacketBase& packet, const sf::IpAddress& address, unsigned short port);
+    bool receivePacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port);
 
-    // Receives packet from socket.
-    bool receivePacket(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port);
+    // Sending and receiving data buffers.
+    bool sendData(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port);
+    bool receiveData(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port);
 
 protected:
     // Network socket.

@@ -24,51 +24,25 @@ bool Server::initialize()
 void Server::onUpdate(float timeDelta)
 {
     // Receive packets.
-    MemoryBuffer packetBuffer;
+    std::unique_ptr<PacketBase> receivedPacket;
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(this->receivePacket(packetBuffer, senderAddress, senderPort))
+    while(receivePacket(receivedPacket, senderAddress, senderPort))
     {
-        PacketHeader packetHeader;
-        if(deserialize(packetBuffer, &packetHeader))
+        TypeInfo::IdentifierType packetType = getTypeIdentifier(*receivedPacket);
+
+        if(packetType == getTypeIdentifier<PacketMessage>())
         {
-            if(packetHeader.type == getTypeIdentifier<PacketMessage>())
-            {
-                PacketMessage packetMessage;
-                if(deserialize(packetBuffer, &packetMessage))
-                {
-                    LOG_INFO("Received message packet with \"%s\" text.", packetMessage.text.c_str());
-                }
-            }
-            else
-            {
-                LOG_ERROR("Unknown packet type received!");
-            }
-        }
-        else
-        {
-            LOG_ERROR("Failed to deserialize packet!");
+            PacketMessage* packetMessage = (PacketMessage*)receivedPacket.get();
+            LOG_INFO("Received message packet with \"%s\" text.", packetMessage->text.c_str());
         }
 
         // Send response packet.
-        {
-            PacketMessage packetMessage;
-            packetMessage.text = "Hello client!";
+        PacketMessage packetMessage;
+        packetMessage.text = "Hello client!";
 
-            PacketHeader packetHeader;
-            packetHeader.type = getTypeIdentifier<PacketMessage>();
-
-            MemoryBuffer packetBuffer;
-            if(serialize(packetBuffer, packetHeader) && serialize(packetBuffer, packetMessage))
-            {
-                this->sendPacket(packetBuffer, senderAddress, senderPort);
-            }
-            else
-            {
-                LOG_ERROR("Failed to serialize packet!");
-            }
-        }
+        sendPacket(packetMessage, senderAddress, senderPort);
     }
 }
 
