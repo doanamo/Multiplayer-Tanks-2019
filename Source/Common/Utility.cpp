@@ -86,3 +86,21 @@ uint32_t stringHash(const std::string& string)
     return hash;
 }
 
+uint32_t calculateCRC32(uint32_t crc, const char* data, std::size_t size)
+{
+    // Implementation based on https://stackoverflow.com/a/27950866
+
+    crc = ~crc;
+
+    while(size--)
+    {
+        crc ^= (unsigned char)*data++;
+
+        for(int i = 0; i < 8; ++i)
+        {
+            crc = crc & 1 ? (crc >> 1) ^ 0x82f63b78 : crc >> 1;
+        }
+    }
+
+    return ~crc;
+}
