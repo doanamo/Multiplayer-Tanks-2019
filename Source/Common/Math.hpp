@@ -23,6 +23,12 @@ inline float toDegrees(const float& radians)
 }
 
 template<typename Type>
+Type clamp(const Type& value, const Type& min, const Type& max)
+{
+    return std::max(min, std::min(max, value));
+}
+
+template<typename Type>
 Type lerp(const Type& from, const Type& to, float alpha)
 {
     return (1.0f - alpha) * from + alpha * to;

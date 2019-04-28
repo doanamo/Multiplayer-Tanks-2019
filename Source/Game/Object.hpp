@@ -69,6 +69,9 @@ private:
     // Group name.
     std::string m_group;
 
+    // Reset interpolation on next tick.
+    bool m_resetInterpolation;
+
 protected:
     // Object transform.
     Transform m_transform;

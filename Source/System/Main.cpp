@@ -26,7 +26,7 @@ int main(int argc, char* argv[])
     // Prepare timer.
     sf::Clock timer;
 
-    const float tickRate = 1.0f / 20.0f;
+    const float tickRate = 1.0f / 10.0f;
     float tickAccumulator = tickRate;
 
     // Run main loop.
@@ -54,7 +54,7 @@ int main(int argc, char* argv[])
         }
 
         // Render application.
-        float timeAlpha = tickAccumulator / tickRate;
+        float timeAlpha = clamp(tickAccumulator / tickRate, 0.0f, 1.0f);
 
         g_window->beginRender();
         g_application->draw(timeAlpha);

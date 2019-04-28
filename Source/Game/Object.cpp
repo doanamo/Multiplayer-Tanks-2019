@@ -6,7 +6,8 @@ Object::Object() :
     m_world(nullptr),
     m_handle(),
     m_name(),
-    m_group()
+    m_group(),
+    m_resetInterpolation(false)
 {
 }
 
@@ -29,12 +30,17 @@ void Object::onCreate()
 
 void Object::onUpdate(float timeDelta)
 {
+    m_resetInterpolation = true;
 }
 
 void Object::onTick(float timeDelta)
 {
-    // Update transform interpolation.
-    m_transform.resetInterpolation();
+    if(m_resetInterpolation)
+    {
+        // Update transform interpolation.
+        m_transform.resetInterpolation();
+        m_resetInterpolation = false;
+    }
 }
 
 void Object::onDraw(float timeAlpha)

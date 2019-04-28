@@ -32,5 +32,5 @@ private:
     std::shared_ptr<sf::Texture> m_texture;
 
     // Tank sprite.
-    sf::RectangleShape tankSprite;
+    sf::RectangleShape m_tankSprite;
 };

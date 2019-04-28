@@ -50,34 +50,34 @@ void Tank::onDraw(float timeAlpha)
     Object::onDraw(timeAlpha);
 
     // Draw tank.
-    tankSprite.setSize(sf::Vector2f(1.0f, 1.0f));
-    tankSprite.setOrigin(tankSprite.getSize() / 2.0f);
-    tankSprite.setPosition(m_transform.getPosition(timeAlpha));
-    tankSprite.setTexture(m_texture.get());
+    m_tankSprite.setSize(sf::Vector2f(1.0f, 1.0f));
+    m_tankSprite.setOrigin(m_tankSprite.getSize() / 2.0f);
+    m_tankSprite.setPosition(m_transform.getPosition(timeAlpha));
+    m_tankSprite.setTexture(m_texture.get());
 
     if(m_transform.getRotation() == 0.0f)
     {
-        tankSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
+        m_tankSprite.setTextureRect(sf::IntRect(0, 0, 32, 32));
     }
     else if(m_transform.getRotation() == 90.0f)
     {
-        tankSprite.setTextureRect(sf::IntRect(0, 32, 32, 32));
+        m_tankSprite.setTextureRect(sf::IntRect(0, 32, 32, 32));
     }
     else if(m_transform.getRotation() == 180.0f)
     {
-        tankSprite.setTextureRect(sf::IntRect(0, 96, 32, 32));
+        m_tankSprite.setTextureRect(sf::IntRect(0, 96, 32, 32));
     }
     else if(m_transform.getRotation() == 270.0f)
     {
-        tankSprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
+        m_tankSprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
     }
 
-    g_render->draw(tankSprite);
+    g_render->draw(m_tankSprite);
 }
 
 sf::Vector2f Tank::getPosition()
 {
-    return tankSprite.getPosition();
+    return m_tankSprite.getPosition();
 }
 
 bool Tank::onSerialize(MemoryBuffer& buffer)
