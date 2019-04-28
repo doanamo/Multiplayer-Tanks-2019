@@ -48,6 +48,12 @@ set(SOURCE_FILES
     "Source/Network/Server.cpp"
     "Source/Network/Client.hpp"
     "Source/Network/Client.cpp"
+    "Source/Network/PacketHeader.hpp"
+    "Source/Network/PacketHeader.cpp"
+    "Source/Network/PacketBase.hpp"
+    "Source/Network/PacketBase.cpp"
+    "Source/Network/PacketMessage.hpp"
+    "Source/Network/PacketMessage.cpp"
 
     "Source/Game/GameInstance.hpp"
     "Source/Game/GameInstance.cpp"
