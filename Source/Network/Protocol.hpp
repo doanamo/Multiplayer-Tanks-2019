@@ -1,8 +1,6 @@
 #pragma once
 
-#include "Network/PacketContainer.hpp"
-#include "Network/PacketBase.hpp"
-#include "Network/PacketMessage.hpp"
+#include "Network/Packets/PacketMessage.hpp"
 
 /*
 enum class PacketType
