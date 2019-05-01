@@ -43,7 +43,7 @@ bool Client::initialize()
     return true;
 }
 
-void Client::onUpdate(float timeDelta)
+void Client::update(float timeDelta)
 {
     // Send packets.
     m_hearbeatTimer = std::max(0.0f, m_hearbeatTimer - timeDelta);
@@ -75,8 +75,20 @@ void Client::onUpdate(float timeDelta)
     }
 }
 
-void Client::onTick(float timeDelta)
+void Client::tick(float timeDelta)
 {
+}
+
+void Client::draw()
+{
+    // Draw ImGui debug window.
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
+    if(ImGui::Begin("Network State (Client)##NetworkState", &cv_showNetwork.value))
+    {
+        
+    }
+    ImGui::End();
+    ImGui::PopStyleVar(1);
 }
 
 bool Client::isConnected() const

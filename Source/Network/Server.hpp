@@ -12,8 +12,9 @@ public:
     ~Server();
 
     bool initialize() override;
-    void onUpdate(float timeDelta) override;
-    void onTick(float timeDelta) override;
+    void update(float timeDelta) override;
+    void tick(float timeDelta) override;
+    void draw() override;
 
     bool isConnected() const override;
     bool isServer() const override;

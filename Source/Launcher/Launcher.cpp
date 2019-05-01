@@ -177,6 +177,7 @@ int main(int argc, char* argv[])
         gameProcesses[i].path = gamePath;
         gameProcesses[i].arguments += gamePath + " ";
         gameProcesses[i].arguments += "-showConsole 1 ";
+        gameProcesses[i].arguments += "-showNetwork 1 ";
 
         // Make the first player a host.
         if(i == 0 && firstPlayerHosts)

@@ -3,6 +3,7 @@
 #include "Precompiled.hpp"
 #include "Network/PacketBase.hpp"
 
+extern ConsoleVariable<bool> cv_showNetwork;
 bool ParseStringToPort(std::string text, unsigned short& port);
 
 class Network
@@ -14,8 +15,9 @@ public:
     virtual ~Network();
 
     virtual bool initialize() = 0;
-    virtual void onUpdate(float timeDelta) = 0;
-    virtual void onTick(float timeDelta) = 0;
+    virtual void update(float timeDelta) = 0;
+    virtual void tick(float timeDelta) = 0;
+    virtual void draw() = 0;
 
     virtual bool isConnected() const = 0;
     virtual bool isServer() const = 0;

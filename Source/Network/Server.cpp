@@ -21,7 +21,7 @@ bool Server::initialize()
     return true;
 }
 
-void Server::onUpdate(float timeDelta)
+void Server::update(float timeDelta)
 {
     // Receive packets.
     std::unique_ptr<PacketBase> receivedPacket;
@@ -46,8 +46,20 @@ void Server::onUpdate(float timeDelta)
     }
 }
 
-void Server::onTick(float timeDelta)
+void Server::tick(float timeDelta)
 {
+}
+
+void Server::draw()
+{
+    // Draw ImGui debug window.
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
+    if(ImGui::Begin("Network State (Server)##NetworkState", &cv_showNetwork.value))
+    {
+        
+    }
+    ImGui::End();
+    ImGui::PopStyleVar(1);
 }
 
 bool Server::isConnected() const

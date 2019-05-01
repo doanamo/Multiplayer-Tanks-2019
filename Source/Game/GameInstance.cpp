@@ -91,10 +91,7 @@ void GameInstance::handleEvent(const sf::Event& event)
 void GameInstance::update(float timeDelta)
 {
     // Update network interface.
-    if(m_network)
-    {
-        m_network->onUpdate(timeDelta);
-    }
+    m_network->update(timeDelta);
 
     // Update world instance.
     m_world->update(timeDelta);
@@ -103,10 +100,7 @@ void GameInstance::update(float timeDelta)
 void GameInstance::tick(float timeDelta)
 {
     // Tick network interface.
-    if(m_network)
-    {
-        m_network->onTick(timeDelta);
-    }
+    m_network->tick(timeDelta);
 
     // Tick game level.
     m_level->tick(timeDelta);
@@ -125,6 +119,9 @@ void GameInstance::draw(float timeAlpha)
 
     // Draw world objects.
     m_world->draw(timeAlpha);
+
+    // Draw network debug.
+    m_network->draw();
 }
 
 World* GameInstance::getWorld()

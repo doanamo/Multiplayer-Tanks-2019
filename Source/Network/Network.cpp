@@ -2,6 +2,8 @@
 #include "Network/Network.hpp"
 #include "Network/PacketContainer.hpp"
 
+ConsoleVariable<bool> cv_showNetwork("showNetwork", false);
+
 bool ParseStringToPort(std::string text, unsigned short& port)
 {
     // Determine listen port.
