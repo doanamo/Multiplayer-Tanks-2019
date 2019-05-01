@@ -1,5 +1,5 @@
 #include "Precompiled.hpp"
-#include "Network/PacketMessage.hpp"
+#include "PacketMessage.hpp"
 
 PacketMessage::PacketMessage()
 {
