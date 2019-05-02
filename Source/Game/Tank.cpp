@@ -75,9 +75,9 @@ void Tank::onDraw(float timeAlpha)
     g_render->draw(m_tankSprite);
 }
 
-sf::Vector2f Tank::getPosition()
+sf::Vector2f Tank::getPosition(float alpha)
 {
-    return m_tankSprite.getPosition();
+    return m_transform.getPosition(alpha);
 }
 
 bool Tank::onSerialize(MemoryBuffer& buffer)

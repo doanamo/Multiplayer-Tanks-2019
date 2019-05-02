@@ -25,9 +25,9 @@ public:
     GameInstance* m_gameInstance;
 
 private:
-    // Game viewport TODO: move viewport to GameInstance
-    sf::View viewport;
+    // Camera viewport
+    sf::View m_viewport;
 
-    bool isViewportCentered;
-    bool isCameraAttachedToPlayer;
+    bool m_isViewportCentered;
+    bool m_isCameraAttachedToPlayer;
 };

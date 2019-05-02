@@ -17,7 +17,7 @@ public:
     void onTick(float timeDelta) override;
     void onDraw(float timeAlpha) override;
 
-    sf::Vector2f getPosition();
+    sf::Vector2f getPosition(float alpha = 1.0f);
 
 protected:
     // Serialization methods.

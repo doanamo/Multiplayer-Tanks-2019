@@ -13,8 +13,8 @@ extern ConsoleVariable<bool> cv_showConsole;
 
 Application::Application() :
     m_gameInstance(nullptr),
-    isViewportCentered(false),
-    isCameraAttachedToPlayer(true)
+    m_isViewportCentered(false),
+    m_isCameraAttachedToPlayer(true)
 {
 }
 
@@ -72,7 +72,7 @@ void Application::handleEvent(const sf::Event& event)
             break;
 
         case sf::Keyboard::O:
-            isCameraAttachedToPlayer = true;
+            m_isCameraAttachedToPlayer = true;
             LOG_TRACE("Camera has re-attached to the player's tank.");
             break;
 
@@ -80,9 +80,9 @@ void Application::handleEvent(const sf::Event& event)
         case sf::Keyboard::K:
         case sf::Keyboard::J:
         case sf::Keyboard::L:
-            if (isCameraAttachedToPlayer)
+            if (m_isCameraAttachedToPlayer)
             {
-                isCameraAttachedToPlayer = false;
+                m_isCameraAttachedToPlayer = false;
                 LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
             }
             break;
@@ -125,31 +125,33 @@ void Application::draw(float timeAlpha)
     viewportSize.x = 10.0f * horizontalAspectRatio;
     viewportSize.y = 10.0f * verticalAspectRatio;
 
-    if (!isViewportCentered)
+    if (!m_isViewportCentered)
     {
-        viewport.setCenter(0.0f, 0.0f);
-        isViewportCentered = true;
+        m_viewport.setCenter(0.0f, 0.0f);
+        m_isViewportCentered = true;
         LOG_TRACE("Application::draw - viewport centered.");
     }
 
-    viewport.setSize(viewportSize);
-    g_window->render.setView(viewport);
+    m_viewport.setSize(viewportSize);
+    g_window->render.setView(m_viewport);
+
+    // Center camera on player.
+    if(m_isCameraAttachedToPlayer)
+    {
+        Tank* tank = dynamic_cast<Tank*>(m_gameInstance->getWorld()->getObjectByName("Player1_Tank"));
+        sf::Vector2f interpolatedPosition = tank->getPosition(timeAlpha);
+        
+        m_viewport.setCenter(interpolatedPosition);
+    }
 
     // Manual camera navigation.
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) m_viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) m_viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) m_viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
+    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) m_viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
      
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
-
-    if (isCameraAttachedToPlayer)
-    {
-        Tank* tank = dynamic_cast<Tank*>(m_gameInstance->getWorld()->getObjectByName("Player1_Tank"));
-        viewport.setCenter(tank->getPosition().x, tank->getPosition().y);
-        // LOG_TRACE("X: %f Y: %f", tank->getPosition().x, tank->getPosition().y);
-    }
 
     // Draw console.
     g_console->display();
