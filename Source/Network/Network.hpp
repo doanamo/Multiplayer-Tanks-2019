@@ -22,7 +22,9 @@ public:
     virtual bool isConnected() const = 0;
     virtual bool isServer() const = 0;
     virtual bool isClient() const = 0;
-    virtual int getClientIndex() const = 0;
+
+    bool isPlayer() const;
+    int getPlayerIndex() const;
 
 protected:
     // Initializes socket.
@@ -40,4 +42,7 @@ protected:
     // Network socket.
     sf::UdpSocket m_socket;
     unsigned short m_listenPort;
+
+    // Player index.
+    int m_playerIndex;
 };

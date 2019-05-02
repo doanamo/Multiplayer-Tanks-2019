@@ -105,9 +105,3 @@ bool Client::isClient() const
 {
     return true;
 }
-
-int Client::getClientIndex() const
-{
-    return 0;
-}
-

@@ -19,7 +19,6 @@ public:
     bool isConnected() const override;
     bool isServer() const override;
     bool isClient() const override;
-    int getClientIndex() const override;
 
 private:
     // Server info.

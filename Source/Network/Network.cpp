@@ -28,7 +28,8 @@ bool ParseStringToPort(std::string text, unsigned short& port)
 
 Network::Network() :
     m_socket(),
-    m_listenPort(0)
+    m_listenPort(0),
+    m_playerIndex(0)
 {
 }
 
@@ -50,6 +51,16 @@ bool Network::initializeSocket(std::string listenPort)
     m_socket.setBlocking(false);
 
     return true;
+}
+
+bool Network::isPlayer() const
+{
+    return m_playerIndex != 0;
+}
+
+int Network::getPlayerIndex() const
+{
+    return m_playerIndex;
 }
 
 bool Network::sendPacket(PacketBase& packet, const sf::IpAddress& address, unsigned short port)

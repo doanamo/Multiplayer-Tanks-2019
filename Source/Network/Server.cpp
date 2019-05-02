@@ -76,8 +76,3 @@ bool Server::isClient() const
 {
     return false;
 }
-
-int Server::getClientIndex() const
-{
-    return 0;
-}
