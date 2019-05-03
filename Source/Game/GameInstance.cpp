@@ -3,13 +3,9 @@
 #include "Game/World.hpp"
 #include "Game/Level.hpp"
 #include "Game/PlayerController.hpp"
-#include "Network/Server.hpp"
-#include "Network/Client.hpp"
-#include "System/CommandLine.hpp"
 #include "System/Window.hpp"
 
 GameInstance::GameInstance() :
-    m_network(nullptr),
     m_world(nullptr),
     m_level(nullptr),
     m_playerController(nullptr)
@@ -36,34 +32,10 @@ GameInstance::~GameInstance()
         delete m_world;
         m_world = nullptr;
     }
-
-    if(m_network)
-    {
-        delete m_network;
-        m_network = nullptr;
-    }
 }
 
 bool GameInstance::initialize()
 {
-    // Create network interface.
-    if(g_commandLine->hasArgument("host"))
-    {
-        m_network = new Server();
-        g_window->setTitle(g_window->getInitialTitle() + " - Server");
-    }
-    else
-    {
-        m_network = new Client();
-        g_window->setTitle(g_window->getInitialTitle() + " - Client");
-    }
-
-    if(m_network)
-    {
-        if(!m_network->initialize())
-            return false;
-    }
-
     // Create world instance.
     m_world = new World;
     if(!m_world->initialize())
@@ -90,18 +62,12 @@ void GameInstance::handleEvent(const sf::Event& event)
 
 void GameInstance::update(float timeDelta)
 {
-    // Update network interface.
-    m_network->update(timeDelta);
-
     // Update world instance.
     m_world->update(timeDelta);
 }
 
 void GameInstance::tick(float timeDelta)
 {
-    // Tick network interface.
-    m_network->tick(timeDelta);
-
     // Tick game level.
     m_level->tick(timeDelta);
 
@@ -119,9 +85,6 @@ void GameInstance::draw(float timeAlpha)
 
     // Draw world objects.
     m_world->draw(timeAlpha);
-
-    // Draw network debug.
-    m_network->draw();
 }
 
 World* GameInstance::getWorld()

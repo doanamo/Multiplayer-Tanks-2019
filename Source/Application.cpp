@@ -3,16 +3,20 @@
 #include "System/Globals.hpp"
 #include "System/Window.hpp"
 #include "System/Console.hpp"
+#include "System/CommandLine.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/PlayerController.hpp"
 #include "Game/World.hpp"
 #include "Game/Tank.hpp"
 #include "Game/Level.hpp"
+#include "Network/Server.hpp"
+#include "Network/Client.hpp"
 
 extern ConsoleVariable<bool> cv_showConsole;
 
 Application::Application() :
     m_gameInstance(nullptr),
+    m_network(nullptr),
     m_isViewportCentered(false),
     m_isCameraAttachedToPlayer(true)
 {
@@ -20,6 +24,13 @@ Application::Application() :
 
 Application::~Application()
 {
+    // Shutdown network interface.
+    if(m_network)
+    {
+        delete m_network;
+        m_network = nullptr;
+    }
+
     // Shutdown game instance.
     if(m_gameInstance)
     {
@@ -34,6 +45,24 @@ bool Application::initialize()
     m_gameInstance = new GameInstance();
     if(!m_gameInstance->initialize())
         return false;
+
+    // Create network interface.
+    if(g_commandLine->hasArgument("host"))
+    {
+        m_network = new Server();
+        g_window->setTitle(g_window->getInitialTitle() + " - Server");
+    }
+    else
+    {
+        m_network = new Client();
+        g_window->setTitle(g_window->getInitialTitle() + " - Client");
+    }
+
+    if(m_network)
+    {
+        if(!m_network->initialize())
+            return false;
+    }
 
     // Create player tank object.
     Tank* playerTank = new Tank();
@@ -95,12 +124,18 @@ void Application::handleEvent(const sf::Event& event)
 
 void Application::update(float timeDelta)
 {
+    // Update network interface.
+    m_network->update(timeDelta);
+
     // Update game instance.
     m_gameInstance->update(timeDelta);
 }
 
 void Application::tick(float timeDelta)
 {
+    // Tick network interface.
+    m_network->tick(timeDelta);
+
     // Tick game instance.
     m_gameInstance->tick(timeDelta);
 }
@@ -152,6 +187,9 @@ void Application::draw(float timeAlpha)
      
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
+
+    // Draw network debug.
+    m_network->draw();
 
     // Draw console.
     g_console->display();

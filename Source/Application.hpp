@@ -24,6 +24,9 @@ public:
     // Game instance.
     GameInstance* m_gameInstance;
 
+    // Network interface.
+    Network* m_network;
+
 private:
     // Camera viewport
     sf::View m_viewport;
