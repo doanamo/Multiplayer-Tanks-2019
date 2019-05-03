@@ -142,6 +142,8 @@ void Application::tick(float timeDelta)
 
 void Application::draw(float timeAlpha)
 {
+    ASSERT(timeAlpha >= 0.0f && timeAlpha <= 1.0f);
+
     // Calculate render target view size and aspect ratio.
     float horizontalAspectRatio = (float)g_window->getWidth() / (float)g_window->getHeight();
     float verticalAspectRatio = (float)g_window->getHeight() / (float)g_window->getWidth();
