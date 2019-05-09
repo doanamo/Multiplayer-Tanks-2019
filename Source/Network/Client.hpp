@@ -11,7 +11,7 @@ public:
     Client();
     ~Client();
 
-    bool initialize() override;
+    bool initialize(const sf::IpAddress& address, unsigned short port) override;
     void update(float timeDelta) override;
     void tick(float timeDelta) override;
     void draw() override;
@@ -24,6 +24,9 @@ private:
     // Server info.
     sf::IpAddress m_serverAddress;
     unsigned short m_serverPort;
+
+    // Connection socket.
+    sf::TcpSocket m_tcpSocket;
 
     // Heartbeat timer.
     float m_hearbeatTimer;

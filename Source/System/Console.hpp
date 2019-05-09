@@ -122,6 +122,8 @@ public:
     void (*function)(std::string);
 };
 
+extern ConsoleVariable<bool> cv_showConsole;
+
 class ConsoleRegistry
 {
     // Type declarations.

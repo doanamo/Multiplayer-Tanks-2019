@@ -4,7 +4,6 @@
 #include "Network/PacketBase.hpp"
 
 extern ConsoleVariable<bool> cv_showNetwork;
-bool ParseStringToPort(std::string text, unsigned short& port);
 
 class Network
 {
@@ -14,21 +13,11 @@ protected:
 public:
     virtual ~Network();
 
-    virtual bool initialize() = 0;
-    virtual void update(float timeDelta) = 0;
-    virtual void tick(float timeDelta) = 0;
-    virtual void draw() = 0;
-
-    virtual bool isConnected() const = 0;
-    virtual bool isServer() const = 0;
-    virtual bool isClient() const = 0;
-
-    bool isPlayer() const;
-    int getPlayerIndex() const;
-
-protected:
-    // Initializes socket.
-    bool initializeSocket(std::string listenPort = "0");
+    // Loop methods.
+    virtual bool initialize(const sf::IpAddress& address, unsigned short port);
+    virtual void update(float timeDelta);
+    virtual void tick(float timeDelta);
+    virtual void draw();
 
     // Sending and receiving packets.
     bool sendPacket(PacketBase& packet, const sf::IpAddress& address, unsigned short port);
@@ -38,11 +27,12 @@ protected:
     bool sendData(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port);
     bool receiveData(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port);
 
+    // Network info.
+    virtual bool isConnected() const;
+    virtual bool isServer() const;
+    virtual bool isClient() const;
+
 protected:
     // Network socket.
-    sf::UdpSocket m_socket;
-    unsigned short m_listenPort;
-
-    // Player index.
-    int m_playerIndex;
+    sf::UdpSocket m_udpSocket;
 };

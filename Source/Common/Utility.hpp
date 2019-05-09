@@ -13,3 +13,4 @@ std::string trimTrailingString(const std::string& string, std::string characters
 unsigned int stringHash(const std::string& string);
 
 uint32_t calculateCRC32(uint32_t crc, const char* data, std::size_t size);
+bool parseStringToPort(std::string text, unsigned short& port);

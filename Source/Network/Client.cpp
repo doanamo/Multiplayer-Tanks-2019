@@ -2,8 +2,6 @@
 #include "Network/Client.hpp"
 #include "Network/Protocol.hpp"
 
-ConsoleVariable<std::string> cv_connect("connect", "127.0.0.1:2076");
-
 Client::Client() :
     m_serverAddress(),
     m_serverPort(0),
@@ -15,30 +13,30 @@ Client::~Client()
 {
 }
 
-bool Client::initialize()
+bool Client::initialize(const sf::IpAddress& address, unsigned short port)
 {
-    // Parse server address and string.
-    auto addressPortSeparator = cv_connect.value.find_first_of(':');
+    // Initialize base class.
+    // Find any available port for client.
+    if(!Network::initialize(address, 0))
+        return false;
 
-    if(addressPortSeparator == std::string::npos || addressPortSeparator == 0)
+    // Save server address and port.
+    m_serverAddress = address;
+    m_serverPort = port;
+
+    // Initialize TCP socket connection.
+    if(m_tcpSocket.connect(address, port, sf::seconds(10.0f)) == sf::Socket::Done)
     {
-        LOG_ERROR("Incorrectly formatted connect variable that should "
-            "contain address and port separated by ':' character!");
+        LOG_INFO("Connected to server at %s:%hu address.",
+            address.toString().c_str(), port);
+    }
+    else
+    {
+        LOG_ERROR("Connection to server at %s:%hu address timed out!",
+            address.toString().c_str(), port);
+
         return false;
     }
-
-    std::string serverAddressString(cv_connect.value, 0, addressPortSeparator);
-    std::string serverPortString(cv_connect.value, addressPortSeparator + 1);
-
-    // Save server address and string.
-    m_serverAddress = serverAddressString;
-
-    if(!ParseStringToPort(serverPortString, m_serverPort))
-        return false;
-
-    // Initializes the base network interface.
-    if(!Network::initializeSocket())
-        return false;
 
     return true;
 }

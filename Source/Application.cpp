@@ -12,7 +12,8 @@
 #include "Network/Server.hpp"
 #include "Network/Client.hpp"
 
-extern ConsoleVariable<bool> cv_showConsole;
+ConsoleVariable<std::string> cv_address("address", "127.0.0.1");
+ConsoleVariable<std::string> cv_port("port", "2076");
 
 Application::Application() :
     m_gameInstance(nullptr),
@@ -49,30 +50,45 @@ bool Application::initialize()
     // Create network interface.
     if(g_commandLine->hasArgument("host"))
     {
+        // Create server network interface.
         m_network = new Server();
+
+        // Change window title.
         g_window->setTitle(g_window->getInitialTitle() + " - Server");
     }
-    else
+    else if(g_commandLine->hasArgument("connect"))
     {
+        // Create client network interface.
         m_network = new Client();
+
+        // Change window title.
         g_window->setTitle(g_window->getInitialTitle() + " - Client");
     }
 
     if(m_network)
     {
-        if(!m_network->initialize())
+        // Parse port number string.
+        unsigned short portNumber = 0;
+        if(!parseStringToPort(cv_port.value, portNumber))
+            return false;
+
+        if(!m_network->initialize(sf::IpAddress(cv_address.value), portNumber))
             return false;
     }
 
-    // Create player tank object.
-    Tank* playerTank = new Tank();
-    Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank, "Player1_Tank", "Players");
-    m_gameInstance->getPlayerController()->control(playerHandle);
+    // Prepare game instance on server.
+    if(m_network && m_network->isServer())
+    {
+        // Create player tank object.
+        Tank* playerTank = new Tank();
+        Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank, "Player1_Tank", "Players");
+        m_gameInstance->getPlayerController()->control(playerHandle);
 
-    // Test instantiation from runtime type.
-    Object* enemyTank = Object::create(getTypeInfo<Tank>().getIdentifier());
-    enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
-    m_gameInstance->getWorld()->addObject(enemyTank);
+        // Test instantiation from runtime type.
+        Object* enemyTank = Object::create(getTypeInfo<Tank>().getIdentifier());
+        enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
+        m_gameInstance->getWorld()->addObject(enemyTank);
+    }
 
     return true;
 }
@@ -125,7 +141,10 @@ void Application::handleEvent(const sf::Event& event)
 void Application::update(float timeDelta)
 {
     // Update network interface.
-    m_network->update(timeDelta);
+    if(m_network)
+    {
+        m_network->update(timeDelta);
+    }
 
     // Update game instance.
     m_gameInstance->update(timeDelta);
@@ -134,7 +153,10 @@ void Application::update(float timeDelta)
 void Application::tick(float timeDelta)
 {
     // Tick network interface.
-    m_network->tick(timeDelta);
+    if(m_network)
+    {
+        m_network->tick(timeDelta);
+    }
 
     // Tick game instance.
     m_gameInstance->tick(timeDelta);
@@ -176,9 +198,12 @@ void Application::draw(float timeAlpha)
     if(m_isCameraAttachedToPlayer)
     {
         Tank* tank = dynamic_cast<Tank*>(m_gameInstance->getWorld()->getObjectByName("Player1_Tank"));
-        sf::Vector2f interpolatedPosition = tank->getPosition(timeAlpha);
         
-        m_viewport.setCenter(interpolatedPosition);
+        if(tank != nullptr)
+        {
+            sf::Vector2f interpolatedPosition = tank->getPosition(timeAlpha);
+            m_viewport.setCenter(interpolatedPosition);
+        }
     }
 
     // Manual camera navigation.
@@ -191,7 +216,10 @@ void Application::draw(float timeAlpha)
     m_gameInstance->draw(timeAlpha);
 
     // Draw network debug.
-    m_network->draw();
+    if(m_network)
+    {
+        m_network->draw();
+    }
 
     // Draw console.
     g_console->display();

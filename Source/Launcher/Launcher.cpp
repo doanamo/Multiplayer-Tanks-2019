@@ -137,10 +137,10 @@ int main(int argc, char* argv[])
         localPlayerCount = 1;
         firstPlayerHosts = false;
 
-        std::cout << "Please enter server IP address:";
+        std::cout << "Please enter server IP address: ";
         std::cin >> serverAddress;
 
-        std::cout << "Please enter server port:";
+        std::cout << "Please enter server port: ";
         std::cin >> serverPort;
     }
     else if(menuInput == "3")
@@ -182,11 +182,11 @@ int main(int argc, char* argv[])
         // Make the first player a host.
         if(i == 0 && firstPlayerHosts)
         {
-            gameProcesses[i].arguments += "-host " + serverPort;
+            gameProcesses[i].arguments += "-host -port " + serverPort;
         }
         else
         {
-            gameProcesses[i].arguments += "-connect " + serverAddress + ":" + serverPort;
+            gameProcesses[i].arguments += "-connect -address " + serverAddress + " -port " + serverPort;
         }
 
         // Spawn new thread.

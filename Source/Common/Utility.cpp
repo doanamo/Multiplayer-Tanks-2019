@@ -104,3 +104,25 @@ uint32_t calculateCRC32(uint32_t crc, const char* data, std::size_t size)
 
     return ~crc;
 }
+
+bool parseStringToPort(std::string text, unsigned short& port)
+{
+    // Determine listen port.
+    int portNumber = -1;
+
+    if(!text.empty())
+    {
+        portNumber = std::stoi(text);
+    }
+
+    // Check listen port.
+    if(portNumber < 0 || portNumber > std::numeric_limits<unsigned short>::max())
+    {
+        LOG_ERROR("Requested listen port number \"%s\" is outside of valid range!", text.c_str());
+        return false;
+    }
+
+    port = (unsigned short)portNumber;
+
+    return true;
+}

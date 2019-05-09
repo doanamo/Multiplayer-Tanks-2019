@@ -2,8 +2,6 @@
 #include "Network/Server.hpp"
 #include "Network/Protocol.hpp"
 
-ConsoleVariable<std::string> cv_host("host", "2076");
-
 Server::Server()
 {
 }
@@ -12,10 +10,19 @@ Server::~Server()
 {
 }
 
-bool Server::initialize()
+bool Server::initialize(const sf::IpAddress& address, unsigned short port)
 {
-    // Initializes the base network interface.
-    if(!Network::initializeSocket(cv_host.value))
+    // Listen for incoming TCP connections.
+    m_tcpListener.setBlocking(false);
+
+    if(m_tcpListener.listen(port) != sf::Socket::Done)
+    {
+        LOG_ERROR("Could not listen to incoming TCP connections!");
+        return false;
+    }
+
+    // Initializes UDP socket.
+    if(!Network::initialize(address, port))
         return false;
 
     return true;
@@ -23,6 +30,32 @@ bool Server::initialize()
 
 void Server::update(float timeDelta)
 {
+}
+
+void Server::tick(float timeDelta)
+{
+    // Listen for incoming connections.
+    while(true)
+    {
+        // Add new potential client to client list.
+        ClientEntry& clientEntry = m_clients.emplace_back();
+        clientEntry.socket = std::make_unique<sf::TcpSocket>();
+
+        // Attempt to connect a new client.
+        if(m_tcpListener.accept(*clientEntry.socket) == sf::Socket::Done)
+        {
+            LOG_INFO("Client at %s:%hu address has been connected.",
+                clientEntry.socket->getRemoteAddress().toString().c_str(),
+                clientEntry.socket->getRemotePort());
+        }
+        else
+        {
+            // There are no (more) clients that are requesting connection.
+            m_clients.pop_back();
+            break;
+        }
+    }
+
     // Receive packets.
     std::unique_ptr<PacketBase> receivedPacket;
     sf::IpAddress senderAddress;
@@ -46,10 +79,6 @@ void Server::update(float timeDelta)
     }
 }
 
-void Server::tick(float timeDelta)
-{
-}
-
 void Server::draw()
 {
     // Draw ImGui debug window.
@@ -70,9 +99,4 @@ bool Server::isConnected() const
 bool Server::isServer() const
 {
     return true;
-}
-
-bool Server::isClient() const
-{
-    return false;
 }
