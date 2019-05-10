@@ -1,7 +1,7 @@
 #include "Precompiled.hpp"
 #include "Serialization/Serialization.hpp"
 
-bool serialize(MemoryBuffer& buffer, Serializable& serializable)
+bool serialize(MemoryBuffer& buffer, const Serializable& serializable)
 {
     return serializable.onSerialize(buffer);
 }

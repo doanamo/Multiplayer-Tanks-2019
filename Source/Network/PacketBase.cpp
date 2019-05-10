@@ -9,7 +9,7 @@ PacketBase::~PacketBase()
 {
 }
 
-bool PacketBase::onSerialize(MemoryBuffer& buffer)
+bool PacketBase::onSerialize(MemoryBuffer& buffer) const
 {
     return true;
 }

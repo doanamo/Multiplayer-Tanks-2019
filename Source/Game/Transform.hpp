@@ -24,7 +24,7 @@ public:
     float getScale(float timeAlpha = 1.0f) const;
 
 protected:
-    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onSerialize(MemoryBuffer& buffer) const override;
     bool onDeserialize(MemoryBuffer& buffer) override;
 
 public:

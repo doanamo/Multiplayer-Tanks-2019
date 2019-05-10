@@ -38,6 +38,9 @@ bool Client::initialize(const sf::IpAddress& address, unsigned short port)
         return false;
     }
 
+    // Set TCP socket as non blocking after we establish connection.
+    m_tcpSocket.setBlocking(false);
+
     return true;
 }
 

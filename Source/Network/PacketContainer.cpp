@@ -13,7 +13,7 @@ PacketContainer::~PacketContainer()
 {
 }
 
-bool PacketContainer::onSerialize(MemoryBuffer& buffer)
+bool PacketContainer::onSerialize(MemoryBuffer& buffer) const
 {
     for(char magic : MagicValue)
     {

@@ -13,7 +13,7 @@ public:
     ~PacketContainer();
 
     // Serialization for packet type.
-    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onSerialize(MemoryBuffer& buffer) const override;
     bool onDeserialize(MemoryBuffer& buffer) override;
 
 public:

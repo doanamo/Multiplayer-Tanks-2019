@@ -150,7 +150,7 @@ void MemoryBuffer::replace(const char* data, std::size_t size)
     memcpy(m_buffer.data(), data, size);
 }
 
-bool MemoryBuffer::onSerialize(MemoryBuffer& buffer)
+bool MemoryBuffer::onSerialize(MemoryBuffer& buffer) const
 {
     if(!serialize(buffer, m_buffer.size()))
         return false;

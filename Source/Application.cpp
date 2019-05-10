@@ -230,6 +230,9 @@ bool Application::saveSnapshot()
     if(!m_gameInstance)
         return false;
 
+    // Prepare world for saving.
+    m_gameInstance->getWorld()->flushObjects();
+
     // Serialize game instance to memory buffer.
     MemoryBuffer memoryBuffer;
     if(!serialize(memoryBuffer, *m_gameInstance))

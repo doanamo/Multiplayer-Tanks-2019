@@ -9,7 +9,7 @@ PacketMessage::~PacketMessage()
 {
 }
 
-bool PacketMessage::onSerialize(MemoryBuffer& buffer)
+bool PacketMessage::onSerialize(MemoryBuffer& buffer) const
 {
     if(!Super::onSerialize(buffer))
         return false;

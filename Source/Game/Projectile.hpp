@@ -18,7 +18,7 @@ public:
 
 protected:
     // Serialization methods.
-    virtual bool onSerialize(MemoryBuffer& buffer) override;
+    virtual bool onSerialize(MemoryBuffer& buffer) const override;
     virtual bool onDeserialize(MemoryBuffer& buffer) override;
 
 private:

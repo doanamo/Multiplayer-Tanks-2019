@@ -56,7 +56,7 @@ void Projectile::onDraw(float timeAlpha)
     g_render->draw(projectileSprite);
 }
 
-bool Projectile::onSerialize(MemoryBuffer& buffer)
+bool Projectile::onSerialize(MemoryBuffer& buffer) const
 {
     Object::onSerialize(buffer);
 

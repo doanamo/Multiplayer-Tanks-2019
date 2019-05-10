@@ -101,6 +101,9 @@ public:
     // Destroys object in world.
     void destroyObject(Handle handle);
 
+    // Processes pending objects.
+    void flushObjects();
+
     // Sets object's unique name.
     bool setObjectName(Handle handle, std::string name, bool force = false);
 
@@ -117,14 +120,11 @@ public:
     std::vector<Object*> getObjectsByGroup(std::string group);
 
 private:
-    // Processes pending objects.
-    void processPendingObjects();
-
     // Gets object entry by handle.
-    ObjectEntry* GetEntryByHandle(Handle handle);
+    ObjectEntry* getEntryByHandle(Handle handle);
 
     // Serialization methods.
-    virtual bool onSerialize(MemoryBuffer& buffer) override;
+    virtual bool onSerialize(MemoryBuffer& buffer) const override;
     virtual bool onDeserialize(MemoryBuffer& buffer) override;
 
 private:

@@ -106,7 +106,7 @@ void PlayerController::tick(float timeDelta)
     }
 }
 
-bool PlayerController::onSerialize(MemoryBuffer& buffer)
+bool PlayerController::onSerialize(MemoryBuffer& buffer) const
 {
     return true;
 }

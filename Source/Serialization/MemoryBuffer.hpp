@@ -30,7 +30,7 @@ public:
     void replace(const char* data, std::size_t size);
 
     // Serialization methods.
-    bool onSerialize(MemoryBuffer& buffer) override;
+    bool onSerialize(MemoryBuffer& buffer) const override;
     bool onDeserialize(MemoryBuffer& buffer) override;
 
     // Accessors.

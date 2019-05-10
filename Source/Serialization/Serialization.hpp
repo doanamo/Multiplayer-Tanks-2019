@@ -4,7 +4,7 @@
 #include "Serialization/MemoryBuffer.hpp"
 #include "Serialization/Serializable.hpp"
 
-bool serialize(MemoryBuffer& buffer, Serializable& serializable);
+bool serialize(MemoryBuffer& buffer, const Serializable& serializable);
 bool deserialize(MemoryBuffer& buffer, Serializable* serializable);
 
 bool serialize(MemoryBuffer& buffer, uint8_t value);

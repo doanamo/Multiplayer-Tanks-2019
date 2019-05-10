@@ -76,7 +76,7 @@ void Level::draw(float timeAlpha)
     }
 }
 
-bool Level::onSerialize(MemoryBuffer& buffer)
+bool Level::onSerialize(MemoryBuffer& buffer) const
 {
     return true;
 }

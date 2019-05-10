@@ -85,7 +85,6 @@ void Server::draw()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
     if(ImGui::Begin("Network State (Server)##NetworkState", &cv_showNetwork.value))
     {
-        
     }
     ImGui::End();
     ImGui::PopStyleVar(1);

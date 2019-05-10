@@ -24,7 +24,7 @@ bool World::initialize()
     return true;
 }
 
-void World::processPendingObjects()
+void World::flushObjects()
 {
     // Destroy objects marked for destruction.
     {
@@ -105,7 +105,7 @@ void World::update(float timeDelta)
 void World::tick(float timeDelta)
 {
     // Process objects waiting for creation and destruction.
-    processPendingObjects();
+    flushObjects();
 
     // Tick all objects.
     std::size_t index = 0;
@@ -291,7 +291,7 @@ void World::destroyObject(Handle handle)
 bool World::setObjectName(Handle handle, std::string name, bool force)
 {
     // Get object entry if handle is valid.
-    ObjectEntry* objectEntry = GetEntryByHandle(handle);
+    ObjectEntry* objectEntry = getEntryByHandle(handle);
 
     if(objectEntry == nullptr)
     {
@@ -359,7 +359,7 @@ bool World::setObjectName(Handle handle, std::string name, bool force)
 void World::setObjectGroup(Handle handle, std::string group)
 {
     // Get object entry if handle is valid.
-    ObjectEntry* objectEntry = GetEntryByHandle(handle);
+    ObjectEntry* objectEntry = getEntryByHandle(handle);
 
     if(objectEntry == nullptr)
     {
@@ -412,7 +412,7 @@ void World::setObjectGroup(Handle handle, std::string group)
     objectEntry->object->m_group = group;
 }
 
-World::ObjectEntry* World::GetEntryByHandle(Handle handle)
+World::ObjectEntry* World::getEntryByHandle(Handle handle)
 {
     // Make sure identifier is within objects array range and return null otherwise.
     if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
@@ -434,7 +434,7 @@ World::ObjectEntry* World::GetEntryByHandle(Handle handle)
 Object* World::getObjectByHandle(Handle handle)
 {
     // Return object pointer if handle is valid.
-    ObjectEntry* objectEntry = GetEntryByHandle(handle);
+    ObjectEntry* objectEntry = getEntryByHandle(handle);
 
     if(objectEntry != nullptr)
     {
@@ -481,10 +481,24 @@ std::vector<Object*> World::getObjectsByGroup(std::string group)
     return results;
 }
 
-bool World::onSerialize(MemoryBuffer& buffer)
+bool World::onSerialize(MemoryBuffer& buffer) const
 {
-    // Process pending objects before serialization.
-    processPendingObjects();
+    // Check if objects are in valid state for serialization.
+    // Call flushObjects() before serialization to avoid failures.
+    for(const ObjectEntry& objectEntry : m_objects)
+    {
+        if(objectEntry.destroy == true)
+        {
+            LOG_ERROR("Could not serialize world due to pending object deletions!");
+            return false;
+        }
+
+        if(objectEntry.created != true)
+        {
+            LOG_ERROR("Could not serialize world due to pending object creations!");
+            return false;
+        }
+    }
 
     // Function for checking if object is eligible for serialization.
     auto ShouldSerializeObject = [](const ObjectEntry& entry)
@@ -501,7 +515,7 @@ bool World::onSerialize(MemoryBuffer& buffer)
     // Serialize created objects.
     // All objects marked for destruction should be already flushed at this point.
     // All created objects should be already marked as created at this point.
-    for(ObjectEntry& objectEntry : m_objects)
+    for(const ObjectEntry& objectEntry : m_objects)
     {
         if(!ShouldSerializeObject(objectEntry))
             continue;
