@@ -102,7 +102,7 @@ PlayerController* GameInstance::getPlayerController()
     return m_playerController;
 }
 
-bool GameInstance::onSerialize(MemoryBuffer& buffer) const
+bool GameInstance::onSerialize(MemoryStream& buffer) const
 {
     if(!serialize(buffer, *m_world))
         return false;
@@ -116,7 +116,7 @@ bool GameInstance::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool GameInstance::onDeserialize(MemoryBuffer& buffer)
+bool GameInstance::onDeserialize(MemoryStream& buffer)
 {
     if(!deserialize(buffer, m_world))
         return false;

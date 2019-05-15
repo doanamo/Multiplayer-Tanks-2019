@@ -80,7 +80,7 @@ sf::Vector2f Tank::getPosition(float alpha)
     return m_transform.getPosition(alpha);
 }
 
-bool Tank::onSerialize(MemoryBuffer& buffer) const
+bool Tank::onSerialize(MemoryStream& buffer) const
 {
     Object::onSerialize(buffer);
 
@@ -90,7 +90,7 @@ bool Tank::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool Tank::onDeserialize(MemoryBuffer& buffer)
+bool Tank::onDeserialize(MemoryStream& buffer)
 {
     Object::onDeserialize(buffer);
 

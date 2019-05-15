@@ -115,7 +115,7 @@ float Transform::getScale(float timeAlpha) const
     return lerp(m_previousScale, m_currentScale, timeAlpha);
 }
 
-bool Transform::onSerialize(MemoryBuffer& buffer) const
+bool Transform::onSerialize(MemoryStream& buffer) const
 {
     if(!serialize(buffer, m_currentPosition))
         return false;
@@ -129,7 +129,7 @@ bool Transform::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool Transform::onDeserialize(MemoryBuffer& buffer)
+bool Transform::onDeserialize(MemoryStream& buffer)
 {
     if(!deserialize(buffer, &m_currentPosition))
         return false;

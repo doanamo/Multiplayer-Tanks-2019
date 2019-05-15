@@ -24,8 +24,8 @@ public:
     float getScale(float timeAlpha = 1.0f) const;
 
 protected:
-    bool onSerialize(MemoryBuffer& buffer) const override;
-    bool onDeserialize(MemoryBuffer& buffer) override;
+    bool onSerialize(MemoryStream& buffer) const override;
+    bool onDeserialize(MemoryStream& buffer) override;
 
 public:
     sf::Vector2f m_currentPosition;

@@ -72,7 +72,8 @@ bool Application::initialize()
         if(!parseStringToPort(cv_port.value, portNumber))
             return false;
 
-        if(!m_network->initialize(sf::IpAddress(cv_address.value), portNumber))
+        // Initialize network interface.
+        if(!m_network->initialize(m_gameInstance, sf::IpAddress(cv_address.value), portNumber))
             return false;
     }
 
@@ -125,7 +126,7 @@ void Application::handleEvent(const sf::Event& event)
         case sf::Keyboard::K:
         case sf::Keyboard::J:
         case sf::Keyboard::L:
-            if (m_isCameraAttachedToPlayer)
+            if(m_isCameraAttachedToPlayer)
             {
                 m_isCameraAttachedToPlayer = false;
                 LOG_TRACE("Camera has been detached from the player. Press 'O' to restore camera to default.");
@@ -184,7 +185,7 @@ void Application::draw(float timeAlpha)
     viewportSize.x = 10.0f * horizontalAspectRatio;
     viewportSize.y = 10.0f * verticalAspectRatio;
 
-    if (!m_isViewportCentered)
+    if(!m_isViewportCentered)
     {
         m_viewport.setCenter(0.0f, 0.0f);
         m_isViewportCentered = true;
@@ -198,7 +199,7 @@ void Application::draw(float timeAlpha)
     if(m_isCameraAttachedToPlayer)
     {
         Tank* tank = dynamic_cast<Tank*>(m_gameInstance->getWorld()->getObjectByName("Player1_Tank"));
-        
+
         if(tank != nullptr)
         {
             sf::Vector2f interpolatedPosition = tank->getPosition(timeAlpha);
@@ -207,11 +208,11 @@ void Application::draw(float timeAlpha)
     }
 
     // Manual camera navigation.
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::I)) m_viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::K)) m_viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::J)) m_viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
-    if (sf::Keyboard::isKeyPressed(sf::Keyboard::L)) m_viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
-     
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::I)) m_viewport.move(0.f * timeAlpha, -0.05f * timeAlpha);
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::K)) m_viewport.move(0.f * timeAlpha, 0.05f * timeAlpha);
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::J)) m_viewport.move(-0.05f * timeAlpha, 0.f * timeAlpha);
+    if(sf::Keyboard::isKeyPressed(sf::Keyboard::L)) m_viewport.move(0.05f * timeAlpha, 0.f * timeAlpha);
+
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
 
@@ -234,13 +235,13 @@ bool Application::saveSnapshot()
     m_gameInstance->getWorld()->flushObjects();
 
     // Serialize game instance to memory buffer.
-    MemoryBuffer memoryBuffer;
+    MemoryStream memoryBuffer;
     if(!serialize(memoryBuffer, *m_gameInstance))
         return false;
 
     // Write buffer to disc.
     std::ofstream file("Snapshot.save", std::ios::binary | std::ios::trunc);
-    
+
     if(!file.is_open())
     {
         LOG_ERROR("Could not open snapshot file for writing!");
@@ -271,7 +272,7 @@ bool Application::loadSnaphot()
     file.seekg(0, std::ios::beg);
 
     // Read snapshot data into memory buffer.
-    MemoryBuffer memoryBuffer;
+    MemoryStream memoryBuffer;
     memoryBuffer.resize(size);
 
     if(!file.read(memoryBuffer.data(), size))

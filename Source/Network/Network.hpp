@@ -4,6 +4,7 @@
 #include "Network/PacketBase.hpp"
 
 extern ConsoleVariable<bool> cv_showNetwork;
+class GameInstance;
 
 class Network
 {
@@ -14,18 +15,24 @@ public:
     virtual ~Network();
 
     // Loop methods.
-    virtual bool initialize(const sf::IpAddress& address, unsigned short port);
+    virtual bool initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port);
     virtual void update(float timeDelta);
     virtual void tick(float timeDelta);
     virtual void draw();
 
     // Sending and receiving packets.
-    bool sendPacket(PacketBase& packet, const sf::IpAddress& address, unsigned short port);
-    bool receivePacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port);
+    bool sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket);
+    bool receiveTcpPacket(std::unique_ptr<PacketBase>& packet, sf::TcpSocket& socket);
+
+    bool sendUdpPacket(const PacketBase& packet, const sf::IpAddress& address, unsigned short port);
+    bool receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port);
 
     // Sending and receiving data buffers.
-    bool sendData(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port);
-    bool receiveData(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port);
+    bool sendTcpData(const MemoryStream& buffer, sf::TcpSocket& socket);
+    bool receiveTcpData(MemoryStream& buffer, sf::TcpSocket& socket);
+
+    bool sendUdpData(const MemoryStream& buffer, const sf::IpAddress& address, unsigned short port);
+    bool receiveUdpData(MemoryStream& buffer, sf::IpAddress& address, unsigned short& port);
 
     // Network info.
     virtual bool isConnected() const;
@@ -33,6 +40,9 @@ public:
     virtual bool isClient() const;
 
 protected:
+    // Game instance.
+    GameInstance* m_gameInstance;
+
     // Network socket.
     sf::UdpSocket m_udpSocket;
 };

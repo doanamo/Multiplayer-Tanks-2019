@@ -124,8 +124,8 @@ private:
     ObjectEntry* getEntryByHandle(Handle handle);
 
     // Serialization methods.
-    virtual bool onSerialize(MemoryBuffer& buffer) const override;
-    virtual bool onDeserialize(MemoryBuffer& buffer) override;
+    virtual bool onSerialize(MemoryStream& buffer) const override;
+    virtual bool onDeserialize(MemoryStream& buffer) override;
 
 private:
     // List of objects currently in the world.

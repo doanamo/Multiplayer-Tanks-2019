@@ -1,6 +1,8 @@
 #include "Precompiled.hpp"
 #include "Network/Server.hpp"
 #include "Network/Protocol.hpp"
+#include "Game/GameInstance.hpp"
+#include "Game/World.hpp"
 
 Server::Server()
 {
@@ -10,20 +12,20 @@ Server::~Server()
 {
 }
 
-bool Server::initialize(const sf::IpAddress& address, unsigned short port)
+bool Server::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port)
 {
+    // Initializes UDP socket.
+    if(!Network::initialize(gameInstance, address, port))
+        return false;
+
     // Listen for incoming TCP connections.
     m_tcpListener.setBlocking(false);
 
     if(m_tcpListener.listen(port) != sf::Socket::Done)
     {
-        LOG_ERROR("Could not listen to incoming TCP connections!");
+        LOG_ERROR("Could not start listening to incoming TCP connections!");
         return false;
     }
-
-    // Initializes UDP socket.
-    if(!Network::initialize(address, port))
-        return false;
 
     return true;
 }
@@ -54,6 +56,18 @@ void Server::tick(float timeDelta)
             m_clients.pop_back();
             break;
         }
+
+        // Prepare world for saving.
+        m_gameInstance->getWorld()->flushObjects();
+
+        // Serialize game instance.
+        MemoryStream memoryBuffer;
+
+        if(!serialize(memoryBuffer, *m_gameInstance))
+            continue;
+
+        // Send current game instance.
+        // TODO
     }
 
     // Receive packets.
@@ -61,7 +75,7 @@ void Server::tick(float timeDelta)
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(receivePacket(receivedPacket, senderAddress, senderPort))
+    while(receiveUdpPacket(receivedPacket, senderAddress, senderPort))
     {
         TypeInfo::IdentifierType packetType = getTypeIdentifier(*receivedPacket);
 
@@ -75,7 +89,7 @@ void Server::tick(float timeDelta)
         PacketMessage packetMessage;
         packetMessage.text = "Hello client!";
 
-        sendPacket(packetMessage, senderAddress, senderPort);
+        sendUdpPacket(packetMessage, senderAddress, senderPort);
     }
 }
 

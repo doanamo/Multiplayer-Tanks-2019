@@ -84,7 +84,7 @@ Transform& Object::getTransform()
     return m_transform;
 }
 
-bool Object::onSerialize(MemoryBuffer& buffer) const
+bool Object::onSerialize(MemoryStream& buffer) const
 {
     if(!serialize(buffer, m_transform))
         return false;
@@ -92,7 +92,7 @@ bool Object::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool Object::onDeserialize(MemoryBuffer& buffer)
+bool Object::onDeserialize(MemoryStream& buffer)
 {
     if(!deserialize(buffer, &m_transform))
         return false;

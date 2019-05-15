@@ -11,7 +11,7 @@ public:
     Client();
     ~Client();
 
-    bool initialize(const sf::IpAddress& address, unsigned short port) override;
+    bool initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port) override;
     void update(float timeDelta) override;
     void tick(float timeDelta) override;
     void draw() override;

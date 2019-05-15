@@ -1,10 +1,12 @@
 #include "Precompiled.hpp"
 #include "Network/Network.hpp"
-#include "Network/PacketContainer.hpp"
+#include "Network/PacketHeader.hpp"
+#include "Game/GameInstance.hpp"
 
 ConsoleVariable<bool> cv_showNetwork("showNetwork", false);
 
 Network::Network() :
+    m_gameInstance(nullptr),
     m_udpSocket()
 {
 }
@@ -13,8 +15,17 @@ Network::~Network()
 {
 }
 
-bool Network::initialize(const sf::IpAddress& address, unsigned short listenPort)
+bool Network::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short listenPort)
 {
+    // Save game instance reference.
+    if(gameInstance == nullptr)
+    {
+        LOG_ERROR("Game instance is needed to initialize network interface!");
+        return false;
+    }
+
+    m_gameInstance = gameInstance;
+
     // Bind socket to port.
     if(m_udpSocket.bind(listenPort) != sf::Socket::Done)
     {
@@ -40,48 +51,91 @@ void Network::draw()
 {
 }
 
-bool Network::sendPacket(PacketBase& packet, const sf::IpAddress& address, unsigned short port)
+bool Network::sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket)
 {
-    // Create packet container.
-    PacketContainer packetContainer;
-    packetContainer.packetType = getTypeIdentifier(packet);
+    ASSERT(false, "Not implemented!");
 
-    if(!serialize(packetContainer.packetBuffer, packet))
+    return true;
+}
+
+bool Network::receiveTcpPacket(std::unique_ptr<PacketBase>& packet, sf::TcpSocket& socket)
+{
+    ASSERT(false, "Not implemented!");
+
+    return true;
+}
+
+bool Network::sendUdpPacket(const PacketBase& packet, const sf::IpAddress& address, unsigned short port)
+{
+    // Serialize packet data.
+    MemoryStream packetData;
+    if(!serialize(packetData, packet))
     {
         LOG_ERROR("Failed to serialize packet!");
         return false;
     }
 
-    // Serialize packet container.
-    MemoryBuffer dataBuffer;
-    if(!serialize(dataBuffer, packetContainer))
+    // Create packet container.
+    PacketHeader packetHeader;
+    packetHeader.packetSize = packetData.size();
+    packetHeader.packetType = getTypeIdentifier(packet);
+    packetHeader.packetCRC = packetHeader.calculateCRC(packetData.data(), packetData.size());
+
+    // Serialize packet header and data into one stream.
+    MemoryStream networkData;
+
+    if(!serialize(networkData, packetHeader))
     {
-        LOG_ERROR("Failed to serialize network data!");
+        LOG_ERROR("Failed to serialize packet header!");
+        return false;
+    }
+
+    if(!serialize(networkData, packetData))
+    {
+        LOG_ERROR("Failed to serialize packet data!");
         return false;
     }
 
     // Send data over network.
-    return sendData(dataBuffer, address, port);
+    return sendUdpData(networkData, address, port);
 }
 
-bool Network::receivePacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port)
+bool Network::receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port)
 {
     // Receive data buffer from over network.
-    MemoryBuffer dataBuffer;
-    if(!receiveData(dataBuffer, address, port))
+    MemoryStream networkData;
+    if(!receiveUdpData(networkData, address, port))
         return false;
-    
-    // Deserialize packet container.
-    PacketContainer packetContainer;
-    if(!deserialize(dataBuffer, &packetContainer))
+
+    // Deserialize packet header.
+    PacketHeader packetHeader;
+    if(!deserialize(networkData, &packetHeader))
     {
-        LOG_ERROR("Failed to deserialize received network data!");
+        LOG_ERROR("Failed to deserialize packet header!");
+        return false;
+    }
+
+    // Deserialize packet data.
+    MemoryStream packetData;
+    if(!deserialize(networkData, &packetData))
+    {
+        LOG_ERROR("Failed to deserialize packet data!");
+        return false;
+    }
+
+    // Verify packet CRC.
+    uint32_t packetCRC = packetHeader.calculateCRC(packetData.data(), packetData.size());
+
+    if(packetCRC != packetHeader.packetCRC)
+    {
+        LOG_WARNING("Received packet CRC does not match actual data CRC!");
         return false;
     }
 
     // Allocate and deserialize packet.
-    packet = std::unique_ptr<PacketBase>(PacketBase::create(packetContainer.packetType));
-    if(!deserialize(packetContainer.packetBuffer, packet.get()))
+    packet = std::unique_ptr<PacketBase>(PacketBase::create(packetHeader.packetType));
+
+    if(!deserialize(packetData, packet.get()))
     {
         LOG_ERROR("Failed to deserialize received packet!");
         return false;
@@ -90,9 +144,28 @@ bool Network::receivePacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& 
     return true;
 }
 
-bool Network::sendData(const MemoryBuffer& buffer, const sf::IpAddress& address, unsigned short port)
+bool Network::sendTcpData(const MemoryStream& buffer, sf::TcpSocket& socket)
 {
-    LOG_TRACE("Sending network data to %s:%hu (%u size).", address.toString().c_str(), port, buffer.size());
+    LOG_TRACE("Sending network data to %s:%hu (%u size).",
+        socket.getRemoteAddress().toString().c_str(),
+        socket.getRemotePort(), buffer.size());
+
+    ASSERT(false, "Not implemented!");
+
+    return true;
+}
+
+bool Network::receiveTcpData(MemoryStream& buffer, sf::TcpSocket& socket)
+{
+    ASSERT(false, "Not implemented!");
+
+    return true;
+}
+
+bool Network::sendUdpData(const MemoryStream& buffer, const sf::IpAddress& address, unsigned short port)
+{
+    LOG_TRACE("Sending network data to %s:%hu (%u size).",
+        address.toString().c_str(), port, buffer.size());
 
     // Send packet read from memory buffer.
     if(m_udpSocket.send(buffer.data(), buffer.size(), address, port) != sf::Socket::Done)
@@ -104,27 +177,24 @@ bool Network::sendData(const MemoryBuffer& buffer, const sf::IpAddress& address,
     return true;
 }
 
-bool Network::receiveData(MemoryBuffer& buffer, sf::IpAddress& address, unsigned short& port)
+bool Network::receiveUdpData(MemoryStream& buffer, sf::IpAddress& address, unsigned short& port)
 {
     // Receive packet and write it into memory buffer.
     char datagramBuffer[sf::UdpSocket::MaxDatagramSize] = { 0 };
     std::size_t bytesReceived = 0;
 
     auto status = m_udpSocket.receive(&datagramBuffer[0], sf::UdpSocket::MaxDatagramSize, bytesReceived, address, port);
+    VERIFY(status != sf::Socket::Partial, "Received partial network data while using UDP socket!");
 
     switch(status)
     {
-        case sf::Socket::Partial:
-            VERIFY(false, "Received partial network data while using UDP socket!");
-            return false;
+    case sf::Socket::Error:
+        LOG_ERROR("Failed to receive network data from socket!");
+        return false;
 
-        case sf::Socket::Error:
-            LOG_ERROR("Failed to receive network data from socket!");
-            return false;
-
-        case sf::Socket::Disconnected:
-        case sf::Socket::NotReady:
-            return false;
+    case sf::Socket::Disconnected:
+    case sf::Socket::NotReady:
+        return false;
     }
 
     LOG_TRACE("Received network data from %s:%hu (%u size).", address.toString().c_str(), port, bytesReceived);

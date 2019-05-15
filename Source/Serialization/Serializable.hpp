@@ -1,10 +1,10 @@
 #pragma once
 
-class MemoryBuffer;
+class MemoryStream;
 
 class Serializable
 {
 public:
-    virtual bool onSerialize(MemoryBuffer& buffer) const = 0;
-    virtual bool onDeserialize(MemoryBuffer& buffer) = 0;
+    virtual bool onSerialize(MemoryStream& buffer) const = 0;
+    virtual bool onDeserialize(MemoryStream& buffer) = 0;
 };

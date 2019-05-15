@@ -56,7 +56,7 @@ void Projectile::onDraw(float timeAlpha)
     g_render->draw(projectileSprite);
 }
 
-bool Projectile::onSerialize(MemoryBuffer& buffer) const
+bool Projectile::onSerialize(MemoryStream& buffer) const
 {
     Object::onSerialize(buffer);
 
@@ -66,7 +66,7 @@ bool Projectile::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool Projectile::onDeserialize(MemoryBuffer& buffer)
+bool Projectile::onDeserialize(MemoryStream& buffer)
 {
     Object::onDeserialize(buffer);
 

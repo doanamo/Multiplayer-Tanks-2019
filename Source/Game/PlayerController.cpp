@@ -106,12 +106,12 @@ void PlayerController::tick(float timeDelta)
     }
 }
 
-bool PlayerController::onSerialize(MemoryBuffer& buffer) const
+bool PlayerController::onSerialize(MemoryStream& buffer) const
 {
     return true;
 }
 
-bool PlayerController::onDeserialize(MemoryBuffer& buffer)
+bool PlayerController::onDeserialize(MemoryStream& buffer)
 {
     // Temporary workaround since we cannot resolve handles yet.
     m_object.identifier = 1;

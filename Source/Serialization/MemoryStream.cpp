@@ -1,16 +1,16 @@
 #include "Precompiled.hpp"
-#include "Serialization/MemoryBuffer.hpp"
+#include "Serialization/MemoryStream.hpp"
 
-MemoryBuffer::MemoryBuffer() :
+MemoryStream::MemoryStream() :
     m_index(0)
 {
 }
 
-MemoryBuffer::~MemoryBuffer()
+MemoryStream::~MemoryStream()
 {
 }
 
-bool MemoryBuffer::writeByte(uint8_t* value)
+bool MemoryStream::writeByte(uint8_t* value)
 {
     if(m_index == m_buffer.size() - 1)
         return false;
@@ -22,7 +22,7 @@ bool MemoryBuffer::writeByte(uint8_t* value)
     return true;
 }
 
-bool MemoryBuffer::writeShort(uint16_t* value)
+bool MemoryStream::writeShort(uint16_t* value)
 {
     if(m_index == m_buffer.size() - 1)
         return false;
@@ -34,7 +34,7 @@ bool MemoryBuffer::writeShort(uint16_t* value)
     return true;
 }
 
-bool MemoryBuffer::writeInteger(uint32_t* value)
+bool MemoryStream::writeInteger(uint32_t* value)
 {
     if(m_index == m_buffer.size() - 1)
         return false;
@@ -46,7 +46,7 @@ bool MemoryBuffer::writeInteger(uint32_t* value)
     return true;
 }
 
-bool MemoryBuffer::writeWord(uint64_t* value)
+bool MemoryStream::writeWord(uint64_t* value)
 {
     if(m_index == m_buffer.size() - 1)
         return false;
@@ -58,7 +58,7 @@ bool MemoryBuffer::writeWord(uint64_t* value)
     return true;
 }
 
-bool MemoryBuffer::writeData(const char* data, std::size_t size)
+bool MemoryStream::writeData(const char* data, std::size_t size)
 {
     if(m_index == m_buffer.size() - 1)
         return false;
@@ -70,7 +70,7 @@ bool MemoryBuffer::writeData(const char* data, std::size_t size)
     return true;
 }
 
-bool MemoryBuffer::readByte(uint8_t* value)
+bool MemoryStream::readByte(uint8_t* value)
 {
     if(m_index + sizeof(uint8_t) > m_buffer.size())
         return false;
@@ -81,7 +81,7 @@ bool MemoryBuffer::readByte(uint8_t* value)
     return value;
 }
 
-bool MemoryBuffer::readShort(uint16_t* value)
+bool MemoryStream::readShort(uint16_t* value)
 {
     if(m_index + sizeof(uint16_t) > m_buffer.size())
         return false;
@@ -92,7 +92,7 @@ bool MemoryBuffer::readShort(uint16_t* value)
     return true;
 }
 
-bool MemoryBuffer::readInteger(uint32_t* value)
+bool MemoryStream::readInteger(uint32_t* value)
 {
     if(m_index + sizeof(uint32_t) > m_buffer.size())
         return false;
@@ -103,7 +103,7 @@ bool MemoryBuffer::readInteger(uint32_t* value)
     return true;
 }
 
-bool MemoryBuffer::readWord(uint64_t* value)
+bool MemoryStream::readWord(uint64_t* value)
 {
     if(m_index + sizeof(uint64_t) > m_buffer.size())
         return false;
@@ -114,7 +114,7 @@ bool MemoryBuffer::readWord(uint64_t* value)
     return true;
 }
 
-bool MemoryBuffer::readData(char* data, std::size_t size)
+bool MemoryStream::readData(char* data, std::size_t size)
 {
     if(m_index + size > m_buffer.size())
         return false;
@@ -125,23 +125,23 @@ bool MemoryBuffer::readData(char* data, std::size_t size)
     return true;
 }
 
-void MemoryBuffer::clear()
+void MemoryStream::clear()
 {
     m_buffer.clear();
     m_index = 0;
 }
 
-void MemoryBuffer::reset()
+void MemoryStream::reset()
 {
     m_index = 0;
 }
 
-void MemoryBuffer::resize(std::size_t size)
+void MemoryStream::resize(std::size_t size)
 {
     m_buffer.resize(size, 0);
 }
 
-void MemoryBuffer::replace(const char* data, std::size_t size)
+void MemoryStream::replace(const char* data, std::size_t size)
 {
     m_buffer.clear();
     m_index = 0;
@@ -150,7 +150,7 @@ void MemoryBuffer::replace(const char* data, std::size_t size)
     memcpy(m_buffer.data(), data, size);
 }
 
-bool MemoryBuffer::onSerialize(MemoryBuffer& buffer) const
+bool MemoryStream::onSerialize(MemoryStream& buffer) const
 {
     if(!serialize(buffer, m_buffer.size()))
         return false;
@@ -161,7 +161,7 @@ bool MemoryBuffer::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool MemoryBuffer::onDeserialize(MemoryBuffer& buffer)
+bool MemoryStream::onDeserialize(MemoryStream& buffer)
 {
     std::size_t bufferSize = 0;
 
@@ -175,17 +175,17 @@ bool MemoryBuffer::onDeserialize(MemoryBuffer& buffer)
     return true;
 }
 
-std::size_t MemoryBuffer::size() const
+std::size_t MemoryStream::size() const
 {
     return m_buffer.size();
 }
 
-const char* MemoryBuffer::data() const
+const char* MemoryStream::data() const
 {
     return &m_buffer[0];
 }
 
-char* MemoryBuffer::data()
+char* MemoryStream::data()
 {
     return &m_buffer[0];
 }

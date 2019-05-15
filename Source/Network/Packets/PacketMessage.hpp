@@ -11,8 +11,8 @@ public:
     PacketMessage();
     ~PacketMessage();
 
-    bool onSerialize(MemoryBuffer& buffer) const override;
-    bool onDeserialize(MemoryBuffer& buffer) override;
+    bool onSerialize(MemoryStream& buffer) const override;
+    bool onDeserialize(MemoryStream& buffer) override;
 
 public:
     std::string text;

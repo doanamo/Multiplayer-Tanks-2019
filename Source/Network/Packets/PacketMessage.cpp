@@ -9,7 +9,7 @@ PacketMessage::~PacketMessage()
 {
 }
 
-bool PacketMessage::onSerialize(MemoryBuffer& buffer) const
+bool PacketMessage::onSerialize(MemoryStream& buffer) const
 {
     if(!Super::onSerialize(buffer))
         return false;
@@ -20,7 +20,7 @@ bool PacketMessage::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool PacketMessage::onDeserialize(MemoryBuffer& buffer)
+bool PacketMessage::onDeserialize(MemoryStream& buffer)
 {
     if(!Super::onDeserialize(buffer))
         return false;

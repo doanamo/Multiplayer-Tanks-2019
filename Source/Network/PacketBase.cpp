@@ -9,12 +9,12 @@ PacketBase::~PacketBase()
 {
 }
 
-bool PacketBase::onSerialize(MemoryBuffer& buffer) const
+bool PacketBase::onSerialize(MemoryStream& buffer) const
 {
     return true;
 }
 
-bool PacketBase::onDeserialize(MemoryBuffer& buffer)
+bool PacketBase::onDeserialize(MemoryStream& buffer)
 {
     return true;
 }

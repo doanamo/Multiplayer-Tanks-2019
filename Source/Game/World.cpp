@@ -481,7 +481,7 @@ std::vector<Object*> World::getObjectsByGroup(std::string group)
     return results;
 }
 
-bool World::onSerialize(MemoryBuffer& buffer) const
+bool World::onSerialize(MemoryStream& buffer) const
 {
     // Check if objects are in valid state for serialization.
     // Call flushObjects() before serialization to avoid failures.
@@ -536,7 +536,7 @@ bool World::onSerialize(MemoryBuffer& buffer) const
     return true;
 }
 
-bool World::onDeserialize(MemoryBuffer& buffer)
+bool World::onDeserialize(MemoryStream& buffer)
 {
     uint32_t objectCount;
     if(!deserialize(buffer, &objectCount))

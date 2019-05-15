@@ -13,11 +13,11 @@ Client::~Client()
 {
 }
 
-bool Client::initialize(const sf::IpAddress& address, unsigned short port)
+bool Client::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port)
 {
     // Initialize base class.
     // Find any available port for client.
-    if(!Network::initialize(address, 0))
+    if(!Network::initialize(gameInstance, address, 0))
         return false;
 
     // Save server address and port.
@@ -54,7 +54,7 @@ void Client::update(float timeDelta)
         PacketMessage packetMessage;
         packetMessage.text = "Hello server!";
 
-        sendPacket(packetMessage, m_serverAddress, m_serverPort);
+        sendUdpPacket(packetMessage, m_serverAddress, m_serverPort);
 
         m_hearbeatTimer = 1.0f;
     }
@@ -64,7 +64,7 @@ void Client::update(float timeDelta)
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(receivePacket(receivedPacket, senderAddress, senderPort))
+    while(receiveUdpPacket(receivedPacket, senderAddress, senderPort))
     {
         TypeInfo::IdentifierType packetType = getTypeIdentifier(*receivedPacket);
 
@@ -86,7 +86,7 @@ void Client::draw()
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
     if(ImGui::Begin("Network State (Client)##NetworkState", &cv_showNetwork.value))
     {
-        
+
     }
     ImGui::End();
     ImGui::PopStyleVar(1);

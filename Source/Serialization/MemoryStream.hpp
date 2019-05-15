@@ -3,11 +3,11 @@
 #include "Precompiled.hpp"
 #include "Serialization/Serializable.hpp"
 
-class MemoryBuffer : public Serializable
+class MemoryStream : public Serializable
 {
 public:
-    MemoryBuffer();
-    ~MemoryBuffer();
+    MemoryStream();
+    ~MemoryStream();
 
     // Writing methods.
     bool writeByte(uint8_t* value);
@@ -30,8 +30,8 @@ public:
     void replace(const char* data, std::size_t size);
 
     // Serialization methods.
-    bool onSerialize(MemoryBuffer& buffer) const override;
-    bool onDeserialize(MemoryBuffer& buffer) override;
+    bool onSerialize(MemoryStream& buffer) const override;
+    bool onDeserialize(MemoryStream& buffer) override;
 
     // Accessors.
     std::size_t size() const;
