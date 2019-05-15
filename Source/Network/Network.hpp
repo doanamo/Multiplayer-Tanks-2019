@@ -23,7 +23,6 @@ public:
     // Sending and receiving packets.
     bool sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket);
     bool receiveTcpPacket(std::unique_ptr<PacketBase>& packet, sf::TcpSocket& socket);
-
     bool sendUdpPacket(const PacketBase& packet, const sf::IpAddress& address, unsigned short port);
     bool receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port);
 
@@ -38,6 +37,10 @@ public:
     virtual bool isConnected() const;
     virtual bool isServer() const;
     virtual bool isClient() const;
+
+protected:
+    bool serializePacket(MemoryStream& stream, const PacketBase& packet);
+    bool deserializePacket(MemoryStream& stream, std::unique_ptr<PacketBase>& packet);
 
 protected:
     // Game instance.

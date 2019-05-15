@@ -53,19 +53,49 @@ void Network::draw()
 
 bool Network::sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket)
 {
-    ASSERT(false, "Not implemented!");
+    // Prepare serialized network data.
+    MemoryStream networkData;
+    if(!serializePacket(networkData, packet))
+        return false;
 
-    return true;
+    // Send data over network.
+    return sendTcpData(networkData, socket);
 }
 
 bool Network::receiveTcpPacket(std::unique_ptr<PacketBase>& packet, sf::TcpSocket& socket)
 {
-    ASSERT(false, "Not implemented!");
+    // Receive data buffer from over network.
+    MemoryStream networkData;
+    if(!receiveTcpData(networkData, socket))
+        return false;
 
-    return true;
+    // Deserialize packet from network data.
+    return deserializePacket(networkData, packet);
 }
 
 bool Network::sendUdpPacket(const PacketBase& packet, const sf::IpAddress& address, unsigned short port)
+{
+    // Prepare serialized network data.
+    MemoryStream networkData;
+    if(!serializePacket(networkData, packet))
+        return false;
+
+    // Send data over network.
+    return sendUdpData(networkData, address, port);
+}
+
+bool Network::receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port)
+{
+    // Receive data buffer from over network.
+    MemoryStream networkData;
+    if(!receiveUdpData(networkData, address, port))
+        return false;
+
+    // Deserialize packet from network data.
+    return deserializePacket(networkData, packet);
+}
+
+bool Network::serializePacket(MemoryStream& stream, const PacketBase& packet)
 {
     // Serialize packet data.
     MemoryStream packetData;
@@ -82,34 +112,26 @@ bool Network::sendUdpPacket(const PacketBase& packet, const sf::IpAddress& addre
     packetHeader.packetCRC = packetHeader.calculateCRC(packetData.data(), packetData.size());
 
     // Serialize packet header and data into one stream.
-    MemoryStream networkData;
-
-    if(!serialize(networkData, packetHeader))
+    if(!serialize(stream, packetHeader))
     {
         LOG_ERROR("Failed to serialize packet header!");
         return false;
     }
 
-    if(!serialize(networkData, packetData))
+    if(!serialize(stream, packetData))
     {
         LOG_ERROR("Failed to serialize packet data!");
         return false;
     }
 
-    // Send data over network.
-    return sendUdpData(networkData, address, port);
+    return true;
 }
 
-bool Network::receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port)
+bool Network::deserializePacket(MemoryStream& stream, std::unique_ptr<PacketBase>& packet)
 {
-    // Receive data buffer from over network.
-    MemoryStream networkData;
-    if(!receiveUdpData(networkData, address, port))
-        return false;
-
     // Deserialize packet header.
     PacketHeader packetHeader;
-    if(!deserialize(networkData, &packetHeader))
+    if(!deserialize(stream, &packetHeader))
     {
         LOG_ERROR("Failed to deserialize packet header!");
         return false;
@@ -117,7 +139,7 @@ bool Network::receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddres
 
     // Deserialize packet data.
     MemoryStream packetData;
-    if(!deserialize(networkData, &packetData))
+    if(!deserialize(stream, &packetData))
     {
         LOG_ERROR("Failed to deserialize packet data!");
         return false;
