@@ -61,13 +61,15 @@ void Server::tick(float timeDelta)
         m_gameInstance->getWorld()->flushObjects();
 
         // Serialize game instance.
-        MemoryStream memoryBuffer;
-
-        if(!serialize(memoryBuffer, *m_gameInstance))
+        PacketStateSave packetStateSave;
+        if(!serialize(packetStateSave.serializedGameInstance, *m_gameInstance))
             continue;
 
         // Send current game instance.
-        // TODO
+        if(!sendTcpPacket(packetStateSave, *clientEntry.socket))
+        {
+            LOG_ERROR("Could not send game state save packet!");
+        }
     }
 
     // Receive packets.

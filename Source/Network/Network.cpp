@@ -168,25 +168,92 @@ bool Network::deserializePacket(MemoryStream& stream, std::unique_ptr<PacketBase
 
 bool Network::sendTcpData(const MemoryStream& buffer, sf::TcpSocket& socket)
 {
-    LOG_TRACE("Sending network data to %s:%hu (%u size).",
+    LOG_TRACE("Sending network data to %s:%hu (%u bytes).",
         socket.getRemoteAddress().toString().c_str(),
         socket.getRemotePort(), buffer.size());
 
-    ASSERT(false, "Not implemented!");
+    // Sends packet over TCP socket.
+    // This should be done asynchronously instead. Here we will get
+    // blocked by one connection for prolonged amount of time.
+    std::size_t totalBytesSent = 0;
+
+    while(totalBytesSent < buffer.size())
+    {
+        std::size_t bytesSent = 0;
+        auto socketStatus = socket.send(buffer.data() + totalBytesSent, buffer.size() - totalBytesSent, bytesSent);
+        totalBytesSent += bytesSent;
+
+        if(socketStatus != sf::Socket::Partial && socketStatus != sf::Socket::Done)
+            return false;
+    }
+
+    ASSERT(totalBytesSent == buffer.size());
 
     return true;
 }
 
 bool Network::receiveTcpData(MemoryStream& buffer, sf::TcpSocket& socket)
 {
-    ASSERT(false, "Not implemented!");
+    // Create stream and allocate data for packet header.
+    MemoryStream networkData;
+    networkData.resize(sizeof(PacketHeader));
+
+    // Receive packet header first.
+    std::size_t totalBytesReceived = 0;
+
+    while(totalBytesReceived < networkData.size())
+    {
+        std::size_t bytesReceived = 0;
+        auto socketStatus = socket.receive(networkData.data(), networkData.size(), bytesReceived);
+        totalBytesReceived += bytesReceived;
+
+        if(socketStatus != sf::Socket::Partial && socketStatus != sf::Socket::Done)
+            return false;
+    }
+
+    ASSERT(totalBytesReceived == sizeof(PacketHeader));
+
+    // Peek packet header.
+    PacketHeader packetHeader;
+    if(!deserialize(networkData, &packetHeader))
+    {
+        LOG_ERROR("Could not deserialize packet header!");
+        return false;
+    }
+
+    networkData.reset();
+
+    // Receive packet data.
+    networkData.resize(sizeof(PacketHeader) + packetHeader.packetSize);
+
+    while(totalBytesReceived < networkData.size())
+    {
+        std::size_t bytesReceived = 0;
+        auto socketStatus = socket.receive(
+            networkData.data() + sizeof(PacketHeader),
+            packetHeader.packetSize, bytesReceived);
+
+        totalBytesReceived += bytesReceived;
+
+        if(socketStatus != sf::Socket::Partial && socketStatus != sf::Socket::Done)
+            return false;
+    }
+
+    ASSERT(totalBytesReceived == networkData.size());
+
+    // Copy received network data to buffer.
+    buffer.replace(networkData.data(), networkData.size());
+
+    LOG_TRACE("Received network data from %s:%hu (%u bytes).",
+        socket.getRemoteAddress().toString().c_str(),
+        socket.getRemotePort(), networkData.size());
 
     return true;
 }
 
 bool Network::sendUdpData(const MemoryStream& buffer, const sf::IpAddress& address, unsigned short port)
 {
-    LOG_TRACE("Sending network data to %s:%hu (%u size).",
+    LOG_TRACE("Sending network data to %s:%hu (%u bytes).",
         address.toString().c_str(), port, buffer.size());
 
     // Send packet read from memory buffer.
@@ -202,24 +269,17 @@ bool Network::sendUdpData(const MemoryStream& buffer, const sf::IpAddress& addre
 bool Network::receiveUdpData(MemoryStream& buffer, sf::IpAddress& address, unsigned short& port)
 {
     // Receive packet and write it into memory buffer.
-    char datagramBuffer[sf::UdpSocket::MaxDatagramSize] = { 0 };
-    std::size_t bytesReceived = 0;
+    std::vector<char> datagramBuffer;
+    datagramBuffer.resize(sf::UdpSocket::MaxDatagramSize);
 
+    std::size_t bytesReceived = 0;
     auto status = m_udpSocket.receive(&datagramBuffer[0], sf::UdpSocket::MaxDatagramSize, bytesReceived, address, port);
     VERIFY(status != sf::Socket::Partial, "Received partial network data while using UDP socket!");
 
-    switch(status)
-    {
-    case sf::Socket::Error:
-        LOG_ERROR("Failed to receive network data from socket!");
+    if(status != sf::Socket::Done)
         return false;
 
-    case sf::Socket::Disconnected:
-    case sf::Socket::NotReady:
-        return false;
-    }
-
-    LOG_TRACE("Received network data from %s:%hu (%u size).", address.toString().c_str(), port, bytesReceived);
+    LOG_TRACE("Received network data from %s:%hu (%u bytes).", address.toString().c_str(), port, bytesReceived);
 
     // Write datagram buffer into provided memory buffer.
     buffer.replace(&datagramBuffer[0], bytesReceived);

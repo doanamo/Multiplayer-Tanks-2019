@@ -21,6 +21,7 @@ bool registerTypes()
 
     REGISTER_TYPE(PacketBase);
     REGISTER_TYPE(PacketMessage);
+    REGISTER_TYPE(PacketStateSave);
 
     return true;
 }

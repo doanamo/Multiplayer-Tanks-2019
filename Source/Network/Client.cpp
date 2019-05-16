@@ -1,6 +1,7 @@
 #include "Precompiled.hpp"
 #include "Network/Client.hpp"
 #include "Network/Protocol.hpp"
+#include "Game/GameInstance.hpp"
 
 Client::Client() :
     m_serverAddress(),
@@ -40,6 +41,27 @@ bool Client::initialize(GameInstance* gameInstance, const sf::IpAddress& address
 
     // Set TCP socket as non blocking after we establish connection.
     m_tcpSocket.setBlocking(false);
+
+    // Receive game state save.
+    std::unique_ptr<PacketBase> receivedPacket;
+
+    while(!receiveTcpPacket(receivedPacket, m_tcpSocket))
+    {
+        sf::sleep(sf::milliseconds(1.0f));
+    }
+
+    // Verify that we received expected packet.
+    if(getTypeIdentifier(*receivedPacket) != getTypeIdentifier<PacketStateSave>())
+    {
+        LOG_ERROR("Received unexpected packet instead of game state save!");
+        return false;
+    }
+
+    PacketStateSave* packetStateSave = (PacketStateSave*)receivedPacket.get();
+
+    // Deserialize game state save into game instance.
+    if(!deserialize(packetStateSave->serializedGameInstance, m_gameInstance))
+        return false;
 
     return true;
 }
