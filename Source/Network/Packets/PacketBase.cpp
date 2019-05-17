@@ -1,5 +1,5 @@
 #include "Precompiled.hpp"
-#include "Network/PacketBase.hpp"
+#include "Network/Packets/PacketBase.hpp"
 
 PacketBase::PacketBase()
 {

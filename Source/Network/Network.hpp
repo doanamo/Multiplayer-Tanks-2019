@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Network/PacketBase.hpp"
+#include "Network/Packets/PacketBase.hpp"
 
 extern ConsoleVariable<bool> cv_showNetwork;
 class GameInstance;

@@ -36,7 +36,7 @@ public:
     virtual void onDraw(float timeAlpha);
     virtual void onDestroy();
 
-    // Get world that owns this object.
+    // Gets world that owns this object.
     World* getWorld() const;
 
     // Gets handle to this object.

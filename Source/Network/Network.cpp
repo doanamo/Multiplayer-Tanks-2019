@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 #include "Network/Network.hpp"
-#include "Network/PacketHeader.hpp"
+#include "Network/Packets/PacketHeader.hpp"
 #include "Game/GameInstance.hpp"
 
 ConsoleVariable<bool> cv_showNetwork("showNetwork", false);

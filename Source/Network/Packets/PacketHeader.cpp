@@ -1,5 +1,5 @@
 #include "Precompiled.hpp"
-#include "Network/PacketHeader.hpp"
+#include "Network/Packets/PacketHeader.hpp"
 
 static const char MagicValue[] = "TanksXD";
 static const std::size_t MagicSize = staticArraySize(MagicValue);
