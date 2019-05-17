@@ -47,7 +47,7 @@ bool Client::initialize(GameInstance* gameInstance, const sf::IpAddress& address
 
     while(!receiveTcpPacket(receivedPacket, m_tcpSocket))
     {
-        sf::sleep(sf::milliseconds(1.0f));
+        sf::sleep(sf::milliseconds(1));
     }
 
     // Verify that we received expected packet.
