@@ -56,6 +56,8 @@ set(SOURCE_FILES
     "Source/Network/Packets/PacketMessage.cpp"
     "Source/Network/Packets/PacketStateSave.hpp"
     "Source/Network/Packets/PacketStateSave.cpp"
+    "Source/Network/Packets/PacketStateUpdate.hpp"
+    "Source/Network/Packets/PacketStateUpdate.cpp"
 
     "Source/Game/GameInstance.hpp"
     "Source/Game/GameInstance.cpp"
