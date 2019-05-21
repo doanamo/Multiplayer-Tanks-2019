@@ -19,6 +19,8 @@ public:
     void tick(float timeDelta);
     void draw(float timeAlpha);
 
+    uint64_t getTickFrame() const;
+
     World* getWorld();
     Level* getLevel();
     PlayerController* getPlayerController();
@@ -29,6 +31,9 @@ protected:
     bool onDeserialize(MemoryStream& buffer) override;
 
 private:
+    // Current tick frame.
+    uint64_t m_tickFrame;
+
     // Game world.
     World* m_world;
 

@@ -6,6 +6,7 @@
 #include "System/Window.hpp"
 
 GameInstance::GameInstance() :
+    m_tickFrame(0),
     m_world(nullptr),
     m_level(nullptr),
     m_playerController(nullptr)
@@ -68,6 +69,9 @@ void GameInstance::update(float timeDelta)
 
 void GameInstance::tick(float timeDelta)
 {
+    // Increment total tick count.
+    ++m_tickFrame;
+
     // Tick game level.
     m_level->tick(timeDelta);
 
@@ -87,6 +91,11 @@ void GameInstance::draw(float timeAlpha)
     m_world->draw(timeAlpha);
 }
 
+uint64_t GameInstance::getTickFrame() const
+{
+    return m_tickFrame;
+}
+
 World* GameInstance::getWorld()
 {
     return m_world;
@@ -104,6 +113,9 @@ PlayerController* GameInstance::getPlayerController()
 
 bool GameInstance::onSerialize(MemoryStream& buffer) const
 {
+    if(!serialize(buffer, m_tickFrame))
+        return false;
+
     if(!serialize(buffer, *m_world))
         return false;
 
@@ -118,6 +130,9 @@ bool GameInstance::onSerialize(MemoryStream& buffer) const
 
 bool GameInstance::onDeserialize(MemoryStream& buffer)
 {
+    if(!deserialize(buffer, &m_tickFrame))
+        return false;
+
     if(!deserialize(buffer, m_world))
         return false;
 
