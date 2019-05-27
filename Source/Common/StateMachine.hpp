@@ -3,12 +3,14 @@
 #include "Precompiled.hpp"
 
 template<typename Type>
+class StateMachine;
+
+template<typename Type>
 class State
 {
 private:
     // Friend declaration.
-    template<typename Type>
-    friend class StateMachine;
+    friend StateMachine<Type>;
 
 protected:
     State() :
