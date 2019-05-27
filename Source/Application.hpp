@@ -1,9 +1,9 @@
 #pragma once
 
 #include "Precompiled.hpp"
-
-class Network;
-class GameInstance;
+#include "Common/StateMachine.hpp"
+#include "Game/GameStateEntry.hpp"
+#include "Game/GameStateSession.hpp"
 
 class Application
 {
@@ -17,20 +17,11 @@ public:
     void tick(float timeDelta);
     void draw(float timeAlpha);
 
-    bool saveSnapshot();
-    bool loadSnaphot();
-
 public:
-    // Game instance.
-    GameInstance* m_gameInstance;
+    // Game state machine.
+    StateMachine<GameStateBase> m_gameStateMachine;
 
-    // Network interface.
-    Network* m_network;
-
-private:
-    // Camera viewport
-    sf::View m_viewport;
-
-    bool m_isViewportCentered;
-    bool m_isCameraAttachedToPlayer;
+    // Game state instances.
+    GameStateEntry m_gameStateEntry;
+    GameStateSession m_gameStateSession;
 };

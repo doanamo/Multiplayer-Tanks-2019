@@ -13,6 +13,7 @@ set(SOURCE_FILES
     "Source/Common/Math.hpp"
     "Source/Common/Utility.hpp"
     "Source/Common/Utility.cpp"
+    "Source/Common/StateMachine.hpp"
 
     "Source/Types/RuntimeTypes.hpp"
     "Source/Types/RuntimeTypes.cpp"
@@ -61,6 +62,12 @@ set(SOURCE_FILES
 
     "Source/Game/GameInstance.hpp"
     "Source/Game/GameInstance.cpp"
+    "Source/Game/GameStateBase.hpp"
+    "Source/Game/GameStateBase.cpp"
+    "Source/Game/GameStateEntry.hpp"
+    "Source/Game/GameStateEntry.cpp"
+    "Source/Game/GameStateSession.hpp"
+    "Source/Game/GameStateSession.cpp"
     "Source/Game/PlayerController.hpp"
     "Source/Game/PlayerController.cpp"
     "Source/Game/Transform.hpp"
