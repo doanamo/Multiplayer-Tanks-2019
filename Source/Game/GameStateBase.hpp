@@ -10,8 +10,8 @@ protected:
     GameStateBase();
 
     // State machine transitions.
-    virtual bool onStateEnter(GameStateBase* newState) override;
-    virtual bool onStateExit(GameStateBase* previousState) override;
+    virtual bool onStateEnter(State<GameStateBase>* newState) override;
+    virtual bool onStateExit(State<GameStateBase>* previousState) override;
 
 public:
     // Base state interface.

@@ -13,8 +13,14 @@ private:
     friend StateMachine<Type>;
 
 protected:
+    // Protected constructor.
     State() :
         m_stateMachine(nullptr)
+    {
+    }
+
+    // Virtual destructor.
+    virtual ~State()
     {
     }
 
@@ -27,8 +33,8 @@ public:
 
 protected:
     // State machine transitions.
-    virtual bool onStateEnter(Type* newState) = 0;
-    virtual bool onStateExit(Type* previousState) = 0;
+    virtual bool onStateEnter(State<Type>* newState) = 0;
+    virtual bool onStateExit(State<Type>* previousState) = 0;
 
 private:
     // Current state machine assigned.
@@ -38,6 +44,10 @@ private:
 template<typename Type>
 class StateMachine
 {
+public:
+    // Type declarations.
+    using StateSharedPtr = std::shared_ptr<State<Type>>;
+
 public:
     StateMachine() :
         m_currentState(nullptr)
@@ -51,7 +61,7 @@ public:
     }
 
     // Changes current state.
-    bool changeState(Type* state)
+    bool changeState(const StateSharedPtr& state)
     {
         // Check assumption so casts are safe.
         static_assert(std::is_base_of<State<Type>, Type>::value, "Type is not derived from State<Type>!");
@@ -72,7 +82,7 @@ public:
         // Exit current state.
         if(m_currentState)
         {
-            if(!((State<Type>*)m_currentState)->onStateExit(state))
+            if(!m_currentState->onStateExit(state.get()))
                 return false;
 
             m_currentState->m_stateMachine = nullptr;
@@ -83,7 +93,7 @@ public:
         if(state)
         {
             state->m_stateMachine = this;
-            if(!((State<Type>*)state)->onStateEnter(m_currentState))
+            if(!state->onStateEnter(m_currentState.get()))
             {
                 state->m_stateMachine = nullptr;
                 return false;
@@ -107,10 +117,21 @@ public:
     // Returns reference to current state.
     Type* getState()
     {
+        // We are assuming that correct template type was set.
+        // Otherwise very bad things may happen here.
+        ASSERT(dynamic_cast<Type*>(m_currentState.get()) != nullptr,
+            "State template argument is not base class of state type!");
+
+        return (Type*)m_currentState.get();
+    }
+
+    // Returns shared pointer to current state.
+    const StateSharedPtr& getStatePtr()
+    {
         return m_currentState;
     }
 
 private:
     // Current state.
-    Type* m_currentState;
+    StateSharedPtr m_currentState;
 };

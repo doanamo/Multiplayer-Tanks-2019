@@ -23,8 +23,8 @@ public:
 
 protected:
     // Game state transitions.
-    bool onStateEnter(GameStateBase* previousState) override;
-    bool onStateExit(GameStateBase* newState) override;
+    bool onStateEnter(State<GameStateBase>* previousState) override;
+    bool onStateExit(State<GameStateBase>* newState) override;
 
 private:
     // Snapshot file save and loading.

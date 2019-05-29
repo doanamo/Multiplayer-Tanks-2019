@@ -156,7 +156,7 @@ void GameStateSession::draw(float timeAlpha)
     }
 }
 
-bool GameStateSession::onStateEnter(GameStateBase* previousState)
+bool GameStateSession::onStateEnter(State<GameStateBase>* previousState)
 {
     // Initialize game instance.
     m_gameInstance = new GameInstance();
@@ -211,7 +211,7 @@ bool GameStateSession::onStateEnter(GameStateBase* previousState)
     return true;
 }
 
-bool GameStateSession::onStateExit(GameStateBase* newState)
+bool GameStateSession::onStateExit(State<GameStateBase>* newState)
 {
     // Delete allocated members.
     delete m_gameInstance;

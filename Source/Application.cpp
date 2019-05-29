@@ -14,14 +14,12 @@ Application::~Application()
 bool Application::initialize()
 {
     // Initialize game state instances.
-    if(!m_gameStateEntry.initialize(&m_gameStateSession))
-        return false;
-
-    if(!m_gameStateSession.initialize())
+    auto gameStateEntry = std::make_shared<GameStateEntry>();
+    if(!gameStateEntry->initialize())
         return false;
 
     // Set initial game state.
-    if(!m_gameStateMachine.changeState(&m_gameStateEntry))
+    if(!m_gameStateMachine.changeState(gameStateEntry))
     {
         LOG_ERROR("Failed to set initial game state!");
         return false;
@@ -44,8 +42,8 @@ void Application::handleEvent(const sf::Event& event)
         }
     }
 
-    // Call game state method.
-    GameStateBase* currentState = m_gameStateMachine.getState();
+    // Invoke current game state.
+    auto currentState = m_gameStateMachine.getState();
 
     if(currentState)
     {
@@ -56,7 +54,7 @@ void Application::handleEvent(const sf::Event& event)
 void Application::update(float timeDelta)
 {
     // Call game state method.
-    GameStateBase* currentState = m_gameStateMachine.getState();
+    auto currentState = m_gameStateMachine.getState();
 
     if(currentState)
     {
@@ -66,8 +64,8 @@ void Application::update(float timeDelta)
 
 void Application::tick(float timeDelta)
 {
-    // Call game state method.
-    GameStateBase* currentState = m_gameStateMachine.getState();
+    // Invoke current game state.
+    auto currentState = m_gameStateMachine.getState();
 
     if(currentState)
     {
@@ -77,8 +75,8 @@ void Application::tick(float timeDelta)
 
 void Application::draw(float timeAlpha)
 {
-    // Call game state method.
-    GameStateBase* currentState = m_gameStateMachine.getState();
+    // Invoke current game state.
+    auto currentState = m_gameStateMachine.getState();
 
     if(currentState)
     {

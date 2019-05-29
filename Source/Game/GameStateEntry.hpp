@@ -12,7 +12,7 @@ public:
     ~GameStateEntry();
 
     // Initializes game state instance.
-    bool initialize(GameStateSession* gameStateSession);
+    bool initialize();
 
     // Game state methods.
     void handleEvent(const sf::Event& event) override;
@@ -22,10 +22,6 @@ public:
 
 protected:
     // Game state transitions.
-    bool onStateEnter(GameStateBase* previousState) override;
-    bool onStateExit(GameStateBase* newState) override;
-
-private:
-    // Game state transitions.
-    GameStateSession* m_gameStateSession;
+    bool onStateEnter(State<GameStateBase>* previousState) override;
+    bool onStateExit(State<GameStateBase>* newState) override;
 };

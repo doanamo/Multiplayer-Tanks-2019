@@ -5,12 +5,12 @@ GameStateBase::GameStateBase()
 {
 }
 
-bool GameStateBase::onStateEnter(GameStateBase* newState)
+bool GameStateBase::onStateEnter(State<GameStateBase>* newState)
 {
     return true;
 }
 
-bool GameStateBase::onStateExit(GameStateBase* previousState)
+bool GameStateBase::onStateExit(State<GameStateBase>* previousState)
 {
     return true;
 }

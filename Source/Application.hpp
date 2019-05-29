@@ -20,8 +20,4 @@ public:
 public:
     // Game state machine.
     StateMachine<GameStateBase> m_gameStateMachine;
-
-    // Game state instances.
-    GameStateEntry m_gameStateEntry;
-    GameStateSession m_gameStateSession;
 };
