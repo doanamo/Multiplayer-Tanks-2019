@@ -16,40 +16,26 @@ GameInstance::GameInstance() :
 GameInstance::~GameInstance()
 {
     // Shutdown systems in reverse order.
-    if(m_playerController)
-    {
-        delete m_playerController;
-        m_playerController = nullptr;
-    }
-
-    if(m_level)
-    {
-        delete m_level;
-        m_level = nullptr;
-    }
-
-    if(m_world)
-    {
-        delete m_world;
-        m_world = nullptr;
-    }
+    m_playerController = nullptr;
+    m_level = nullptr;
+    m_world = nullptr;
 }
 
 bool GameInstance::initialize()
 {
     // Create world instance.
-    m_world = new World;
+    m_world = std::make_unique<World>();
     if(!m_world->initialize())
         return false;
 
     // Create game level.
-    m_level = new Level;
+    m_level = std::make_unique<Level>();
     if(!m_level->initialize())
         return false;
 
     // Create player controller. 
-    m_playerController = new PlayerController;
-    if(!m_playerController->initialize(m_world))
+    m_playerController = std::make_unique<PlayerController>();
+    if(!m_playerController->initialize(m_world.get()))
         return false;
 
     return true;
@@ -98,17 +84,17 @@ uint64_t GameInstance::getTickFrame() const
 
 World* GameInstance::getWorld()
 {
-    return m_world;
+    return m_world.get();
 }
 
 Level* GameInstance::getLevel()
 {
-    return m_level;
+    return m_level.get();
 }
 
 PlayerController* GameInstance::getPlayerController()
 {
-    return m_playerController;
+    return m_playerController.get();
 }
 
 bool GameInstance::onSerialize(MemoryStream& buffer) const
@@ -133,13 +119,13 @@ bool GameInstance::onDeserialize(MemoryStream& buffer)
     if(!deserialize(buffer, &m_tickFrame))
         return false;
 
-    if(!deserialize(buffer, m_world))
+    if(!deserialize(buffer, m_world.get()))
         return false;
 
-    if(!deserialize(buffer, m_level))
+    if(!deserialize(buffer, m_level.get()))
         return false;
 
-    if(!deserialize(buffer, m_playerController))
+    if(!deserialize(buffer, m_playerController.get()))
         return false;
 
     return true;

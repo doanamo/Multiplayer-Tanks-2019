@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Common/Debug.hpp"
+#include "Precompiled.hpp"
 
 enum class LogType
 {
@@ -46,9 +46,10 @@ private:
     std::ofstream m_logFile;
 };
 
-// Logging macros.
-extern Logger* g_logger;
+// Extract logger from globals header.
+extern std::unique_ptr<Logger> g_logger;
 
+// Logging macros.
 #define LOG_INDENT(indent) \
         assert(g_logger != nullptr && "Logger has not been initialized!"); \
         g_logger->setNextIndent(indent);

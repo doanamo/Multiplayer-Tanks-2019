@@ -71,7 +71,8 @@ void Level::draw(float timeAlpha)
                 mapTileSprite.setTexture(m_textureMissingTexture.get());
                 break;
             }
-            g_render->draw(mapTileSprite);
+
+            g_renderTarget->draw(mapTileSprite);
         }
     }
 }

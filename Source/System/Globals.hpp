@@ -1,13 +1,22 @@
 #pragma once
 
-extern class Logger* g_logger;
-extern class CommandLine* g_commandLine;
-extern class RuntimeTypes* g_runtimeTypes;
-extern class Window* g_window;
-extern class sf::RenderTarget* g_render;
-extern class Console* g_console;
-extern class AssetManager* g_assetManager;
-extern class Application* g_application;
+class Logger;
+class CommandLine;
+class RuntimeTypes;
+class Window;
+class Console;
+class AssetManager;
+class Application;
+class sf::RenderTarget;
+
+extern std::unique_ptr<Logger> g_logger;
+extern std::unique_ptr<CommandLine> g_commandLine;
+extern std::unique_ptr<RuntimeTypes> g_runtimeTypes;
+extern std::unique_ptr<Window> g_window;
+extern std::unique_ptr<Console> g_console;
+extern std::unique_ptr<AssetManager> g_assetManager;
+extern std::unique_ptr<Application> g_application;
+extern sf::RenderTarget* g_renderTarget;
 
 bool initializeGlobals(int argc, char* argv[]);
 void shutdownGlobals();

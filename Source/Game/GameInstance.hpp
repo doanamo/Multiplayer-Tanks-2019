@@ -35,14 +35,11 @@ private:
     uint64_t m_tickFrame;
 
     // Game world.
-    World* m_world;
+    std::unique_ptr<World> m_world;
 
     // Game level.
-    Level* m_level;
+    std::unique_ptr<Level> m_level;
 
     // Local player controller.
-    PlayerController* m_playerController;
-
-    // Local player camera.
-    // PlayerCamera* m_playerCamera;
+    std::unique_ptr<PlayerController> m_playerController;
 };

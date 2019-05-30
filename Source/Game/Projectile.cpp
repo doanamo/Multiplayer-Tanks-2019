@@ -53,7 +53,7 @@ void Projectile::onDraw(float timeAlpha)
 
     projectileSprite.setPosition(projectileSprite.getPosition() + sf::Vector2f(0.0f, -0.05f));
 
-    g_render->draw(projectileSprite);
+    g_renderTarget->draw(projectileSprite);
 }
 
 bool Projectile::onSerialize(MemoryStream& buffer) const

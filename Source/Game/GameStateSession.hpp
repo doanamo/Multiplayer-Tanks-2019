@@ -33,10 +33,10 @@ private:
 
 private:
     // Game instance.
-    GameInstance* m_gameInstance;
+    std::unique_ptr<GameInstance> m_gameInstance;
 
     // Network interface.
-    Network* m_network;
+    std::unique_ptr<Network> m_network;
 
     // Camera viewport
     sf::View m_viewport;

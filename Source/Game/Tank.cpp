@@ -72,7 +72,7 @@ void Tank::onDraw(float timeAlpha)
         m_tankSprite.setTextureRect(sf::IntRect(0, 64, 32, 32));
     }
 
-    g_render->draw(m_tankSprite);
+    g_renderTarget->draw(m_tankSprite);
 }
 
 sf::Vector2f Tank::getPosition(float alpha)

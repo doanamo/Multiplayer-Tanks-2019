@@ -31,6 +31,70 @@ bool GameStateSession::initialize()
     return true;
 }
 
+bool GameStateSession::onStateEnter(State<GameStateBase>* previousState)
+{
+    // Initialize game instance.
+    m_gameInstance = std::make_unique<GameInstance>();
+    if(!m_gameInstance->initialize())
+        return false;
+
+    // Create network interface.
+    if(g_commandLine->hasArgument("host"))
+    {
+        // Create server network interface.
+        m_network = std::make_unique<Server>();
+
+        // Change window title.
+        g_window->setTitle(g_window->getInitialTitle() + " - Server");
+    }
+    else if(g_commandLine->hasArgument("connect"))
+    {
+        // Create client network interface.
+        m_network = std::make_unique<Client>();
+
+        // Change window title.
+        g_window->setTitle(g_window->getInitialTitle() + " - Client");
+    }
+
+    if(m_network)
+    {
+        // Parse port number string.
+        unsigned short portNumber = 0;
+        if(!parseStringToPort(cv_port.value, portNumber))
+            return false;
+
+        // Initialize network interface.
+        if(!m_network->initialize(m_gameInstance.get(), sf::IpAddress(cv_address.value), portNumber))
+            return false;
+    }
+
+    // Prepare game instance on server.
+    if(m_network && m_network->isServer())
+    {
+        // Create player tank object.
+        Tank* playerTank = new Tank();
+        Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank, "Player1_Tank", "Players");
+        m_gameInstance->getPlayerController()->control(playerHandle);
+
+        // Test instantiation from runtime type.
+        Object* enemyTank = Object::create(getTypeInfo<Tank>().getIdentifier());
+        enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
+        m_gameInstance->getWorld()->addObject(enemyTank);
+    }
+
+    // Success!
+    return true;
+}
+
+bool GameStateSession::onStateExit(State<GameStateBase>* newState)
+{
+    // Clear allocation objects.
+    m_network = nullptr;
+    m_gameInstance = nullptr;
+
+    return true;
+}
+
 void GameStateSession::handleEvent(const sf::Event& event)
 {
     // Handle keyboard input.
@@ -156,73 +220,6 @@ void GameStateSession::draw(float timeAlpha)
     }
 }
 
-bool GameStateSession::onStateEnter(State<GameStateBase>* previousState)
-{
-    // Initialize game instance.
-    m_gameInstance = new GameInstance();
-    if(!m_gameInstance->initialize())
-        return false;
-
-    // Create network interface.
-    if(g_commandLine->hasArgument("host"))
-    {
-        // Create server network interface.
-        m_network = new Server();
-
-        // Change window title.
-        g_window->setTitle(g_window->getInitialTitle() + " - Server");
-    }
-    else if(g_commandLine->hasArgument("connect"))
-    {
-        // Create client network interface.
-        m_network = new Client();
-
-        // Change window title.
-        g_window->setTitle(g_window->getInitialTitle() + " - Client");
-    }
-
-    if(m_network)
-    {
-        // Parse port number string.
-        unsigned short portNumber = 0;
-        if(!parseStringToPort(cv_port.value, portNumber))
-            return false;
-
-        // Initialize network interface.
-        if(!m_network->initialize(m_gameInstance, sf::IpAddress(cv_address.value), portNumber))
-            return false;
-    }
-
-    // Prepare game instance on server.
-    if(m_network && m_network->isServer())
-    {
-        // Create player tank object.
-        Tank* playerTank = new Tank();
-        Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank, "Player1_Tank", "Players");
-        m_gameInstance->getPlayerController()->control(playerHandle);
-
-        // Test instantiation from runtime type.
-        Object* enemyTank = Object::create(getTypeInfo<Tank>().getIdentifier());
-        enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
-        m_gameInstance->getWorld()->addObject(enemyTank);
-    }
-
-    // Success!
-    return true;
-}
-
-bool GameStateSession::onStateExit(State<GameStateBase>* newState)
-{
-    // Delete allocated members.
-    delete m_gameInstance;
-    m_gameInstance = nullptr;
-
-    delete m_network;
-    m_network = nullptr;
-
-    return true;
-}
-
 bool GameStateSession::saveSnapshot()
 {
     if(!m_gameInstance)
@@ -280,20 +277,17 @@ bool GameStateSession::loadSnaphot()
 
     file.close();
 
-    // Shutdown current game instance.
-    if(m_gameInstance)
-    {
-        delete m_gameInstance;
-        m_gameInstance = nullptr;
-    }
-
-    // Create new game instance.
-    m_gameInstance = new GameInstance();
+    // Create new game instance in place of old one.
+    m_gameInstance = std::make_unique<GameInstance>();
     if(!m_gameInstance->initialize())
         return false;
 
+    // Hack: Remove existing network interface.
+    // Loading snapshot should create new session state.
+    m_network = nullptr;
+
     // Deserialize game instance from memory buffer.
-    if(!deserialize(memoryBuffer, m_gameInstance))
+    if(!deserialize(memoryBuffer, m_gameInstance.get()))
         return false;
 
     // Success!
