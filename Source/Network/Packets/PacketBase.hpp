@@ -10,7 +10,7 @@ protected:
     PacketBase();
 
 public:
-    ~PacketBase();
+    virtual ~PacketBase();
 
     bool onSerialize(MemoryStream& buffer) const override;
     bool onDeserialize(MemoryStream& buffer) override;
