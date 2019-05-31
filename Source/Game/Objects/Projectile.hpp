@@ -1,6 +1,6 @@
 #pragma once
 
-#include "Game/Object.hpp"
+#include "Game/World/Object.hpp"
 
 class Projectile : public Object
 {

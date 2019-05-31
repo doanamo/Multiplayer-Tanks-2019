@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Game/Object.hpp"
+#include "Game/World/Object.hpp"
 
 class Tank : public Object
 {

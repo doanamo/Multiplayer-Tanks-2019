@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Game/Handle.hpp"
-#include "Game/Object.hpp"
+#include "Handle.hpp"
+#include "Object.hpp"
 
 class World : public Serializable
 {

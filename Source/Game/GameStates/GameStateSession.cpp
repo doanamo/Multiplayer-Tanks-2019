@@ -4,10 +4,10 @@
 #include "System/Window.hpp"
 #include "System/CommandLine.hpp"
 #include "Game/GameInstance.hpp"
-#include "Game/PlayerController.hpp"
-#include "Game/World.hpp"
-#include "Game/Tank.hpp"
+#include "Game/World/World.hpp"
+#include "Game/Objects/Tank.hpp"
 #include "Game/Level.hpp"
+#include "Game/PlayerController.hpp"
 #include "Network/Server.hpp"
 #include "Network/Client.hpp"
 

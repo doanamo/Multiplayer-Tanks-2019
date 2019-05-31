@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Game/Handle.hpp"
-#include "Game/Transform.hpp"
+#include "Handle.hpp"
+#include "Transform.hpp"
 #include "System/Globals.hpp"
 
 class World;

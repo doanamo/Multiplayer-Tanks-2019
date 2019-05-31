@@ -1,5 +1,5 @@
 #include "Precompiled.hpp"
-#include "Game/Projectile.hpp"
+#include "Projectile.hpp"
 #include "System/AssetManager.h"
 
 Projectile::Projectile() :

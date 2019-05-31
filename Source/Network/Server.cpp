@@ -2,7 +2,7 @@
 #include "Network/Server.hpp"
 #include "Network/Protocol.hpp"
 #include "Game/GameInstance.hpp"
-#include "Game/World.hpp"
+#include "Game/World/World.hpp"
 
 Server::Server()
 {

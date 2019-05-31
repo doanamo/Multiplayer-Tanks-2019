@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
-#include "Game/PlayerController.hpp"
-#include "Game/World.hpp"
+#include "PlayerController.hpp"
+#include "Game/World/World.hpp"
 
 PlayerController::PlayerController() :
     m_world(nullptr),

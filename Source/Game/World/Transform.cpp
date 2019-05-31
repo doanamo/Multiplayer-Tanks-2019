@@ -1,5 +1,5 @@
 #include "Precompiled.hpp"
-#include "Game/Transform.hpp"
+#include "Transform.hpp"
 
 static const sf::Vector2f ForwardVector(0.0f, -1.0f);
 

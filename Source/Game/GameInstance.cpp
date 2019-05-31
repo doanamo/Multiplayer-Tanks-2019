@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 #include "Game/GameInstance.hpp"
-#include "Game/World.hpp"
+#include "Game/World/World.hpp"
 #include "Game/Level.hpp"
 #include "Game/PlayerController.hpp"
 #include "System/Window.hpp"

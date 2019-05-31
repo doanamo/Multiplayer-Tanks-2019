@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Game/Tank.hpp"
+#include "Objects/Tank.hpp"
 
 class World;
 

@@ -1,10 +1,9 @@
 #include "Precompiled.hpp"
 #include "System/Globals.hpp"
 #include "Types/RuntimeTypes.hpp"
-#include "Game/Object.hpp"
-#include "Game/Tank.hpp"
-#include "Game/Projectile.hpp"
-#include "Game/Level.hpp"
+#include "Game/World/Object.hpp"
+#include "Game/Objects/Tank.hpp"
+#include "Game/Objects/Projectile.hpp"
 #include "Network/Protocol.hpp"
 
 #define REGISTER_TYPE(type) g_runtimeTypes->registerType(type::staticTypeInfo());

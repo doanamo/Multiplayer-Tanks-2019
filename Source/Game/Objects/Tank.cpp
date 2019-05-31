@@ -1,7 +1,7 @@
 #include "Precompiled.hpp"
-#include "Game/Tank.hpp"
-#include "Game/Projectile.hpp"
-#include "Game/World.hpp"
+#include "Tank.hpp"
+#include "Projectile.hpp"
+#include "Game/World/World.hpp"
 #include "System/AssetManager.h"
 
 Tank::Tank() :

@@ -2,8 +2,8 @@
 
 #include "Precompiled.hpp"
 #include "Common/StateMachine.hpp"
-#include "Game/GameStateEntry.hpp"
-#include "Game/GameStateSession.hpp"
+#include "Game/GameStates/GameStateEntry.hpp"
+#include "Game/GameStates/GameStateSession.hpp"
 
 class Application
 {

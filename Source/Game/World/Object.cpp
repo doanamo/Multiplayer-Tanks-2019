@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
-#include "Game/Object.hpp"
-#include "Game/World.hpp"
+#include "Object.hpp"
+#include "World.hpp"
 
 Object::Object() :
     m_world(nullptr),
