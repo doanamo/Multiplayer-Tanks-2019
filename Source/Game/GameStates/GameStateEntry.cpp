@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 #include "GameStateEntry.hpp"
-#include "GameStateSession.hpp"
+#include "GameStateMainMenu.hpp"
 
 GameStateEntry::GameStateEntry()
 {
@@ -33,17 +33,15 @@ void GameStateEntry::draw(float timeAlpha)
 
 bool GameStateEntry::onStateEnter(State<GameStateBase>* previousState)
 {
-    // Create session game state.
-    auto gameStateSession = std::make_shared<GameStateSession>();
-    if(!gameStateSession->initialize())
-        return false;
+    // Create default state.
+    auto defaultGameState = std::make_shared<GameStateMainMenu>();
 
     // Change game state.
     auto stateMachine = getStateMachine();
     if(stateMachine == nullptr)
         return false;
 
-    return stateMachine->changeState(gameStateSession);
+    return stateMachine->changeState(defaultGameState);
 }
 
 bool GameStateEntry::onStateExit(State<GameStateBase>* newState)

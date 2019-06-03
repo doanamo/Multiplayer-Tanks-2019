@@ -66,6 +66,8 @@ set(SOURCE_FILES
     "Source/Game/GameStates/GameStateBase.cpp"
     "Source/Game/GameStates/GameStateEntry.hpp"
     "Source/Game/GameStates/GameStateEntry.cpp"
+    "Source/Game/GameStates/GameStateMainMenu.hpp"
+    "Source/Game/GameStates/GameStateMainMenu.cpp"
     "Source/Game/GameStates/GameStateSession.hpp"
     "Source/Game/GameStates/GameStateSession.cpp"
     "Source/Game/World/Transform.hpp"

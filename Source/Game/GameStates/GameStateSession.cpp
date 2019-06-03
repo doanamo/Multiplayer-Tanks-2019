@@ -69,7 +69,7 @@ bool GameStateSession::onStateEnter(State<GameStateBase>* previousState)
     }
 
     // Prepare game instance on server.
-    if(m_network && m_network->isServer())
+    if(!m_network || m_network->isServer())
     {
         // Create player tank object.
         Tank* playerTank = new Tank();
