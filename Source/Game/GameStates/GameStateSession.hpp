@@ -3,7 +3,6 @@
 #include "Precompiled.hpp"
 #include "GameStateBase.hpp"
 
-class Network;
 class GameInstance;
 
 class GameStateSession : public GameStateBase
@@ -34,13 +33,4 @@ private:
 private:
     // Game instance.
     std::unique_ptr<GameInstance> m_gameInstance;
-
-    // Network interface.
-    std::unique_ptr<Network> m_network;
-
-    // Camera viewport
-    sf::View m_viewport;
-
-    bool m_isViewportCentered;
-    bool m_isCameraAttachedToPlayer;
 };

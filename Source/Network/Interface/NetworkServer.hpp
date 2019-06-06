@@ -1,21 +1,21 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Network/Network.hpp"
+#include "NetworkBase.hpp"
 
-class Server : public Network
+class NetworkServer : public NetworkBase
 {
 public:
-    Server();
-    ~Server();
+    NetworkServer();
+    ~NetworkServer();
 
     bool initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port) override;
     void update(float timeDelta) override;
     void tick(float timeDelta) override;
     void draw() override;
 
+    NetworkMode getMode() const override;
     bool isConnected() const override;
-    bool isServer() const override;
 
 private:
     // List of clients.

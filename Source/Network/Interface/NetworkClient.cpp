@@ -1,24 +1,24 @@
 #include "Precompiled.hpp"
-#include "Network/Client.hpp"
+#include "NetworkClient.hpp"
 #include "Network/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 
-Client::Client() :
+NetworkClient::NetworkClient() :
     m_serverAddress(),
     m_serverPort(0),
     m_hearbeatTimer(0.0f)
 {
 }
 
-Client::~Client()
+NetworkClient::~NetworkClient()
 {
 }
 
-bool Client::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port)
+bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port)
 {
     // Initialize base class.
     // Find any available port for client.
-    if(!Network::initialize(gameInstance, address, 0))
+    if(!NetworkBase::initialize(gameInstance, address, 0))
         return false;
 
     // Save server address and port.
@@ -66,7 +66,7 @@ bool Client::initialize(GameInstance* gameInstance, const sf::IpAddress& address
     return true;
 }
 
-void Client::update(float timeDelta)
+void NetworkClient::update(float timeDelta)
 {
     // Send packets.
     m_hearbeatTimer = std::max(0.0f, m_hearbeatTimer - timeDelta);
@@ -98,11 +98,11 @@ void Client::update(float timeDelta)
     }
 }
 
-void Client::tick(float timeDelta)
+void NetworkClient::tick(float timeDelta)
 {
 }
 
-void Client::draw()
+void NetworkClient::draw()
 {
     // Draw ImGui debug window.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
@@ -114,17 +114,12 @@ void Client::draw()
     ImGui::PopStyleVar(1);
 }
 
-bool Client::isConnected() const
+NetworkMode NetworkClient::getMode() const
 {
-    return false;
+    return NetworkMode::Client;
 }
 
-bool Client::isServer() const
+bool NetworkClient::isConnected() const
 {
     return false;
-}
-
-bool Client::isClient() const
-{
-    return true;
 }

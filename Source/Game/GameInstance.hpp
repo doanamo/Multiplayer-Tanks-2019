@@ -2,7 +2,7 @@
 
 #include "Precompiled.hpp"
 
-class Network;
+class NetworkInterface;
 class World;
 class Level;
 class PlayerController;
@@ -20,6 +20,7 @@ public:
     void draw(float timeAlpha);
 
     uint64_t getTickFrame() const;
+    NetworkInterface* getNetwork();
 
     World* getWorld();
     Level* getLevel();
@@ -34,7 +35,10 @@ private:
     // Current tick frame.
     uint64_t m_tickFrame;
 
-    // Game world.
+    // Network interface.
+    std::unique_ptr<NetworkInterface> m_network;
+   
+    // Objects in world.
     std::unique_ptr<World> m_world;
 
     // Game level.
@@ -42,4 +46,10 @@ private:
 
     // Local player controller.
     std::unique_ptr<PlayerController> m_playerController;
+
+    // Camera viewport
+    sf::View m_viewport;
+
+    bool m_isViewportCentered;
+    bool m_isCameraAttachedToPlayer;
 };

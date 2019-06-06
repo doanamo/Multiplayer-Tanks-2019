@@ -1,21 +1,21 @@
 #include "Precompiled.hpp"
-#include "Network/Server.hpp"
+#include "NetworkServer.hpp"
 #include "Network/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
 
-Server::Server()
+NetworkServer::NetworkServer()
 {
 }
 
-Server::~Server()
+NetworkServer::~NetworkServer()
 {
 }
 
-bool Server::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port)
+bool NetworkServer::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port)
 {
     // Initializes UDP socket.
-    if(!Network::initialize(gameInstance, address, port))
+    if(!NetworkBase::initialize(gameInstance, address, port))
         return false;
 
     // Listen for incoming TCP connections.
@@ -30,11 +30,11 @@ bool Server::initialize(GameInstance* gameInstance, const sf::IpAddress& address
     return true;
 }
 
-void Server::update(float timeDelta)
+void NetworkServer::update(float timeDelta)
 {
 }
 
-void Server::tick(float timeDelta)
+void NetworkServer::tick(float timeDelta)
 {
     // Listen for incoming connections.
     while(true)
@@ -95,7 +95,7 @@ void Server::tick(float timeDelta)
     }
 }
 
-void Server::draw()
+void NetworkServer::draw()
 {
     // Draw ImGui debug window.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
@@ -106,12 +106,12 @@ void Server::draw()
     ImGui::PopStyleVar(1);
 }
 
-bool Server::isConnected() const
+NetworkMode NetworkServer::getMode() const
 {
-    return true;
+    return NetworkMode::Server;
 }
 
-bool Server::isServer() const
+bool NetworkServer::isConnected() const
 {
     return true;
 }

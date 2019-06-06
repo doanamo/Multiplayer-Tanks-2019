@@ -1,21 +1,21 @@
 #include "Precompiled.hpp"
-#include "Network/Network.hpp"
+#include "NetworkBase.hpp"
 #include "Network/Packets/PacketHeader.hpp"
 #include "Game/GameInstance.hpp"
 
 ConsoleVariable<bool> cv_showNetwork("showNetwork", false);
 
-Network::Network() :
+NetworkBase::NetworkBase() :
     m_gameInstance(nullptr),
     m_udpSocket()
 {
 }
 
-Network::~Network()
+NetworkBase::~NetworkBase()
 {
 }
 
-bool Network::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short listenPort)
+bool NetworkBase::initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short listenPort)
 {
     // Save game instance reference.
     if(gameInstance == nullptr)
@@ -39,19 +39,19 @@ bool Network::initialize(GameInstance* gameInstance, const sf::IpAddress& addres
     return true;
 }
 
-void Network::update(float timeDelta)
+void NetworkBase::update(float timeDelta)
 {
 }
 
-void Network::tick(float timeDelta)
+void NetworkBase::tick(float timeDelta)
 {
 }
 
-void Network::draw()
+void NetworkBase::draw()
 {
 }
 
-bool Network::sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket)
+bool NetworkBase::sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket)
 {
     // Prepare serialized network data.
     MemoryStream networkData;
@@ -62,7 +62,7 @@ bool Network::sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket)
     return sendTcpData(networkData, socket);
 }
 
-bool Network::receiveTcpPacket(std::unique_ptr<PacketBase>& packet, sf::TcpSocket& socket)
+bool NetworkBase::receiveTcpPacket(std::unique_ptr<PacketBase>& packet, sf::TcpSocket& socket)
 {
     // Receive data buffer from over network.
     MemoryStream networkData;
@@ -73,7 +73,7 @@ bool Network::receiveTcpPacket(std::unique_ptr<PacketBase>& packet, sf::TcpSocke
     return deserializePacket(networkData, packet);
 }
 
-bool Network::sendUdpPacket(const PacketBase& packet, const sf::IpAddress& address, unsigned short port)
+bool NetworkBase::sendUdpPacket(const PacketBase& packet, const sf::IpAddress& address, unsigned short port)
 {
     // Prepare serialized network data.
     MemoryStream networkData;
@@ -84,7 +84,7 @@ bool Network::sendUdpPacket(const PacketBase& packet, const sf::IpAddress& addre
     return sendUdpData(networkData, address, port);
 }
 
-bool Network::receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port)
+bool NetworkBase::receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddress& address, unsigned short& port)
 {
     // Receive data buffer from over network.
     MemoryStream networkData;
@@ -95,7 +95,7 @@ bool Network::receiveUdpPacket(std::unique_ptr<PacketBase>& packet, sf::IpAddres
     return deserializePacket(networkData, packet);
 }
 
-bool Network::serializePacket(MemoryStream& stream, const PacketBase& packet)
+bool NetworkBase::serializePacket(MemoryStream& stream, const PacketBase& packet)
 {
     // Serialize packet data.
     MemoryStream packetData;
@@ -127,7 +127,7 @@ bool Network::serializePacket(MemoryStream& stream, const PacketBase& packet)
     return true;
 }
 
-bool Network::deserializePacket(MemoryStream& stream, std::unique_ptr<PacketBase>& packet)
+bool NetworkBase::deserializePacket(MemoryStream& stream, std::unique_ptr<PacketBase>& packet)
 {
     // Deserialize packet header.
     PacketHeader packetHeader;
@@ -166,7 +166,7 @@ bool Network::deserializePacket(MemoryStream& stream, std::unique_ptr<PacketBase
     return true;
 }
 
-bool Network::sendTcpData(const MemoryStream& buffer, sf::TcpSocket& socket)
+bool NetworkBase::sendTcpData(const MemoryStream& buffer, sf::TcpSocket& socket)
 {
     LOG_TRACE("Sending network data to %s:%hu (%u bytes).",
         socket.getRemoteAddress().toString().c_str(),
@@ -192,7 +192,7 @@ bool Network::sendTcpData(const MemoryStream& buffer, sf::TcpSocket& socket)
     return true;
 }
 
-bool Network::receiveTcpData(MemoryStream& buffer, sf::TcpSocket& socket)
+bool NetworkBase::receiveTcpData(MemoryStream & buffer, sf::TcpSocket & socket)
 {
     // Create stream and allocate data for packet header.
     MemoryStream networkData;
@@ -251,7 +251,7 @@ bool Network::receiveTcpData(MemoryStream& buffer, sf::TcpSocket& socket)
     return true;
 }
 
-bool Network::sendUdpData(const MemoryStream& buffer, const sf::IpAddress& address, unsigned short port)
+bool NetworkBase::sendUdpData(const MemoryStream & buffer, const sf::IpAddress & address, unsigned short port)
 {
     LOG_TRACE("Sending network data to %s:%hu (%u bytes).",
         address.toString().c_str(), port, buffer.size());
@@ -266,7 +266,7 @@ bool Network::sendUdpData(const MemoryStream& buffer, const sf::IpAddress& addre
     return true;
 }
 
-bool Network::receiveUdpData(MemoryStream& buffer, sf::IpAddress& address, unsigned short& port)
+bool NetworkBase::receiveUdpData(MemoryStream & buffer, sf::IpAddress & address, unsigned short& port)
 {
     // Receive packet and write it into memory buffer.
     std::vector<char> datagramBuffer;
@@ -285,19 +285,4 @@ bool Network::receiveUdpData(MemoryStream& buffer, sf::IpAddress& address, unsig
     buffer.replace(&datagramBuffer[0], bytesReceived);
 
     return true;
-}
-
-bool Network::isConnected() const
-{
-    return false;
-}
-
-bool Network::isServer() const
-{
-    return false;
-}
-
-bool Network::isClient() const
-{
-    return false;
 }

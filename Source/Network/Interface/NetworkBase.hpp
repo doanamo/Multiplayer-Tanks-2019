@@ -1,24 +1,26 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Network/Packets/PacketBase.hpp"
+#include "NetworkInterface.hpp"
 
 extern ConsoleVariable<bool> cv_showNetwork;
+
 class GameInstance;
 
-class Network
+class NetworkBase : public NetworkInterface
 {
 protected:
-    Network();
+    NetworkBase();
 
 public:
-    virtual ~Network();
+    // Virtual destructor.
+    virtual ~NetworkBase();
 
-    // Loop methods.
+    // Network methods.
     virtual bool initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port);
-    virtual void update(float timeDelta);
-    virtual void tick(float timeDelta);
-    virtual void draw();
+    virtual void update(float timeDelta) override;
+    virtual void tick(float timeDelta) override;
+    virtual void draw() override;
 
     // Sending and receiving packets.
     bool sendTcpPacket(const PacketBase& packet, sf::TcpSocket& socket);
@@ -32,11 +34,6 @@ public:
 
     bool sendUdpData(const MemoryStream& buffer, const sf::IpAddress& address, unsigned short port);
     bool receiveUdpData(MemoryStream& buffer, sf::IpAddress& address, unsigned short& port);
-
-    // Network info.
-    virtual bool isConnected() const;
-    virtual bool isServer() const;
-    virtual bool isClient() const;
 
 protected:
     bool serializePacket(MemoryStream& stream, const PacketBase& packet);
