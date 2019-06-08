@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 #include "GameStateMainMenu.hpp"
-#include "GameStateSession.hpp"
+#include "GameStateLoading.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.hpp"
 
@@ -45,13 +45,9 @@ void GameStateMainMenu::draw(float timeAlpha)
     {
         if(ImGui::Button("Solo Game", getButtonSize()))
         {
-            // Temp: Should be replaced by loading screen state.
-            auto gameStateSession = std::make_shared<GameStateSession>();
-
-            if(gameStateSession->initialize())
-            {
-                getStateMachine()->changeState(gameStateSession);
-            }
+            // Transition to new game state loading.
+            auto gameStateLoading = std::make_shared<GameStateLoading>();
+            getStateMachine()->changeState(gameStateLoading);
         }
 
         if(ImGui::Button("Load Game", getButtonSize()))
