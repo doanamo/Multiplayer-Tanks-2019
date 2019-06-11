@@ -19,11 +19,10 @@ public:
     void tick(float timeDelta);
     void draw(float timeAlpha);
 
-    uint64_t getTickFrame() const;
+    uint64_t          getTickFrame() const;
     NetworkInterface* getNetwork();
-
-    World* getWorld();
-    Level* getLevel();
+    World*            getWorld();
+    Level*            getLevel();
     PlayerController* getPlayerController();
 
 protected:

@@ -1,6 +1,7 @@
 #include "Precompiled.hpp"
 #include "GameStateSession.hpp"
 #include "Game/GameInstance.hpp"
+#include "Game/SnapshotSaveLoad.hpp"
 #include "Game/World/World.hpp"
 #include "Game/Objects/Tank.hpp"
 #include "Game/Level.hpp"
@@ -65,11 +66,23 @@ void GameStateSession::handleEvent(const sf::Event& event)
         switch(event.key.code)
         {
         case sf::Keyboard::F5:
-            this->saveSnapshot();
+            // Save snapshot.
+            {
+                SnapshotSaveLoad snapshotSaver(m_gameInstance.get());
+                snapshotSaver.save("Snapshot.save");
+            }
             break;
 
         case sf::Keyboard::F8:
-            this->loadSnaphot();
+            // Load snapshot.
+            m_gameInstance = std::make_unique<GameInstance>();
+
+            if(m_gameInstance->initialize())
+            {
+                SnapshotSaveLoad snapshotLoader(m_gameInstance.get());
+                snapshotLoader.load("Snapshot.save");
+            }
+
             break;
 
         case sf::Keyboard::F10:
@@ -98,76 +111,4 @@ void GameStateSession::draw(float timeAlpha)
 {
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
-}
-
-bool GameStateSession::saveSnapshot()
-{
-    if(!m_gameInstance)
-        return false;
-
-    // Prepare world for saving.
-    m_gameInstance->getWorld()->flushObjects();
-
-    // Serialize game instance to memory buffer.
-    MemoryStream memoryBuffer;
-    if(!serialize(memoryBuffer, *m_gameInstance))
-        return false;
-
-    // Write buffer to disc.
-    std::ofstream file("Snapshot.save", std::ios::binary | std::ios::trunc);
-
-    if(!file.is_open())
-    {
-        LOG_ERROR("Could not open snapshot file for writing!");
-        return false;
-    }
-
-    file.write(memoryBuffer.data(), memoryBuffer.size());
-    file.close();
-
-    // Success!
-    LOG_INFO("Snapshot file has been saved!");
-
-    return true;
-}
-
-bool GameStateSession::loadSnaphot()
-{
-    // Open and read file into memory buffer.
-    std::ifstream file("Snapshot.save", std::ios::binary | std::ios::ate);
-
-    if(!file.is_open())
-    {
-        LOG_ERROR("Could not open snapshot file for reading!");
-        return false;
-    }
-
-    std::size_t size = (std::size_t)file.tellg();
-    file.seekg(0, std::ios::beg);
-
-    // Read snapshot data into memory buffer.
-    MemoryStream memoryBuffer;
-    memoryBuffer.resize(size);
-
-    if(!file.read(memoryBuffer.data(), size))
-    {
-        LOG_ERROR("Could not read snapshot file!");
-        return false;
-    }
-
-    file.close();
-
-    // Create new game instance in place of old one.
-    m_gameInstance = std::make_unique<GameInstance>();
-    if(!m_gameInstance->initialize())
-        return false;
-
-    // Deserialize game instance from memory buffer.
-    if(!deserialize(memoryBuffer, m_gameInstance.get()))
-        return false;
-
-    // Success!
-    LOG_INFO("Snapshot file has been loaded!");
-
-    return true;
 }

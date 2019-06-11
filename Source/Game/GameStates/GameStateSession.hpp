@@ -26,11 +26,6 @@ protected:
     bool onStateExit(State<GameStateBase>* newState) override;
 
 private:
-    // Snapshot file save and loading.
-    bool saveSnapshot();
-    bool loadSnaphot();
-
-private:
     // Game instance.
     std::unique_ptr<GameInstance> m_gameInstance;
 };

@@ -90,6 +90,8 @@ set(SOURCE_FILES
     "Source/Game/Level.cpp"
     "Source/Game/PlayerController.hpp"
     "Source/Game/PlayerController.cpp"
+    "Source/Game/SnapshotSaveLoad.hpp"
+    "Source/Game/SnapshotSaveLoad.cpp"
 )
 
 # Create missing source files.

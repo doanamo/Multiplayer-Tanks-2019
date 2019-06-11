@@ -52,6 +52,7 @@ void GameStateMainMenu::draw(float timeAlpha)
 
         if(ImGui::Button("Load Game", getButtonSize()))
         {
+
         }
 
         if(ImGui::Button("Host Game", getButtonSize()))
