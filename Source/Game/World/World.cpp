@@ -487,16 +487,19 @@ bool World::onSerialize(MemoryStream& buffer) const
     // Call flushObjects() before serialization to avoid failures.
     for(const ObjectEntry& objectEntry : m_objects)
     {
-        if(objectEntry.destroy == true)
+        if(objectEntry.object != nullptr)
         {
-            LOG_ERROR("Could not serialize world due to pending object deletions!");
-            return false;
-        }
+            if(objectEntry.destroy == true)
+            {
+                LOG_ERROR("Could not serialize world due to pending object deletions!");
+                return false;
+            }
 
-        if(objectEntry.created != true)
-        {
-            LOG_ERROR("Could not serialize world due to pending object creations!");
-            return false;
+            if(objectEntry.created != true)
+            {
+                LOG_ERROR("Could not serialize world due to pending object creations!");
+                return false;
+            }
         }
     }
 
