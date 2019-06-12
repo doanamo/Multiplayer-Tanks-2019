@@ -20,39 +20,22 @@ GameStateSession::~GameStateSession()
     
 bool GameStateSession::initialize()
 {
-    return true;
-}
-
-bool GameStateSession::onStateEnter(State<GameStateBase>* previousState)
-{
     // Initialize game instance.
     m_gameInstance = std::make_unique<GameInstance>();
     if(!m_gameInstance->initialize())
         return false;
 
-    // Prepare game instance on server.
-    NetworkMode networkMode = m_gameInstance->getNetwork()->getMode();
+    return true;
+}
 
-    if(networkMode != NetworkMode::Client)
-    {
-        // Create player tank object.
-        Tank* playerTank = new Tank();
-        Handle playerHandle = m_gameInstance->getWorld()->addObject(playerTank, "Player1_Tank", "Players");
-        m_gameInstance->getPlayerController()->control(playerHandle);
-
-        // Test instantiation from runtime type.
-        Object* enemyTank = Object::create(getTypeInfo<Tank>().getIdentifier());
-        enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
-        m_gameInstance->getWorld()->addObject(enemyTank);
-    }
-
-    // Success!
+bool GameStateSession::onStateEnter(State<GameStateBase>* previousState)
+{
     return true;
 }
 
 bool GameStateSession::onStateExit(State<GameStateBase>* newState)
 {
-    // Clear allocation objects.
+    // Clear game instance.
     m_gameInstance = nullptr;
 
     return true;
@@ -111,4 +94,9 @@ void GameStateSession::draw(float timeAlpha)
 {
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
+}
+
+GameInstance* GameStateSession::getGameInstance()
+{
+    return m_gameInstance.get();
 }

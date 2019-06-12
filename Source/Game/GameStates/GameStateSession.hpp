@@ -19,6 +19,9 @@ public:
     void update(float timeDelta) override;
     void tick(float timeDelta) override;
     void draw(float timeAlpha) override;
+    
+    // Returns the game instance.
+    GameInstance* getGameInstance();
 
 protected:
     // Game state transitions.

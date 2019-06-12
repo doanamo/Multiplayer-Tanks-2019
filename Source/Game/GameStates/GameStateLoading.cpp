@@ -2,16 +2,97 @@
 #include "GameStateLoading.hpp"
 #include "GameStateSession.hpp"
 #include "GameStateMainMenu.hpp"
+#include "Game/GameInstance.hpp"
+#include "Game/PlayerController.hpp"
+#include "Game/SnapshotSaveLoad.hpp"
+#include "Game/World/World.hpp"
+#include "Game/Objects/Tank.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.hpp"
 
-GameStateLoading::GameStateLoading() :
+GameProvisionParams::GameProvisionParams() :
+    provisionMode(GameProvisionMode::Regular),
+    snapshotFile(""),
+    snapshotStream(nullptr),
+    connectionAddress("127.0.0.1"),
+    connectionPort(2077)
+{
+}
+
+GameStateLoading::GameStateLoading(GameProvisionParams& params) :
+    m_params(params),
     m_delay(1.0f)
 {
 }
 
 GameStateLoading::~GameStateLoading()
 {
+}
+
+bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& session)
+{
+    // Initialize game state session.
+    if(!session->initialize())
+        return false;
+
+    // Retrieve created game instance.
+    GameInstance* gameInstance = session->getGameInstance();
+    ASSERT(gameInstance, "Game instance was expected to exist!");
+
+    // Provision created game state session.
+    if(m_params.provisionMode == GameProvisionMode::Regular ||
+        m_params.provisionMode == GameProvisionMode::Host)
+    {
+        // Create player tank object.
+        Tank* playerTank = new Tank();
+        Handle playerHandle = gameInstance->getWorld()->addObject(playerTank, "Player1_Tank", "Players");
+        gameInstance->getPlayerController()->control(playerHandle);
+
+        // Test instantiation from runtime type.
+        Object* enemyTank = Object::create(getTypeInfo<Tank>().getIdentifier());
+        enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
+        gameInstance->getWorld()->addObject(enemyTank);
+    }
+
+    switch(m_params.provisionMode)
+    {
+    case GameProvisionMode::Regular:
+        break;
+
+    case GameProvisionMode::LoadFromFile:
+        {
+            SnapshotSaveLoad snapshotLoader(gameInstance);
+            if(!snapshotLoader.load(m_params.snapshotFile))
+                return false;
+        }
+        break;
+
+    case GameProvisionMode::LoadFromStream:
+        {
+            ASSERT(m_params.snapshotStream);
+
+            SnapshotSaveLoad snapshotLoader(gameInstance);
+            if(!snapshotLoader.load(*m_params.snapshotStream))
+                return false;
+        }
+        break;
+
+    case GameProvisionMode::Host:
+        {
+        }
+        break;
+
+    case GameProvisionMode::Connect:
+        {
+        }
+        break;
+
+    default:
+        ASSERT(false, "Invalid game provision mode!");
+    }
+
+    // Success!
+    return true;
 }
 
 void GameStateLoading::handleEvent(const sf::Event& event)
@@ -22,8 +103,10 @@ void GameStateLoading::update(float timeDelta)
 {
     if(m_delay == 0.0f)
     {
+        // Provision new session game state and change to it.
         auto gameStateSession = std::make_shared<GameStateSession>();
-        if(!getStateMachine()->changeState(gameStateSession))
+
+        if(!provisionSession(gameStateSession) || !getStateMachine()->changeState(gameStateSession))
         {
             auto gameStateMainMenu = std::make_shared<GameStateMainMenu>();
             if(!getStateMachine()->changeState(gameStateMainMenu))
@@ -31,7 +114,7 @@ void GameStateLoading::update(float timeDelta)
                 g_window->close();
             }
         }
-
+        
         return;
     }
 

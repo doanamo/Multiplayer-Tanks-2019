@@ -45,14 +45,21 @@ void GameStateMainMenu::draw(float timeAlpha)
     {
         if(ImGui::Button("Solo Game", getButtonSize()))
         {
-            // Transition to new game state loading.
-            auto gameStateLoading = std::make_shared<GameStateLoading>();
+            GameProvisionParams provisionParams;
+            provisionParams.provisionMode = GameProvisionMode::Regular;
+
+            auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
             getStateMachine()->changeState(gameStateLoading);
         }
 
         if(ImGui::Button("Load Game", getButtonSize()))
         {
+            GameProvisionParams provisionParams;
+            provisionParams.provisionMode = GameProvisionMode::LoadFromFile;
+            provisionParams.snapshotFile = "Snapshot.save";
 
+            auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
+            getStateMachine()->changeState(gameStateLoading);
         }
 
         if(ImGui::Button("Host Game", getButtonSize()))
