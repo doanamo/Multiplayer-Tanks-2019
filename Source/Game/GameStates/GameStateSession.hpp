@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 #include "GameStateBase.hpp"
+#include "Network/Interface/NetworkInterface.hpp"
 
 class GameInstance;
 
@@ -12,7 +13,7 @@ public:
     ~GameStateSession();
 
     // Initializes game state instance.
-    bool initialize();
+    bool initialize(const NetworkParams& networkParams);
 
     // Game state methods.
     void handleEvent(const sf::Event& event) override;

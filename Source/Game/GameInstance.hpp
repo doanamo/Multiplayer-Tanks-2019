@@ -1,8 +1,8 @@
 #pragma once
 
 #include "Precompiled.hpp"
+#include "Network/Interface/NetworkInterface.hpp"
 
-class NetworkInterface;
 class World;
 class Level;
 class PlayerController;
@@ -13,7 +13,7 @@ public:
     GameInstance();
     ~GameInstance();
 
-    bool initialize();
+    bool initialize(const NetworkParams& networkParams);
     void handleEvent(const sf::Event& event);
     void update(float timeDelta);
     void tick(float timeDelta);
@@ -34,9 +34,6 @@ private:
     // Current tick frame.
     uint64_t m_tickFrame;
 
-    // Network interface.
-    std::unique_ptr<NetworkInterface> m_network;
-   
     // Objects in world.
     std::unique_ptr<World> m_world;
 
@@ -51,4 +48,7 @@ private:
 
     bool m_isViewportCentered;
     bool m_isCameraAttachedToPlayer;
+
+    // Network interface.
+    std::unique_ptr<NetworkInterface> m_network;
 };

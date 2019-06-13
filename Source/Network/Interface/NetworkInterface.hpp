@@ -10,6 +10,20 @@ enum class NetworkMode
     Client,
 };
 
+struct NetworkParams
+{
+    NetworkParams() :
+        mode(NetworkMode::Offline),
+        address("127.0.0.1"),
+        port(2077)
+    {
+    }
+
+    NetworkMode mode;
+    std::string address;
+    unsigned short port;
+};
+
 class NetworkInterface
 {
 public:

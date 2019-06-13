@@ -31,8 +31,27 @@ GameStateLoading::~GameStateLoading()
 
 bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& session)
 {
+    // Prepare network parameters.
+    NetworkParams networkParams;
+
+    if(m_params.provisionMode == GameProvisionMode::Host)
+    {
+        networkParams.mode = NetworkMode::Server;
+        networkParams.port = 2077;
+    }
+    else if(m_params.provisionMode == GameProvisionMode::Connect)
+    {
+        networkParams.mode = NetworkMode::Client;
+        networkParams.address = "127.0.0.1";
+        networkParams.port = 2077;
+    }
+    else
+    {
+        networkParams.mode = NetworkMode::Offline;
+    }
+
     // Initialize game state session.
-    if(!session->initialize())
+    if(!session->initialize(networkParams))
         return false;
 
     // Retrieve created game instance.
@@ -54,41 +73,20 @@ bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& sessi
         gameInstance->getWorld()->addObject(enemyTank);
     }
 
-    switch(m_params.provisionMode)
+    // Load snapshot file.
+    if(m_params.provisionMode == GameProvisionMode::LoadFromFile)
     {
-    case GameProvisionMode::Regular:
-        break;
+        SnapshotSaveLoad snapshotLoader(gameInstance);
+        if(!snapshotLoader.load(m_params.snapshotFile))
+            return false;
+    }
+    else if(m_params.provisionMode == GameProvisionMode::LoadFromStream)
+    {
+        ASSERT(m_params.snapshotStream);
 
-    case GameProvisionMode::LoadFromFile:
-        {
-            SnapshotSaveLoad snapshotLoader(gameInstance);
-            if(!snapshotLoader.load(m_params.snapshotFile))
-                return false;
-        }
-        break;
-
-    case GameProvisionMode::LoadFromStream:
-        {
-            ASSERT(m_params.snapshotStream);
-
-            SnapshotSaveLoad snapshotLoader(gameInstance);
-            if(!snapshotLoader.load(*m_params.snapshotStream))
-                return false;
-        }
-        break;
-
-    case GameProvisionMode::Host:
-        {
-        }
-        break;
-
-    case GameProvisionMode::Connect:
-        {
-        }
-        break;
-
-    default:
-        ASSERT(false, "Invalid game provision mode!");
+        SnapshotSaveLoad snapshotLoader(gameInstance);
+        if(!snapshotLoader.load(*m_params.snapshotStream))
+            return false;
     }
 
     // Success!

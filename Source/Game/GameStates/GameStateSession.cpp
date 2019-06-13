@@ -1,5 +1,6 @@
 #include "Precompiled.hpp"
 #include "GameStateSession.hpp"
+#include "GameStateLoading.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
 #include "Game/World/World.hpp"
@@ -18,11 +19,11 @@ GameStateSession::~GameStateSession()
 {
 }
     
-bool GameStateSession::initialize()
+bool GameStateSession::initialize(const NetworkParams& networkParams)
 {
     // Initialize game instance.
     m_gameInstance = std::make_unique<GameInstance>();
-    if(!m_gameInstance->initialize())
+    if(!m_gameInstance->initialize(networkParams))
         return false;
 
     return true;
@@ -58,15 +59,15 @@ void GameStateSession::handleEvent(const sf::Event& event)
 
         case sf::Keyboard::F8:
             // Load snapshot.
-            m_gameInstance = std::make_unique<GameInstance>();
-
-            if(m_gameInstance->initialize())
             {
-                SnapshotSaveLoad snapshotLoader(m_gameInstance.get());
-                snapshotLoader.load("Snapshot.save");
-            }
+                GameProvisionParams provisionParams;
+                provisionParams.provisionMode = GameProvisionMode::LoadFromFile;
+                provisionParams.snapshotFile = "Snapshot.save";
 
-            break;
+                auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
+                getStateMachine()->changeState(gameStateLoading);
+            }
+            return;
 
         case sf::Keyboard::F10:
             g_window->close();

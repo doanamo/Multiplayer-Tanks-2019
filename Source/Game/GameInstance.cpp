@@ -31,52 +31,12 @@ GameInstance::~GameInstance()
     m_world = nullptr;
 }
 
-bool GameInstance::initialize()
+bool GameInstance::initialize(const NetworkParams& networkParams)
 {
     // Create world instance.
     m_world = std::make_unique<World>();
     if(!m_world->initialize())
         return false;
-
-    // Parse port number string.
-    unsigned short portNumber = 0;
-    if(!parseStringToPort(cv_port.value, portNumber))
-        return false;
-
-    // Create network interface.
-    if(g_commandLine->hasArgument("host"))
-    {
-        // Create server network interface.
-        auto networkServer = std::make_unique<NetworkServer>();
-
-        if(networkServer->initialize(this, sf::IpAddress(cv_address.value), portNumber))
-        {
-            // Set network interface.
-            m_network = std::move(networkServer);
-
-            // Change window title.
-            g_window->setTitle(g_window->getInitialTitle() + " - Server");
-        }
-    }
-    else if(g_commandLine->hasArgument("connect"))
-    {
-        // Create client network interface.
-        auto networkClient = std::make_unique<NetworkClient>();
-
-        if(networkClient->initialize(this, sf::IpAddress(cv_address.value), portNumber))
-        {
-            // Set network interface.
-            m_network = std::move(networkClient);
-
-            // Change window title.
-            g_window->setTitle(g_window->getInitialTitle() + " - Client");
-        }
-    }
-    else
-    {
-        // Create offline network interface.
-        m_network = std::make_unique<NetworkOffline>();
-    }
 
     // Create game level.
     m_level = std::make_unique<Level>();
@@ -88,6 +48,43 @@ bool GameInstance::initialize()
     if(!m_playerController->initialize(m_world.get()))
         return false;
 
+    // Create network interface.
+    // #todo: Move title rename to game sessions. Implement Window::SetTitleDecorator.
+    if(networkParams.mode == NetworkMode::Offline)
+    {
+        // Create offline network interface.
+        m_network = std::make_unique<NetworkOffline>();
+    }
+    else if(networkParams.mode == NetworkMode::Server)
+    {
+        // Create server network interface.
+        auto networkServer = std::make_unique<NetworkServer>();
+
+        if(networkServer->initialize(this, sf::IpAddress(networkParams.address), networkParams.port))
+        {
+            // Set network interface.
+            m_network = std::move(networkServer);
+
+            // Change window title.
+            g_window->setTitle(g_window->getInitialTitle() + " - Server");
+        }
+    }
+    else if(networkParams.mode == NetworkMode::Client)
+    {
+        // Create client network interface.
+        auto networkClient = std::make_unique<NetworkClient>();
+
+        if(networkClient->initialize(this, sf::IpAddress(networkParams.address), networkParams.port))
+        {
+            // Set network interface.
+            m_network = std::move(networkClient);
+
+            // Change window title.
+            g_window->setTitle(g_window->getInitialTitle() + " - Client");
+        }
+    }
+
+    // Success!
     return true;
 }
 

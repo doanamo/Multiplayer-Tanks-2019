@@ -64,19 +64,37 @@ void GameStateMainMenu::draw(float timeAlpha)
 
         if(ImGui::Button("Host Game", getButtonSize()))
         {
+            GameProvisionParams provisionParams;
+            provisionParams.provisionMode = GameProvisionMode::Host;
+            provisionParams.connectionAddress = "127.0.0.1";
+            provisionParams.connectionPort = 2077;
+
+            auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
+            getStateMachine()->changeState(gameStateLoading);
         }
 
         if(ImGui::Button("Join Game", getButtonSize()))
         {
+            GameProvisionParams provisionParams;
+            provisionParams.provisionMode = GameProvisionMode::Connect;
+            provisionParams.connectionAddress = "127.0.0.1";
+            provisionParams.connectionPort = 2077;
+
+            auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
+            getStateMachine()->changeState(gameStateLoading);
         }
 
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.6f);
         if(ImGui::Button("Options", getButtonSize()))
         {
         }
+        ImGui::PopStyleVar();
 
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.6f);
         if(ImGui::Button("Credits", getButtonSize()))
         {
         }
+        ImGui::PopStyleVar();
 
         if(ImGui::Button("Exit", getButtonSize()))
         {
