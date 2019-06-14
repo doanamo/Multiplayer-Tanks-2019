@@ -39,11 +39,6 @@ void GameStateEntry::draw(float timeAlpha)
 
 bool GameStateEntry::onStateEnter(State<GameStateBase>* previousState)
 {
-    // Parse port number string.
-    unsigned short portNumber = 0;
-    if(!parseStringToPort(cv_port.value, portNumber))
-        return false;
-
     // Transition to next state based on launch arguments (or their lack). 
     std::shared_ptr<State<GameStateBase>> nextState;
 
@@ -52,7 +47,7 @@ bool GameStateEntry::onStateEnter(State<GameStateBase>* previousState)
         GameProvisionParams provisionParams;
         provisionParams.provisionMode = GameProvisionMode::Host;
         provisionParams.connectionAddress = cv_address.value;
-        provisionParams.connectionPort = portNumber;
+        provisionParams.connectionPort = cv_port.value;
 
         nextState = std::make_shared<GameStateLoading>(provisionParams);
     }
@@ -61,7 +56,7 @@ bool GameStateEntry::onStateEnter(State<GameStateBase>* previousState)
         GameProvisionParams provisionParams;
         provisionParams.provisionMode = GameProvisionMode::Connect;
         provisionParams.connectionAddress = cv_address.value;
-        provisionParams.connectionPort = portNumber;
+        provisionParams.connectionPort = cv_port.value;
 
         nextState = std::make_shared<GameStateLoading>(provisionParams);
     }

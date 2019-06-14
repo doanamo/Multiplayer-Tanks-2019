@@ -6,6 +6,14 @@
 
 GameStateMainMenu::GameStateMainMenu()
 {
+    // Set default variables.
+    std::string defaultConnectionAddress = "127.0.0.1";
+    m_inputConnectionAddress = std::vector<char>(defaultConnectionAddress.begin(), defaultConnectionAddress.end());
+    m_inputConnectionAddress.push_back(0);
+
+    std::string defaultConnectionPort = "2077";
+    m_inputConnectionPort = std::vector<char>(defaultConnectionPort.begin(), defaultConnectionPort.end());
+    m_inputConnectionPort.push_back(0);
 }
 
 GameStateMainMenu::~GameStateMainMenu()
@@ -64,24 +72,68 @@ void GameStateMainMenu::draw(float timeAlpha)
 
         if(ImGui::Button("Host Game", getButtonSize()))
         {
-            GameProvisionParams provisionParams;
-            provisionParams.provisionMode = GameProvisionMode::Host;
-            provisionParams.connectionAddress = "127.0.0.1";
-            provisionParams.connectionPort = 2077;
+            ImGui::OpenPopup("Host Game");
+        }
 
-            auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
-            getStateMachine()->changeState(gameStateLoading);
+        if(ImGui::BeginPopupModal("Host Game", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::InputText("Port", &m_inputConnectionPort, ImGuiInputTextFlags_CharsDecimal);
+            ImGui::Separator();
+
+            float availableWidth = ImGui::GetContentRegionAvailWidth();
+
+            if(ImGui::Button("Host", ImVec2(availableWidth * 0.5f, 0)))
+            {
+                GameProvisionParams provisionParams;
+                provisionParams.provisionMode = GameProvisionMode::Host;
+                provisionParams.connectionAddress = std::string(m_inputConnectionAddress.begin(), m_inputConnectionAddress.end());
+                provisionParams.connectionPort = std::string(m_inputConnectionPort.begin(), m_inputConnectionPort.end());
+
+                auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
+                getStateMachine()->changeState(gameStateLoading);
+            }
+            float size = ImGui::GetItemRectSize().x;
+
+            ImGui::SameLine();
+            if(ImGui::Button("Back", ImVec2(-1, 0)))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
         }
 
         if(ImGui::Button("Join Game", getButtonSize()))
         {
-            GameProvisionParams provisionParams;
-            provisionParams.provisionMode = GameProvisionMode::Connect;
-            provisionParams.connectionAddress = "127.0.0.1";
-            provisionParams.connectionPort = 2077;
+            ImGui::OpenPopup("Join Game");
+        }
 
-            auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
-            getStateMachine()->changeState(gameStateLoading);
+        if(ImGui::BeginPopupModal("Join Game", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+        {
+            ImGui::InputText("Address", &m_inputConnectionAddress, ImGuiInputTextFlags_CharsDecimal);
+            ImGui::InputText("Port", &m_inputConnectionPort, ImGuiInputTextFlags_CharsDecimal);
+            ImGui::Separator();
+
+            float availableWidth = ImGui::GetContentRegionAvailWidth();
+
+            if(ImGui::Button("Join", ImVec2(availableWidth * 0.5f, 0)))
+            {
+                GameProvisionParams provisionParams;
+                provisionParams.provisionMode = GameProvisionMode::Connect;
+                provisionParams.connectionAddress = std::string(m_inputConnectionAddress.begin(), m_inputConnectionAddress.end());
+                provisionParams.connectionPort = std::string(m_inputConnectionPort.begin(), m_inputConnectionPort.end());
+
+                auto gameStateLoading = std::make_shared<GameStateLoading>(provisionParams);
+                getStateMachine()->changeState(gameStateLoading);
+            }
+
+            ImGui::SameLine();
+            if(ImGui::Button("Back", ImVec2(-1, 0)))
+            {
+                ImGui::CloseCurrentPopup();
+            }
+
+            ImGui::EndPopup();
         }
 
         ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.6f);

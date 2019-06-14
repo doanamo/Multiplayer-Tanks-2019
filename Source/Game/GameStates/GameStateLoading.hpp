@@ -32,7 +32,7 @@ struct GameProvisionParams
     std::string connectionAddress;
 
     // Network port used for connection.
-    unsigned short connectionPort;
+    std::string connectionPort;
 };
 
 class GameStateLoading : public GameStateBase

@@ -15,7 +15,7 @@ GameProvisionParams::GameProvisionParams() :
     snapshotFile(""),
     snapshotStream(nullptr),
     connectionAddress("127.0.0.1"),
-    connectionPort(2077)
+    connectionPort("2077")
 {
 }
 
@@ -31,19 +31,24 @@ GameStateLoading::~GameStateLoading()
 
 bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& session)
 {
+    // Parse port number string.
+    unsigned short portNumber = 0;
+    if(!parseStringToPort(m_params.connectionPort, portNumber))
+        return false;
+
     // Prepare network parameters.
     NetworkParams networkParams;
 
     if(m_params.provisionMode == GameProvisionMode::Host)
     {
         networkParams.mode = NetworkMode::Server;
-        networkParams.port = 2077;
+        networkParams.port = portNumber;
     }
     else if(m_params.provisionMode == GameProvisionMode::Connect)
     {
         networkParams.mode = NetworkMode::Client;
         networkParams.address = "127.0.0.1";
-        networkParams.port = 2077;
+        networkParams.port = portNumber;
     }
     else
     {

@@ -19,5 +19,6 @@ protected:
     bool onStateExit(State<GameStateBase>* previousState) override;
 
 private:
-
+    std::vector<char> m_inputConnectionAddress;
+    std::vector<char> m_inputConnectionPort;
 };
