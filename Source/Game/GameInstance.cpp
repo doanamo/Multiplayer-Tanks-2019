@@ -10,9 +10,6 @@
 #include "System/CommandLine.hpp"
 #include "System/Window.hpp"
 
-ConsoleVariable<std::string> cv_address("address", "127.0.0.1");
-ConsoleVariable<std::string> cv_port("port", "2076");
-
 GameInstance::GameInstance() :
     m_tickFrame(0),
     m_world(nullptr),
