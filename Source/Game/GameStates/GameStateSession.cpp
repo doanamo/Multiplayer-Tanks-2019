@@ -1,6 +1,7 @@
 #include "Precompiled.hpp"
 #include "GameStateSession.hpp"
 #include "GameStateLoading.hpp"
+#include "GameStateMainMenu.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
 #include "Game/World/World.hpp"
@@ -11,7 +12,8 @@
 #include "System/Globals.hpp"
 #include "System/Window.hpp"
 
-GameStateSession::GameStateSession()
+GameStateSession::GameStateSession() :
+    m_gameMenuOpen(false)
 {
 }
 
@@ -49,6 +51,21 @@ void GameStateSession::handleEvent(const sf::Event& event)
     {
         switch(event.key.code)
         {
+        case sf::Keyboard::Escape:
+            // Open game menu.
+            if(!m_gameMenuOpen)
+            {
+                if(!ImGui::IsAnyItemFocused())
+                {
+                    m_gameMenuOpen = true;
+                }
+            }
+            else
+            {
+                m_gameMenuOpen = false;
+            }
+            break;
+
         case sf::Keyboard::F5:
             // Save snapshot.
             {
@@ -95,6 +112,52 @@ void GameStateSession::draw(float timeAlpha)
 {
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
+
+    // Draw game menu modal popup.
+    auto getButtonSize = []() -> ImVec2
+    {
+        return ImVec2(ImGui::GetContentRegionAvailWidth() + 8.0f, 0.0f);
+    };
+
+    if(m_gameMenuOpen)
+    {
+        if(!ImGui::IsPopupOpen("Game Menu"))
+        {
+            ImGui::OpenPopup("Game Menu");
+        }
+    }
+
+    ImGui::SetNextWindowContentWidth(200.0f);
+    ImGui::PushStyleVar(ImGuiStyleVar_WindowTitleAlign, ImVec2(0.5f, 0.5f));
+
+    if(ImGui::BeginPopupModal("Game Menu", nullptr, ImGuiWindowFlags_AlwaysAutoResize))
+    {
+        if(ImGui::Button("Resume", getButtonSize()))
+        {
+            m_gameMenuOpen = false;
+        }
+
+        ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.6f);
+        if(ImGui::Button("Options", getButtonSize()))
+        {
+        }
+        ImGui::PopStyleVar();
+
+        if(ImGui::Button("Quit", getButtonSize()))
+        {
+            auto gameStateMainMenu = std::make_shared<GameStateMainMenu>();
+            getStateMachine()->changeState(gameStateMainMenu);
+        }
+
+        if(!m_gameMenuOpen)
+        {
+            ImGui::CloseCurrentPopup();
+        }
+
+        ImGui::EndPopup();
+    }
+
+    ImGui::PopStyleVar();
 }
 
 GameInstance* GameStateSession::getGameInstance()

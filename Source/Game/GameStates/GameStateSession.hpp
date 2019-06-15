@@ -32,4 +32,7 @@ protected:
 private:
     // Game instance.
     std::unique_ptr<GameInstance> m_gameInstance;
+
+    // Game menu state.
+    bool m_gameMenuOpen;
 };

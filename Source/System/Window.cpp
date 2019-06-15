@@ -58,11 +58,7 @@ bool Window::pollEvent(sf::Event& event)
 {
     while(m_window.pollEvent(event))
     {
-        if(ImGui::SFML::ProcessEvent(event))
-        {
-            // Continue to next event if ImGui wants to consume input.
-            continue;
-        }
+        ImGui::SFML::ProcessEvent(event);
 
         if(event.type == sf::Event::Closed)
         {
