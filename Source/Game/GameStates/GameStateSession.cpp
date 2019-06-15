@@ -113,6 +113,9 @@ void GameStateSession::draw(float timeAlpha)
     // Draw game instance.
     m_gameInstance->draw(timeAlpha);
 
+    // State to change into.
+    std::shared_ptr<GameStateBase> changeState;
+
     // Draw game menu modal popup.
     auto getButtonSize = []() -> ImVec2
     {
@@ -137,6 +140,23 @@ void GameStateSession::draw(float timeAlpha)
             m_gameMenuOpen = false;
         }
 
+        if(ImGui::Button("Save", getButtonSize()))
+        {
+            SnapshotSaveLoad snapshotSaver(m_gameInstance.get());
+            snapshotSaver.save("Snapshot.save");
+
+            m_gameMenuOpen = false;
+        }
+
+        if(ImGui::Button("Load", getButtonSize()))
+        {
+            GameProvisionParams provisionParams;
+            provisionParams.provisionMode = GameProvisionMode::LoadFromFile;
+            provisionParams.snapshotFile = "Snapshot.save";
+
+            changeState = std::make_shared<GameStateLoading>(provisionParams);
+        }
+
         ImGui::PushStyleVar(ImGuiStyleVar_Alpha, ImGui::GetStyle().Alpha * 0.6f);
         if(ImGui::Button("Options", getButtonSize()))
         {
@@ -145,8 +165,7 @@ void GameStateSession::draw(float timeAlpha)
 
         if(ImGui::Button("Quit", getButtonSize()))
         {
-            auto gameStateMainMenu = std::make_shared<GameStateMainMenu>();
-            getStateMachine()->changeState(gameStateMainMenu);
+            changeState = std::make_shared<GameStateMainMenu>();
         }
 
         if(!m_gameMenuOpen)
@@ -158,6 +177,12 @@ void GameStateSession::draw(float timeAlpha)
     }
 
     ImGui::PopStyleVar();
+
+    // Change to new state if requested.
+    if(changeState)
+    {
+        getStateMachine()->changeState(changeState);
+    }
 }
 
 GameInstance* GameStateSession::getGameInstance()
