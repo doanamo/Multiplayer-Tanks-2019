@@ -196,3 +196,12 @@ target_link_libraries("Game" "SFML-ImGui")
 if(WIN32)
     add_subdirectory("Source/Launcher")
 endif()
+
+# Configure packaging command.
+install(TARGETS "Game" DESTINATION .)
+install(TARGETS "Launcher" DESTINATION .)
+install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Deploy/Data/" DESTINATION "Data")
+
+set(CPACK_GENERATOR "ZIP")
+set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
+include(CPack)
