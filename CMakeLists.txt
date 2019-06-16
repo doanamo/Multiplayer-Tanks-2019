@@ -193,9 +193,7 @@ set_property(TARGET "SFML-ImGui" PROPERTY FOLDER "External")
 target_link_libraries("Game" "SFML-ImGui")
 
 # Add launcher project.
-if(WIN32)
-    add_subdirectory("Source/Launcher")
-endif()
+add_subdirectory("Source/Launcher")
 
 # Configure packaging command.
 install(TARGETS "Game" DESTINATION .)
