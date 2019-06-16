@@ -9,3 +9,6 @@ set_target_properties("Launcher" PROPERTIES RUNTIME_OUTPUT_DIRECTORY "${CMAKE_BI
 
 # Set main build directory as the working directory.
 set_target_properties("Launcher" PROPERTIES VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_SOURCE_DIR}/Deploy/")
+
+# Launcher install command.
+install(TARGETS "Launcher" DESTINATION .)

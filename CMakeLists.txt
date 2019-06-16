@@ -195,11 +195,11 @@ target_link_libraries("Game" "SFML-ImGui")
 # Add launcher project.
 add_subdirectory("${CMAKE_CURRENT_SOURCE_DIR}/Source/Launcher")
 
-# Configure packaging command.
+# Game install command.
 install(TARGETS "Game" DESTINATION .)
-install(TARGETS "Launcher" DESTINATION .)
 install(DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/Deploy/Data/" DESTINATION "Data")
 
+# Configure packaging command.
 set(CPACK_GENERATOR "ZIP")
 set(CPACK_INCLUDE_TOPLEVEL_DIRECTORY OFF)
 include(CPack)
