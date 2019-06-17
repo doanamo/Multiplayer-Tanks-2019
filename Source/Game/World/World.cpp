@@ -523,7 +523,7 @@ bool World::onSerialize(MemoryStream& buffer) const
         if(!ShouldSerializeObject(objectEntry))
             continue;
 
-        if(!serialize(buffer, objectEntry.object->getTypeInfo().getIdentifier()))
+        if(!serialize(buffer, getTypeIdentifier(*objectEntry.object)))
             return false;
 
         if(!serialize(buffer, objectEntry.object->getName()))

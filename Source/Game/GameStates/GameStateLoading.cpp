@@ -73,7 +73,7 @@ bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& sessi
         gameInstance->getPlayerController()->control(playerHandle);
 
         // Test instantiation from runtime type.
-        Object* enemyTank = Object::create(getTypeInfo<Tank>().getIdentifier());
+        Object* enemyTank = Object::create(getTypeIdentifier<Tank>());
         enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
         gameInstance->getWorld()->addObject(enemyTank);
     }
