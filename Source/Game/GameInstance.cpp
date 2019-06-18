@@ -174,7 +174,7 @@ void GameInstance::draw(float timeAlpha)
     // Center camera on player.
     if(m_isCameraAttachedToPlayer)
     {
-        Tank* tank = dynamic_cast<Tank*>(m_world->getObjectByName("Player1_Tank"));
+        Tank* tank = m_world->getObjectByName("Player1_Tank")->as<Tank>();
 
         if(tank != nullptr)
         {

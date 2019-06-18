@@ -129,6 +129,25 @@ TypeInfo::IdentifierType getTypeIdentifier(const Type& type)
         return nullptr; \
     }
 
+#define TYPE_DECLARE_CAST(type) \
+    template<typename Type> \
+    bool is() const \
+    { \
+        TypeInfo& typeInfo = this->getTypeInfo(); \
+        TypeInfo::IdentifierType typeIdentifier = getTypeIdentifier<Type>(); \
+        return typeInfo.isSame(typeIdentifier) || typeInfo.isBase(typeIdentifier); \
+    } \
+    \
+    template<typename Type> \
+    Type* as() \
+    { \
+        if(this->is<Type>()) \
+        { \
+            return reinterpret_cast<Type*>(this); \
+        } \
+        return nullptr; \
+    }
+
 #define TYPE_DECLARE_BASE(type) \
     public: \
         static TypeInfo& staticTypeInfo() \
@@ -138,7 +157,8 @@ TypeInfo::IdentifierType getTypeIdentifier(const Type& type)
         } \
         TYPE_DECLARE_DETERMINE(type) \
         TYPE_DECLARE_ALLOCATE(type) \
-        TYPE_DECLARE_CREATE(type)
+        TYPE_DECLARE_CREATE(type) \
+        TYPE_DECLARE_CAST(type)
 
 #define TYPE_DECLARE_DERIVED(type, base) \
     public: \
@@ -150,7 +170,8 @@ TypeInfo::IdentifierType getTypeIdentifier(const Type& type)
         TYPE_DECLARE_SUPER(base) \
         TYPE_DECLARE_DETERMINE(type) \
         TYPE_DECLARE_ALLOCATE(type) \
-        TYPE_DECLARE_CREATE(type)
+        TYPE_DECLARE_CREATE(type) \
+        TYPE_DECLARE_CAST(type)
 
 #define TYPE_DECLARE_CHOOSER(...) TYPE_DECLARE_EXPAND(TYPE_DECLARE_DEDUCE(__VA_ARGS__, TYPE_DECLARE_DERIVED, TYPE_DECLARE_BASE))
 #define TYPE_DECLARE(...) TYPE_DECLARE_EXPAND(TYPE_DECLARE_CHOOSER(__VA_ARGS__)(__VA_ARGS__))
