@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 #include "NetworkServer.hpp"
-#include "Network/Protocol.hpp"
+#include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
 

@@ -41,8 +41,6 @@ set(SOURCE_FILES
     "Source/System/Console.hpp"
     "Source/System/Console.cpp"
 
-    "Source/Network/Protocol.hpp"
-    "Source/Network/Protocol.cpp"
     "Source/Network/Interface/NetworkInterface.hpp"
     "Source/Network/Interface/NetworkBase.hpp"
     "Source/Network/Interface/NetworkBase.cpp"
@@ -52,6 +50,8 @@ set(SOURCE_FILES
     "Source/Network/Interface/NetworkServer.cpp"
     "Source/Network/Interface/NetworkClient.hpp"
     "Source/Network/Interface/NetworkClient.cpp"
+    "Source/Network/Packets/Protocol.hpp"
+    "Source/Network/Packets/Protocol.cpp"
     "Source/Network/Packets/PacketHeader.hpp"
     "Source/Network/Packets/PacketHeader.cpp"
     "Source/Network/Packets/PacketBase.hpp"

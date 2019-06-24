@@ -4,7 +4,7 @@
 #include "Game/World/Object.hpp"
 #include "Game/Objects/Tank.hpp"
 #include "Game/Objects/Projectile.hpp"
-#include "Network/Protocol.hpp"
+#include "Network/Packets/Protocol.hpp"
 
 #define REGISTER_TYPE(type) g_runtimeTypes->registerType(type::staticTypeInfo());
 
