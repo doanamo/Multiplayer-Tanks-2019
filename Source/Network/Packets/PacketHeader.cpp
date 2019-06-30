@@ -5,9 +5,11 @@ static const char MagicValue[] = "TanksXD";
 static const std::size_t MagicSize = staticArraySize(MagicValue);
 
 PacketHeader::PacketHeader() :
-    packetCRC(0),
-    packetSize(0),
-    packetType(stringHash(""))
+    checksum(0),
+    sequenceIndex(0),
+    acknowledgmentIndex(0),
+    transformMethod(0),
+    transformExtra(0)
 {
 }
 
@@ -15,14 +17,13 @@ PacketHeader::~PacketHeader()
 {
 }
 
-uint32_t PacketHeader::calculateCRC(const char* data, std::size_t size)
+uint32_t PacketHeader::calculateChecksum(const char* data, std::size_t size) const
 {
-    ASSERT(packetSize != 0, "Packet size should be set before calculating CRC!");
-    ASSERT(packetType != stringHash(""), "Packet type should be set before calculating CRC!");
-
     uint32_t crc = 0;
-    crc = calculateCRC32(crc, (const char*)&packetSize, sizeof(packetSize));
-    crc = calculateCRC32(crc, (const char*)&packetType, sizeof(packetType));
+    crc = calculateCRC32(crc, (const char*)&sequenceIndex, sizeof(sequenceIndex));
+    crc = calculateCRC32(crc, (const char*)&acknowledgmentIndex, sizeof(acknowledgmentIndex));
+    crc = calculateCRC32(crc, (const char*)&transformMethod, sizeof(transformMethod));
+    crc = calculateCRC32(crc, (const char*)&transformExtra, sizeof(transformExtra));
     crc = calculateCRC32(crc, data, size);
     return crc;
 }
@@ -35,14 +36,21 @@ bool PacketHeader::onSerialize(MemoryStream& buffer) const
             return false;
     }
 
-    if(!serialize(buffer, packetCRC))
+    if(!serialize(buffer, checksum))
         return false;
 
-    if(!serialize(buffer, packetSize))
+    if(!serialize(buffer, sequenceIndex))
         return false;
 
-    if(!serialize(buffer, packetType))
+    if(!serialize(buffer, acknowledgmentIndex))
         return false;
+
+    if(!serialize(buffer, transformMethod))
+        return false;
+
+    if(!serialize(buffer, transformExtra))
+        return false;
+
 
     return true;
 }
@@ -62,13 +70,19 @@ bool PacketHeader::onDeserialize(MemoryStream& buffer)
         }
     }
 
-    if(!deserialize(buffer, &packetCRC))
+    if(!deserialize(buffer, &checksum))
         return false;
 
-    if(!deserialize(buffer, &packetSize))
+    if(!deserialize(buffer, &sequenceIndex))
         return false;
 
-    if(!deserialize(buffer, &packetType))
+    if(!deserialize(buffer, &acknowledgmentIndex))
+        return false;
+
+    if(!deserialize(buffer, &transformMethod))
+        return false;
+
+    if(!deserialize(buffer, &transformExtra))
         return false;
 
     return true;

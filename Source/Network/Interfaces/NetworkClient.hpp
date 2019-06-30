@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 #include "NetworkBase.hpp"
+#include "Network/Connection/ConnectionSocket.hpp"
 
 extern ConsoleVariable<std::string> cv_connect;
 
@@ -11,7 +12,7 @@ public:
     NetworkClient();
     ~NetworkClient();
 
-    bool initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port) override;
+    bool initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port);
     void update(float timeDelta) override;
     void tick(float timeDelta) override;
     void draw() override;
@@ -20,12 +21,8 @@ public:
     bool isConnected() const override;
 
 private:
-    // Server info.
-    sf::IpAddress m_serverAddress;
-    unsigned short m_serverPort;
-
     // Connection socket.
-    sf::TcpSocket m_tcpSocket;
+    ConnectionSocket m_socket;
 
     // Heartbeat timer.
     float m_hearbeatTimer;

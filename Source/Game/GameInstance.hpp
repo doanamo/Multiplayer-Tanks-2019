@@ -1,7 +1,7 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Network/Interface/NetworkInterface.hpp"
+#include "Network/Interfaces/NetworkInterface.hpp"
 
 class World;
 class Level;

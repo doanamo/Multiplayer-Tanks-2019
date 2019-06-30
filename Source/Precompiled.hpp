@@ -13,6 +13,12 @@
 #include <functional>
 #include <queue>
 #include <map>
+#include <set>
+#include <unordered_map>
+#include <unordered_set>
+#include <thread>
+#include <atomic>
+#include <mutex>
 
 // JSON
 #include <nlohmann/json.hpp>

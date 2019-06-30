@@ -25,12 +25,19 @@ bool Logger::initialize()
 
 void Logger::setNextIndent(int indent)
 {
+    // Lock logger mutex.
+    std::scoped_lock<std::mutex> lock(m_mutex);
+
+    // Set logger indent.
     m_nextIndent = indent;
 }
 
 void Logger::write(LogType type, const char* format, ...)
 {
     ASSERT(format != nullptr);
+
+    // Lock logger mutex.
+    std::scoped_lock<std::mutex> lock(m_mutex);
 
     // Truncate message history.
     if(m_messages.size() == MaxMessageCount)

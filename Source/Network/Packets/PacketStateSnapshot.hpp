@@ -5,13 +5,13 @@
 
 class GameInstance;
 
-class PacketStateSave : public PacketBase
+class PacketStateSnapshot : public PacketBase
 {
-    TYPE_DECLARE(PacketStateSave, PacketBase);
+    TYPE_DECLARE(PacketStateSnapshot, PacketBase);
 
 public:
-    PacketStateSave();
-    ~PacketStateSave();
+    PacketStateSnapshot();
+    ~PacketStateSnapshot();
 
     bool onSerialize(MemoryStream& buffer) const override;
     bool onDeserialize(MemoryStream& buffer) override;

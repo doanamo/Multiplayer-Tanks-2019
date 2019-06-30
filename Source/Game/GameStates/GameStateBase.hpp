@@ -8,6 +8,7 @@ class GameStateBase : public State<GameStateBase>
 protected:
     // Protected constructor.
     GameStateBase();
+    virtual ~GameStateBase();
 
     // State machine transitions.
     virtual bool onStateEnter(State<GameStateBase>* newState) override;

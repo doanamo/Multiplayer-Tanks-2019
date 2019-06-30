@@ -27,6 +27,11 @@ struct NetworkParams
 class NetworkInterface
 {
 public:
+    // Virtual destructor.
+    virtual ~NetworkInterface()
+    {
+    }
+
     // Network methods.
     virtual void update(float timeDelta) = 0;
     virtual void tick(float timeDelta) = 0;

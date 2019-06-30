@@ -1,16 +1,16 @@
 #include "Precompiled.hpp"
-#include "Network/Packets/PacketStateSave.hpp"
+#include "Network/Packets/PacketStateSnapshot.hpp"
 #include "Game/GameInstance.hpp"
 
-PacketStateSave::PacketStateSave()
+PacketStateSnapshot::PacketStateSnapshot()
 {
 }
 
-PacketStateSave::~PacketStateSave()
+PacketStateSnapshot::~PacketStateSnapshot()
 {
 }
 
-bool PacketStateSave::onSerialize(MemoryStream& buffer) const
+bool PacketStateSnapshot::onSerialize(MemoryStream& buffer) const
 {
     if(!Super::onSerialize(buffer))
         return false;
@@ -21,7 +21,7 @@ bool PacketStateSave::onSerialize(MemoryStream& buffer) const
     return true;
 }
 
-bool PacketStateSave::onDeserialize(MemoryStream& buffer)
+bool PacketStateSnapshot::onDeserialize(MemoryStream& buffer)
 {
     if(!Super::onDeserialize(buffer))
         return false;

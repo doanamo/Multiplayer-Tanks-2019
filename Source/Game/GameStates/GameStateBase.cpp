@@ -5,6 +5,11 @@ GameStateBase::GameStateBase()
 {
 }
 
+GameStateBase::~GameStateBase()
+{
+    LOG_TRACE("GameStateBase::~GameStateBase()");
+}
+
 bool GameStateBase::onStateEnter(State<GameStateBase>* newState)
 {
     return true;

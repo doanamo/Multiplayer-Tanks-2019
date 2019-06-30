@@ -6,6 +6,12 @@ MemoryStream::MemoryStream() :
 {
 }
 
+MemoryStream::MemoryStream(std::size_t size) :
+    m_index(0),
+    m_buffer(size)
+{
+}
+
 MemoryStream::~MemoryStream()
 {
 }

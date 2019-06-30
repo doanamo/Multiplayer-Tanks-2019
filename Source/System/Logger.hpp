@@ -34,6 +34,9 @@ public:
     const MessageList& getMessages() const;
 
 private:
+    // Logger mutex.
+    std::mutex m_mutex;
+    
     // Message history.
     const int MaxMessageCount = 1000;
     MessageList m_messages;

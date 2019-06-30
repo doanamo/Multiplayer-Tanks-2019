@@ -9,6 +9,7 @@ Application::Application()
 
 Application::~Application()
 {
+    LOG_TRACE("Application::~Application()");
 }
 
 bool Application::initialize()

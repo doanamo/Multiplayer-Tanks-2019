@@ -7,6 +7,7 @@ class MemoryStream : public Serializable
 {
 public:
     MemoryStream();
+    MemoryStream(std::size_t size);
     ~MemoryStream();
 
     // Writing methods.

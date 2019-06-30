@@ -2,7 +2,7 @@
 
 #include "Precompiled.hpp"
 #include "GameStateBase.hpp"
-#include "Network/Interface/NetworkInterface.hpp"
+#include "Network/Interfaces/NetworkInterface.hpp"
 
 class GameInstance;
 

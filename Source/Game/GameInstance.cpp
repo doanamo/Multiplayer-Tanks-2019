@@ -3,9 +3,9 @@
 #include "Game/World/World.hpp"
 #include "Game/Level.hpp"
 #include "Game/PlayerController.hpp"
-#include "Network/Interface/NetworkServer.hpp"
-#include "Network/Interface/NetworkClient.hpp"
-#include "Network/Interface/NetworkOffline.hpp"
+#include "Network/Interfaces/NetworkServer.hpp"
+#include "Network/Interfaces/NetworkClient.hpp"
+#include "Network/Interfaces/NetworkOffline.hpp"
 #include "System/Globals.hpp"
 #include "System/CommandLine.hpp"
 #include "System/Window.hpp"
@@ -52,33 +52,32 @@ bool GameInstance::initialize(const NetworkParams& networkParams)
         // Create offline network interface.
         m_network = std::make_unique<NetworkOffline>();
     }
-    else if(networkParams.mode == NetworkMode::Server)
+    if(networkParams.mode == NetworkMode::Server)
     {
         // Create server network interface.
         auto networkServer = std::make_unique<NetworkServer>();
 
-        if(networkServer->initialize(this, sf::IpAddress(networkParams.address), networkParams.port))
-        {
-            // Set network interface.
-            m_network = std::move(networkServer);
+        if(!networkServer->initialize(this, networkParams.port))
+            return false;
 
-            // Change window title.
-            g_window->setTitle(g_window->getInitialTitle() + " - Server");
-        }
+        // Set network interface.
+        m_network = std::move(networkServer);
+
+        // Change window title.
+        g_window->setTitle(g_window->getInitialTitle() + " - Server");
     }
     else if(networkParams.mode == NetworkMode::Client)
     {
         // Create client network interface.
         auto networkClient = std::make_unique<NetworkClient>();
+        if(!networkClient->initialize(this, sf::IpAddress(networkParams.address), networkParams.port))
+            return false;
 
-        if(networkClient->initialize(this, sf::IpAddress(networkParams.address), networkParams.port))
-        {
-            // Set network interface.
-            m_network = std::move(networkClient);
+        // Set network interface.
+        m_network = std::move(networkClient);
 
-            // Change window title.
-            g_window->setTitle(g_window->getInitialTitle() + " - Client");
-        }
+        // Change window title.
+        g_window->setTitle(g_window->getInitialTitle() + " - Client");
     }
 
     // Success!
@@ -174,12 +173,17 @@ void GameInstance::draw(float timeAlpha)
     // Center camera on player.
     if(m_isCameraAttachedToPlayer)
     {
-        Tank* tank = m_world->getObjectByName("Player1_Tank")->as<Tank>();
+        Object* object = m_world->getObjectByName("Player1_Tank");
 
-        if(tank != nullptr)
+        if(object)
         {
-            sf::Vector2f interpolatedPosition = tank->getPosition(timeAlpha);
-            m_viewport.setCenter(interpolatedPosition);
+            Tank* tank = object->as<Tank>();
+
+            if(tank != nullptr)
+            {
+                sf::Vector2f interpolatedPosition = tank->getPosition(timeAlpha);
+                m_viewport.setCenter(interpolatedPosition);
+            }
         }
     }
 

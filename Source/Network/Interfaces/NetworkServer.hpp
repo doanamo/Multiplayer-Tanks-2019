@@ -2,14 +2,19 @@
 
 #include "Precompiled.hpp"
 #include "NetworkBase.hpp"
+#include "Network/Connection/ConnectionSocket.hpp"
 
+// Forward declarations.
+class ConnectionBackend;
+
+// Network server class.
 class NetworkServer : public NetworkBase
 {
 public:
     NetworkServer();
     ~NetworkServer();
 
-    bool initialize(GameInstance* gameInstance, const sf::IpAddress& address, unsigned short port) override;
+    bool initialize(GameInstance* gameInstance, unsigned short port);
     void update(float timeDelta) override;
     void tick(float timeDelta) override;
     void draw() override;
@@ -18,14 +23,14 @@ public:
     bool isConnected() const override;
 
 private:
+    // Default connection socket.
+    ConnectionSocket m_socket;
+
     // List of clients.
     struct ClientEntry
     {
-        std::unique_ptr<sf::TcpSocket> socket;
+        std::unique_ptr<ConnectionSocket> socket;
     };
 
     std::vector<ClientEntry> m_clients;
-
-    // Incoming connection listener.
-    sf::TcpListener m_tcpListener;
 };

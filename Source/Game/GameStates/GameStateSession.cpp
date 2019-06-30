@@ -8,7 +8,7 @@
 #include "Game/Objects/Tank.hpp"
 #include "Game/Level.hpp"
 #include "Game/PlayerController.hpp"
-#include "Network/Interface/NetworkInterface.hpp"
+#include "Network/Interfaces/NetworkInterface.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.hpp"
 
@@ -19,6 +19,7 @@ GameStateSession::GameStateSession() :
 
 GameStateSession::~GameStateSession()
 {
+    LOG_TRACE("GameStateSession::~GameStateSession()");
 }
     
 bool GameStateSession::initialize(const NetworkParams& networkParams)
