@@ -4,7 +4,6 @@
 #include "Game/GameInstance.hpp"
 
 NetworkClient::NetworkClient() :
-    m_socket(),
     m_hearbeatTimer(0.0f)
 {
 }
@@ -27,44 +26,34 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
     }
 
     // Request game state snapshot.
-    MemoryStream packetData;
-
-    do
+    while(true)
     {
-        // Send connection request to server.
-        MemoryStream networkData;
-        PacketConnect connectPacket;
+        // Send connection request packet until we get a response.
+        std::unique_ptr<PacketBase> receivedPacket;
 
-        if(!serialize(networkData, getTypeIdentifier(connectPacket)))
-            return false;
+        do
+        {
+            // Send connection request to server.
+            PacketConnect connectPacket;
+            sendPacket(m_socket, connectPacket, false);
 
-        if(!serialize(networkData, connectPacket))
-            return false;
+            // Wait to avoid spamming.
+            sf::sleep(sf::milliseconds(100));
+        }
+        while(!receivePacket(m_socket, receivedPacket, nullptr));
 
-        m_socket.send(networkData, false);
+        // Check if packet type matches expected type.
+        PacketStateSnapshot* snapshotPacket = receivedPacket->as<PacketStateSnapshot>();
+        if(receivedPacket == nullptr)
+            continue;
 
-        // Wait to avoid spamming.
-        sf::sleep(sf::milliseconds(100));
+        // Deserialize game state save into game instance.
+        if(!deserialize(snapshotPacket->serializedGameInstance, m_gameInstance))
+            continue;
+
+        // Break free.
+        break;
     }
-    while(!m_socket.receive(packetData, nullptr));
-
-    // Read packet type.
-    TypeInfo::IdentifierType packetType = 0;
-
-    if(!deserialize(packetData, &packetType))
-        return false;
-
-    if(packetType != getTypeIdentifier<PacketStateSnapshot>())
-        return false;
-
-    // Deserialize packet packet.
-    PacketStateSnapshot stateSnapshot;
-    if(!deserialize(packetData, &stateSnapshot))
-        return false;
-
-    // Deserialize game state save into game instance.
-    if(!deserialize(stateSnapshot.serializedGameInstance, m_gameInstance))
-        return false;
 
     // Success!
     return true;
@@ -80,37 +69,24 @@ void NetworkClient::update(float timeDelta)
         PacketMessage packetMessage;
         packetMessage.text = "Hello server!";
 
-        MemoryStream packetData;
-        if(serialize(packetData, packetMessage))
-        {
-            m_socket.send(packetData, false);
-        }
+        sendPacket(m_socket, packetMessage, false);
 
         m_hearbeatTimer = 1.0f;
     }
 
     // Receive packets.
-    MemoryStream receivedPacketData;
+    std::unique_ptr<PacketBase> receivedPacket;
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(m_socket.receive(receivedPacketData, nullptr, &senderAddress, &senderPort))
+    while(receivePacket(m_socket, receivedPacket, nullptr, &senderAddress, &senderPort))
     {
-        // Read packet type.
-        TypeInfo::IdentifierType packetType = 0;
+        PacketMessage* packetMessage = receivedPacket->as<PacketMessage>();
 
-        if(!deserialize(receivedPacketData, &packetType))
-            continue;
-
-        if(packetType != getTypeIdentifier<PacketMessage>())
-            continue;
-
-        // Deserialize packet.
-        PacketMessage packetMessage;
-        if(!deserialize(receivedPacketData, &packetMessage))
-            continue;
-
-        LOG_INFO("Received message packet with \"%s\" text.", packetMessage.text.c_str());
+        if(packetMessage)
+        {
+            LOG_INFO("Received message packet with \"%s\" text.", packetMessage->text.c_str());
+        }
     }
 }
 

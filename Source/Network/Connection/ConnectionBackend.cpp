@@ -160,6 +160,20 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
 
             // Check socket status.
             // Break out of the loop if there are no new datagrams.
+            switch(status)
+            {
+            case sf::Socket::Partial:
+                LOG_ERROR("Received partial packet in UDP socket!");
+                break;
+
+            case sf::Socket::Disconnected:
+                LOG_ERROR("Could not receive from UDP socket due to socket disconnection!");
+
+            case sf::Socket::Error:
+                LOG_ERROR("Could not receive from UDP secket due to unknown error!");
+                break;
+            }
+
             if(status != sf::Socket::Done)
                 break;
 
@@ -192,7 +206,7 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                 LOG_WARNING("Invalid packet checksum detected! Dropping corrupted packet.");
                 continue;
             }
-            
+
             // Find socket connected to source and push incoming packet entry.
             {
                 // Lock registering and unregistering connection sockets.

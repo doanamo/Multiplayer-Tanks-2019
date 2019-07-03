@@ -12,6 +12,6 @@ protected:
 public:
     virtual ~PacketBase();
 
-    bool onSerialize(MemoryStream& buffer) const override;
-    bool onDeserialize(MemoryStream& buffer) override;
+    virtual bool onSerialize(MemoryStream& buffer) const override;
+    virtual bool onDeserialize(MemoryStream& buffer) override;
 };

@@ -2,7 +2,6 @@
 
 #include "Precompiled.hpp"
 #include "NetworkBase.hpp"
-#include "Network/Connection/ConnectionSocket.hpp"
 
 extern ConsoleVariable<std::string> cv_connect;
 
@@ -21,9 +20,6 @@ public:
     bool isConnected() const override;
 
 private:
-    // Connection socket.
-    ConnectionSocket m_socket;
-
     // Heartbeat timer.
     float m_hearbeatTimer;
 };

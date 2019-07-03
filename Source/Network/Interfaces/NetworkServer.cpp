@@ -37,20 +37,16 @@ void NetworkServer::update(float timeDelta)
 void NetworkServer::tick(float timeDelta)
 {
     // Received packet data.
-    MemoryStream receivedPacketData;
+    std::unique_ptr<PacketBase> receivedPacket;
     sf::IpAddress remoteAddress;
     unsigned short remotePort;
 
     // Receive connection packets.
-    while(m_socket.receive(receivedPacketData, nullptr, &remoteAddress, &remotePort))
+    while(receivePacket(m_socket, receivedPacket, nullptr, &remoteAddress, &remotePort))
     {
-        // Check packet type.
-        TypeInfo::IdentifierType packetType = 0;
-
-        if(!deserialize(receivedPacketData, &packetType))
-            continue;
-
-        if(packetType != getTypeIdentifier<PacketConnect>())
+        // Retrieve connect packet.
+        PacketConnect* packetConnect = receivedPacket->as<PacketConnect>();
+        if(packetConnect == nullptr)
             continue;
 
         // Check if we already have socket registered with remote address and port.
@@ -74,58 +70,42 @@ void NetworkServer::tick(float timeDelta)
     // Receive packets from connected clients.
     for(auto& clientEntry : m_clients)
     {
-        while(clientEntry.socket->receive(receivedPacketData, nullptr))
+        while(receivePacket(*clientEntry.socket, receivedPacket, nullptr))
         {
-            // Check packet type.
-            TypeInfo::IdentifierType packetType = 0;
-            if(!deserialize(receivedPacketData, &packetType))
-                continue;
-
             // Respond to received packet.
-            if(packetType == getTypeIdentifier<PacketConnect>())
+            if(receivedPacket->is<PacketConnect>())
             {
-                // Prepare world for saving.
+                // Serialize game instance.
                 m_gameInstance->getWorld()->flushObjects();
 
-                // Serialize game instance.
                 PacketStateSnapshot packetStateSnapshot;
                 if(!serialize(packetStateSnapshot.serializedGameInstance, *m_gameInstance))
                     continue;
 
-                // Serialize packet data.
-                MemoryStream packetData;
-                if(!serialize(packetData, packetStateSnapshot))
-                    continue;
-
                 // Send serialized packet.
-                if(!clientEntry.socket->send(packetData, false))
+                if(!sendPacket(*clientEntry.socket, packetStateSnapshot, false))
                 {
                     LOG_ERROR("Failed to send state snapshot packet to client!");
                     continue;
                 }
             }
-            else if(packetType == getTypeIdentifier<PacketMessage>())
+            else if(receivedPacket->is<PacketMessage>())
             {
                 // Deserialize packet.
-                PacketMessage packetMessage;
-                if(!deserialize(receivedPacketData, &packetMessage))
-                    continue;
+                PacketMessage* packetMessage = receivedPacket->as<PacketMessage>();
+                ASSERT(packetMessage != nullptr);
 
-                LOG_INFO("Received message packet with \"%s\" text.", packetMessage.text.c_str());
+                LOG_INFO("Received message packet with \"%s\" text.", packetMessage->text.c_str());
 
                 // Send response packet.
                 {
                     PacketMessage packetMessage;
                     packetMessage.text = "Hello server!";
 
-                    MemoryStream packetData;
-                    if(serialize(packetData, packetMessage))
+                    if(!sendPacket(*clientEntry.socket, packetMessage, false))
                     {
-                        if(!clientEntry.socket->send(packetData, false))
-                        {
-                            LOG_ERROR("Failed to send message packet to client!");
-                            continue;
-                        }
+                        LOG_ERROR("Failed to send message packet to client!");
+                        continue;
                     }
                 }
             }

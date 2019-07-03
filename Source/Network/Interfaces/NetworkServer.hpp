@@ -23,9 +23,6 @@ public:
     bool isConnected() const override;
 
 private:
-    // Default connection socket.
-    ConnectionSocket m_socket;
-
     // List of clients.
     struct ClientEntry
     {

@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 #include "NetworkInterface.hpp"
+#include "Network/Connection/ConnectionSocket.hpp"
 
 // Global declarations.
 extern ConsoleVariable<bool> cv_showNetwork;
@@ -26,6 +27,17 @@ public:
     virtual void draw() override;
 
 protected:
+    // Serializes and sends packet.
+    bool sendPacket(ConnectionSocket& socket, PacketBase& packet, bool reliable, const sf::IpAddress* address = nullptr, const unsigned short* port = nullptr);
+
+    // Receives and deserializes packet.
+    bool receivePacket(ConnectionSocket& socket, std::unique_ptr<PacketBase>& packet, bool* reliable = nullptr, sf::IpAddress* address = nullptr, unsigned short* port = nullptr);
+
+protected:
+    // Connection socket.
+    // Every client and server has at least one main socket.
+    ConnectionSocket m_socket;
+
     // Game instance.
     GameInstance* m_gameInstance;
 };

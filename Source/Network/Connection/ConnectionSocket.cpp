@@ -94,7 +94,7 @@ bool ConnectionSocket::listen(unsigned short localPort)
     return true;
 }
 
-bool ConnectionSocket::send(const MemoryStream& packet, bool reliable, sf::IpAddress* address, unsigned short* port)
+bool ConnectionSocket::send(const MemoryStream& packet, bool reliable, const sf::IpAddress* address, const unsigned short* port)
 {
     ASSERT(m_initialized);
 

@@ -29,7 +29,7 @@ public:
 
     // Sends packet.
     // Reliable packet send should not have address and port arguments provided - remote address and port will be used.
-    bool send(const MemoryStream& packet, bool reliable, sf::IpAddress* address = nullptr, unsigned short* port = nullptr);
+    bool send(const MemoryStream& packet, bool reliable, const sf::IpAddress* address = nullptr, const unsigned short* port = nullptr);
     
     // Receives packet.
     // In all cases address and port will point at remote source of received packet.
