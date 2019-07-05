@@ -167,7 +167,11 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                 break;
 
             case sf::Socket::Disconnected:
-                LOG_ERROR("Could not receive from UDP socket due to socket disconnection!");
+                // This state is normal if target socket does not exist anymore.
+                // Reproducible by shutting down one side of a connection (e.g. server).
+                // No idea how socket knows that it disconnected.
+                LOG_WARNING("Could not receive from UDP socket due to socket disconnection!");
+                break;
 
             case sf::Socket::Error:
                 LOG_ERROR("Could not receive from UDP secket due to unknown error!");
