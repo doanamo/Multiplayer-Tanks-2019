@@ -13,19 +13,38 @@ public:
         ObjectEntry(int index = 0) :
             handle(index),
             object(nullptr),
-            created(false),
-            destroy(false)
+            created(false)
         {
         }
 
         Handle handle;
         Object* object;
         bool created;
-        bool destroy;
     };
 
     using ObjectList = std::vector<ObjectEntry>;
-    using FreeList = std::queue<std::size_t>;
+    using FreeList = std::queue<Handle::ValueType>;
+
+    // Objects command.
+    enum class ObjectCommandType
+    {
+        Invalid,
+        Create,
+        Destroy,
+    };
+
+    struct ObjectCommand
+    {
+        ObjectCommand() :
+            handle(), type(ObjectCommandType::Invalid)
+        {
+        }
+
+        Handle handle;
+        ObjectCommandType type;
+    };
+
+    using CommandList = std::queue<ObjectCommand>;
 
     // Object name registry.
     struct ObjectNameIndex
@@ -119,6 +138,10 @@ public:
     // Gets objects in world by group.
     std::vector<Object*> getObjectsByGroup(std::string group);
 
+    // Get total number of created objects.
+    // Adding new object will not immediately increase this counter.
+    uint32_t getObjectCount() const;
+
 private:
     // Gets object entry by handle.
     ObjectEntry* getEntryByHandle(Handle handle);
@@ -128,8 +151,12 @@ private:
     virtual bool onDeserialize(MemoryStream& buffer) override;
 
 private:
-    // List of objects currently in the world.
+    // List of commands.
+    CommandList m_commands;
+
+    // List of objects.
     ObjectList m_objects;
+    uint32_t m_objectCount;
     FreeList m_freeList;
 
     // Registry of objects.

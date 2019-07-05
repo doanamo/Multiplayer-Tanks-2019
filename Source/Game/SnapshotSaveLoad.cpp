@@ -107,8 +107,11 @@ bool SnapshotSaveLoad::load(MemoryStream& memoryStream)
     // Check if we have valid game instance reference.
     VERIFY(m_gameInstance);
 
+    // Verify that game instance is fresh.
+    // Here we do this by checking if world is empty.
+    VERIFY(m_gameInstance->getWorld()->getObjectCount() == 0, "World appears to have already been populated!");
+
     // Deserialize game instance from memory stream.
-    // TODO: Make sure that game instance can be written into.
     if(!deserialize(memoryStream, m_gameInstance))
     {
         LOG_ERROR("Could not deserialize game instance!");

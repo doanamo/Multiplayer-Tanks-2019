@@ -4,6 +4,7 @@
 #include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
+#include "Game/SnapshotSaveLoad.hpp"
 
 NetworkServer::NetworkServer()
 {
@@ -70,17 +71,19 @@ void NetworkServer::tick(float timeDelta)
     // Receive packets from connected clients.
     for(auto& clientEntry : m_clients)
     {
+        // Respond to received packet.
         while(receivePacket(*clientEntry.socket, receivedPacket, nullptr))
         {
-            // Respond to received packet.
             if(receivedPacket->is<PacketConnect>())
             {
-                // Serialize game instance.
-                m_gameInstance->getWorld()->flushObjects();
-
+                // Save game snapshot into packet memory stream.
                 PacketStateSnapshot packetStateSnapshot;
-                if(!serialize(packetStateSnapshot.serializedGameInstance, *m_gameInstance))
+                SnapshotSaveLoad snapshotSave(m_gameInstance);
+                if(!snapshotSave.save(packetStateSnapshot.serializedGameInstance))
+                {
+                    LOG_ERROR("Coult not save snapshot into packet memoty!");
                     continue;
+                }
 
                 // Send serialized packet.
                 if(!sendPacket(*clientEntry.socket, packetStateSnapshot, false))

@@ -2,6 +2,7 @@
 #include "NetworkClient.hpp"
 #include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
+#include "Game/SnapshotSaveLoad.hpp"
 
 NetworkClient::NetworkClient() :
     m_hearbeatTimer(0.0f)
@@ -47,11 +48,15 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
         if(receivedPacket == nullptr)
             continue;
 
-        // Deserialize game state save into game instance.
-        if(!deserialize(snapshotPacket->serializedGameInstance, m_gameInstance))
+        // Load snapshot from packet memory.
+        SnapshotSaveLoad snapshotLoad(m_gameInstance);
+        if(!snapshotLoad.load(snapshotPacket->serializedGameInstance))
+        {
+            LOG_ERROR("Could not load snapshot from packet memory!");
             continue;
+        }
 
-        // Break free.
+        // Break out of while loop.
         break;
     }
 
@@ -81,10 +86,9 @@ void NetworkClient::update(float timeDelta)
 
     while(receivePacket(m_socket, receivedPacket, nullptr, &senderAddress, &senderPort))
     {
-        PacketMessage* packetMessage = receivedPacket->as<PacketMessage>();
-
-        if(packetMessage)
+        if(receivedPacket->is<PacketMessage>())
         {
+            PacketMessage* packetMessage = receivedPacket->as<PacketMessage>();
             LOG_INFO("Received message packet with \"%s\" text.", packetMessage->text.c_str());
         }
     }

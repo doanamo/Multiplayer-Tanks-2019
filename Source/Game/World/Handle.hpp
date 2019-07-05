@@ -4,7 +4,9 @@
 
 struct Handle
 {
-    Handle(int identifier = -1) :
+    using ValueType = int;
+
+    Handle(ValueType identifier = 0) :
         identifier(identifier),
         version(0)
     {
@@ -20,6 +22,6 @@ struct Handle
         return identifier != other.identifier || version != other.version;
     }
 
-    int identifier;
-    int version;
+    ValueType identifier;
+    ValueType version;
 };

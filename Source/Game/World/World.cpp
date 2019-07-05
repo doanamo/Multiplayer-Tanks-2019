@@ -3,13 +3,15 @@
 
 ConsoleVariable<bool> cv_showWorldInfo("showWorldInfo", false);
 
-World::World()
+World::World() :
+    m_objectCount(0)
 {
 }
 
 World::~World()
 {
     // Delete all objects without calling on destroy methods.
+    // We do not care if objects die peacefully, if the entire world is being destroyed.
     for(ObjectEntry& objectEntry : m_objects)
     {
         if(objectEntry.object != nullptr)
@@ -26,60 +28,85 @@ bool World::initialize()
 
 void World::flushObjects()
 {
-    // Destroy objects marked for destruction.
+    // Iterate over list of commands.
+    // Additional commands can be added during processing of objects.
+    // For this reason we make copies of the list and process them until it is empty after all iterations.
+    int currentIteration = 0;
+
+    while(!m_commands.empty())
     {
-        std::size_t index = 0;
-        while(index < m_objects.size())
+        // Check iteration count.
+        ++currentIteration;
+
+        ASSERT(currentIteration <= 100, "Maximum iteration of object processing loop has been reached! Possible infinite loop detected.")
+
+        // Copy and empty command list.
+        CommandList commands;
+        commands.swap(m_commands);
+
+        // Iterate over list of copied commands.
+        while(!commands.empty())
         {
-            ObjectEntry& objectEntry = m_objects[index];
+            // Pop command from queue.
+            ObjectCommand& command = commands.front();
+            commands.pop();
 
-            if(objectEntry.destroy)
+            // Resolve object handle.
+            ObjectEntry* objectEntry = getEntryByHandle(command.handle);
+            if(objectEntry == nullptr)
+                continue;
+
+            // Check object state.
+            ASSERT(objectEntry->object != nullptr, "Object entry pointed by command has null object!");
+
+            // Process commands sequentially.
+            switch(command.type)
             {
-                ASSERT(objectEntry.object != nullptr, "Object entry marked for destruction does not have an object set!");
+            case ObjectCommandType::Invalid:
+                ASSERT(false, "Invalid command type!");
+                break;
 
-                // Call on destroy method.
-                objectEntry.object->onDestroy();
+            case ObjectCommandType::Create:
+                {
+                    // Increment number of objects.
+                    ++m_objectCount;
 
-                // Reset object name and group to remove them from registry.
-                this->setObjectName(objectEntry.handle, "");
-                this->setObjectGroup(objectEntry.handle, "");
+                    // Call on create method.
+                    objectEntry->object->onCreate();
 
-                // Invalidate object handle.
-                objectEntry.handle.version++;
+                    // Mark object as created.
+                    objectEntry->created = true;
+                }
+                break;
 
-                // Delete object from memory.
-                delete objectEntry.object;
-                objectEntry.object = nullptr;
+            case ObjectCommandType::Destroy:
+                {
+                    // Call on destroy method.
+                    objectEntry->object->onDestroy();
 
-                // Reset object entry state.
-                objectEntry.created = false;
-                objectEntry.destroy = false;
+                    // Decrement object count.
+                    --m_objectCount;
 
-                // Add entry index to free list.
-                m_freeList.push(index);
+                    // Reset object name and group to remove them from registry.
+                    this->setObjectName(objectEntry->handle, "");
+                    this->setObjectGroup(objectEntry->handle, "");
+
+                    // Invalidate object handle.
+                    objectEntry->handle.version++;
+
+                    // Delete object from memory.
+                    delete objectEntry->object;
+                    objectEntry->object = nullptr;
+
+                    // Reset object entry state.
+                    objectEntry->created = false;
+
+                    // Add entry index to free list.
+                    ASSERT(objectEntry->handle.identifier != 0);
+                    m_freeList.push(objectEntry->handle.identifier - 1);
+                }
+                break;
             }
-
-            index++;
-        }
-    }
-
-    // Mark objects added last frame as created.
-    {
-        std::size_t index = 0;
-        while(index < m_objects.size())
-        {
-            ObjectEntry& objectEntry = m_objects[index];
-
-            if(!objectEntry.created && objectEntry.object != nullptr)
-            {
-                // Mark object as created.
-                objectEntry.created = true;
-
-                // Call on create method.
-                objectEntry.object->onCreate();
-            }
-
-            index++;
         }
     }
 }
@@ -105,6 +132,7 @@ void World::update(float timeDelta)
 void World::tick(float timeDelta)
 {
     // Process objects waiting for creation and destruction.
+    // Do this in tick so object commands get processed once per frame.
     flushObjects();
 
     // Tick all objects.
@@ -177,7 +205,7 @@ void World::draw(float timeAlpha)
         // Draw ImGui window.
         if(ImGui::Begin("World Info", &cv_showWorldInfo.value))
         {
-            ImGui::Text("List of object entries (%i total):", m_objects.size());
+            ImGui::Text("List of object entries (%i total, %u active):", m_objects.size(), m_objectCount);
 
             int groupedEntityCount = 0;
 
@@ -243,9 +271,13 @@ Handle World::addObject(Object* object, std::string name, std::string group)
     // Create new object entry if free list is empty.
     if(m_freeList.empty())
     {
-        int handleIndex = (int)m_objects.size() + 1;
-        m_objects.emplace_back(handleIndex);
-        m_freeList.push(m_objects.size() - 1);
+        // Create object entry with new index.
+        Handle::ValueType newHandleIndex = (Handle::ValueType)(m_objects.size() + 1);
+        m_objects.emplace_back(newHandleIndex);
+
+        // Add new object entry to free list.
+        std::size_t currentObjectEntryCount = m_objects.size();
+        m_freeList.push((Handle::ValueType)(currentObjectEntryCount - 1));
     }
 
     // Get free object entry from free list queue.
@@ -254,7 +286,6 @@ Handle World::addObject(Object* object, std::string name, std::string group)
     m_freeList.pop();
 
     ASSERT(!objectEntry.created, "Free object entry should not be marked as already created!");
-    ASSERT(!objectEntry.destroy, "Free object entry should not be marked as pending destruction!");
 
     // Assign new object to entry.
     objectEntry.object = object;
@@ -269,23 +300,23 @@ Handle World::addObject(Object* object, std::string name, std::string group)
     this->setObjectName(objectEntry.handle, name);
     this->setObjectGroup(objectEntry.handle, group);
 
+    // Add command to create object.
+    ObjectCommand command;
+    command.type = ObjectCommandType::Create;
+    command.handle = objectEntry.handle;
+    m_commands.push(command);
+
     // Return object handle.
     return objectEntry.handle;
 }
 
 void World::destroyObject(Handle handle)
 {
-    // Make sure identifier is within objects array range and do nothing otherwise.
-    if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
-        return;
-
-    // Mark object entry for destruction.
-    ObjectEntry& objectEntry = m_objects[handle.identifier - 1];
-
-    if(handle.version == objectEntry.handle.version)
-    {
-        objectEntry.destroy = true;
-    }
+    // Add command to destroy object.
+    ObjectCommand command;
+    command.type = ObjectCommandType::Destroy;
+    command.handle = handle;
+    m_commands.push(command);
 }
 
 bool World::setObjectName(Handle handle, std::string name, bool force)
@@ -415,7 +446,7 @@ void World::setObjectGroup(Handle handle, std::string group)
 World::ObjectEntry* World::getEntryByHandle(Handle handle)
 {
     // Make sure identifier is within objects array range and return null otherwise.
-    if(handle.identifier <= 0 && handle.identifier > (int)m_objects.size())
+    if(handle.identifier <= 0 && handle.identifier > (Handle::ValueType)m_objects.size())
         return nullptr;
 
     // Make sure versions are matching.
@@ -481,27 +512,16 @@ std::vector<Object*> World::getObjectsByGroup(std::string group)
     return results;
 }
 
+uint32_t World::getObjectCount() const
+{
+    return m_objectCount;
+}
+
 bool World::onSerialize(MemoryStream& buffer) const
 {
     // Check if objects are in valid state for serialization.
     // Call flushObjects() before serialization to avoid failures.
-    for(const ObjectEntry& objectEntry : m_objects)
-    {
-        if(objectEntry.object != nullptr)
-        {
-            if(objectEntry.destroy == true)
-            {
-                LOG_ERROR("Could not serialize world due to pending object deletions!");
-                return false;
-            }
-
-            if(objectEntry.created != true)
-            {
-                LOG_ERROR("Could not serialize world due to pending object creations!");
-                return false;
-            }
-        }
-    }
+    ASSERT(m_commands.empty(), "Cannot serialize while command list is not empty!");
 
     // Function for checking if object is eligible for serialization.
     auto ShouldSerializeObject = [](const ObjectEntry& entry)
@@ -541,6 +561,7 @@ bool World::onSerialize(MemoryStream& buffer) const
 
 bool World::onDeserialize(MemoryStream& buffer)
 {
+    // Deserialize and add new objects,
     uint32_t objectCount;
     if(!deserialize(buffer, &objectCount))
         return false;
