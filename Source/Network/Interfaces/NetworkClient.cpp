@@ -26,22 +26,17 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
         return false;
     }
 
-    // Request game state snapshot.
+    // Send connection request to server.
+    PacketConnect connectPacket;
+    sendPacket(m_socket, connectPacket, true);
+
+    // Receive and process state snapshot.
     while(true)
     {
-        // Send connection request packet until we get a response.
+        // Wait until we receive packet.
         std::unique_ptr<PacketBase> receivedPacket;
-
-        do
-        {
-            // Send connection request to server.
-            PacketConnect connectPacket;
-            sendPacket(m_socket, connectPacket, false);
-
-            // Wait to avoid spamming.
-            sf::sleep(sf::milliseconds(100));
-        }
-        while(!receivePacket(m_socket, receivedPacket, nullptr));
+        if(!receivePacket(m_socket, receivedPacket))
+            continue;
 
         // Check if packet type matches expected type.
         PacketStateSnapshot* snapshotPacket = receivedPacket->as<PacketStateSnapshot>();
@@ -66,7 +61,7 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
 
 void NetworkClient::update(float timeDelta)
 {
-    // Send packets.
+    // Send periodical packet.
     m_hearbeatTimer = std::max(0.0f, m_hearbeatTimer - timeDelta);
 
     if(m_hearbeatTimer == 0.0f)
@@ -74,7 +69,7 @@ void NetworkClient::update(float timeDelta)
         PacketMessage packetMessage;
         packetMessage.text = "Hello server!";
 
-        sendPacket(m_socket, packetMessage, false);
+        sendPacket(m_socket, packetMessage, true);
 
         m_hearbeatTimer = 1.0f;
     }

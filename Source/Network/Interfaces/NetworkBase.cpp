@@ -78,6 +78,16 @@ bool NetworkBase::receivePacket(ConnectionSocket& socket, std::unique_ptr<Packet
     if(!socket.receive(packetData, reliable, address, port))
         return false;
 
+    // Deserialize packet.
+    if(!readPacket(packetData, packet))
+        return false;
+
+    // Success!
+    return true;
+}
+
+bool NetworkBase::readPacket(MemoryStream& packetData, std::unique_ptr<PacketBase>& packet)
+{
     // Deserialize packet type.
     TypeInfo::IdentifierType packetType = 0;
     if(!deserialize(packetData, &packetType))

@@ -45,20 +45,30 @@ public:
 
     // Pushes outgoing packet that will be processed for sending.
     bool pushOutgoing(const PacketEntry& packetEntry);
+    
+    // Peeks outgoing packet that will be processed next for sending.
+    bool peekOutgoing(PacketEntry& packetEntry);
 
     // Pops outgoing packet that will be processed for sending.
-    // For sole use of backend to add incoming packets.
-    bool popOutgoing(PacketEntry& packetEntry);
+    bool popOutgoing(PacketEntry* packetEntry = nullptr);
 
     // Pushes incoming packet that will be processed for receiving.
-    // For sole use of backend to add incoming packets.
     bool pushIncoming(const PacketEntry& packetEntry);
 
-    // Peeks incoming packet that will be processed for receiving.
-    bool peekIncoming(const PacketEntry** packetEntry);
+    // Peeks incoming packet that will be processed next for receiving.
+    bool peekIncoming(PacketEntry& packetEntry);
 
     // Pops incoming packet that will be processed for receiving.
-    bool popIncoming(PacketEntry& packetEntry);
+    bool popIncoming(PacketEntry* packetEntry = nullptr);
+    
+    // Pushes reliable packet to queue until it gets acknowledged.
+    bool pushReliable(const PacketEntry& packetEntry);
+
+    // Peeks reliable packet that is waiting next for acknowledgment.
+    bool peekReliable(PacketEntry& packetEntry);
+
+    // Pops reliable packet if it has already been acknowledged.
+    bool popReliable(PacketEntry* packetEntry = nullptr);
 
     // Checks if context supports reliability.
     bool supportsReliability() const;
@@ -70,17 +80,20 @@ private:
     // Instance mutex.
     std::mutex m_mutex;
 
+    // Outgoing and incoming packet queues.
+    std::queue<PacketEntry> m_outgoingQueue;
+    std::queue<PacketEntry> m_incomingQueue;
+
+    // Whether connection using this context supports reliability.
+    bool m_supportsReliability;
+
     // Current sequence indices.
     uint32_t m_sequenceIndex;
     uint32_t m_acknowledgmentIndex;
 
-    // Outgoing and incoming packet queues.
-    std::queue<PacketEntry> m_outgoingQueue;
-    std::queue<PacketEntry> m_incomingQueue;
+    // Reliable packets that need to be acknowledged.
+    std::queue<PacketEntry> m_reliableQueue;
     
-    // Whether connection using this context supports reliability.
-    bool m_supportsReliability;
-
     // Initialization state.
     bool m_initialized;
 };

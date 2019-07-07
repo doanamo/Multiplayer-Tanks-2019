@@ -132,7 +132,7 @@ bool ConnectionSocket::receive(MemoryStream& packet, bool* reliable, sf::IpAddre
 
     // Receive incoming packet.
     ConnectionContext::PacketEntry packetEntry;
-    if(!m_connectionContext.popIncoming(packetEntry))
+    if(!m_connectionContext.popIncoming(&packetEntry))
         return false;
 
     // Copy packet data and info.

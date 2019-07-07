@@ -33,6 +33,9 @@ protected:
     // Receives and deserializes packet.
     bool receivePacket(ConnectionSocket& socket, std::unique_ptr<PacketBase>& packet, bool* reliable = nullptr, sf::IpAddress* address = nullptr, unsigned short* port = nullptr);
 
+    // Deserializes packet from memory buffer.
+    bool readPacket(MemoryStream& packetData, std::unique_ptr<PacketBase>& packet);
+
 protected:
     // Connection socket.
     // Every client and server has at least one main socket.

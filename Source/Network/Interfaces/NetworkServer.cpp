@@ -37,27 +37,32 @@ void NetworkServer::update(float timeDelta)
 
 void NetworkServer::tick(float timeDelta)
 {
-    // Received packet data.
-    std::unique_ptr<PacketBase> receivedPacket;
-    sf::IpAddress remoteAddress;
-    unsigned short remotePort;
+    // Receive packet from default socket.
+    // This needs another solution, either simplify or creating ConnectionSwitch for handling connections.
+    ConnectionContext& socketContext = m_socket.getConnectionContext();
+    ConnectionContext::PacketEntry packetEntry;
 
-    // Receive connection packets.
-    while(receivePacket(m_socket, receivedPacket, nullptr, &remoteAddress, &remotePort))
+    while(socketContext.popIncoming(&packetEntry))
     {
+        // Read received packet.
+        std::unique_ptr<PacketBase> receivedPacket;
+        if(!readPacket(packetEntry.packet, receivedPacket))
+            continue;
+
         // Retrieve connect packet.
         PacketConnect* packetConnect = receivedPacket->as<PacketConnect>();
         if(packetConnect == nullptr)
             continue;
 
         // Check if we already have socket registered with remote address and port.
-        if(m_socket.getConnectionBackend()->hasSocketRegistered(remoteAddress, remotePort))
+        auto socketBackend = m_socket.getConnectionBackend();
+        if(socketBackend->hasSocketRegistered(packetEntry.address, packetEntry.port))
             continue;
 
         // Add new client connection list.
-        std::unique_ptr<ConnectionSocket> clientSocket = std::make_unique<ConnectionSocket>(m_socket.getConnectionBackend());
+        std::unique_ptr<ConnectionSocket> clientSocket = std::make_unique<ConnectionSocket>(socketBackend);
 
-        if(!clientSocket->connect(remoteAddress, remotePort))
+        if(!clientSocket->connect(packetEntry.address, packetEntry.port))
         {
             LOG_ERROR("Could not connect new client socket!");
             continue;
@@ -66,12 +71,20 @@ void NetworkServer::tick(float timeDelta)
         // Move socket to client list.
         ClientEntry& clientEntry = m_clients.emplace_back();
         clientEntry.socket = std::move(clientSocket);
+
+        // Reset received memory stream index (bit of a hack).
+        // Get lack received packet copy would be a good solution? Would waste some little memory.
+        packetEntry.packet.reset();
+        
+        // Push received packet to new socket.
+        clientEntry.socket->getConnectionContext().pushIncoming(packetEntry);
     }
 
     // Receive packets from connected clients.
     for(auto& clientEntry : m_clients)
     {
         // Respond to received packet.
+        std::unique_ptr<PacketBase> receivedPacket;
         while(receivePacket(*clientEntry.socket, receivedPacket, nullptr))
         {
             if(receivedPacket->is<PacketConnect>())
@@ -79,14 +92,15 @@ void NetworkServer::tick(float timeDelta)
                 // Save game snapshot into packet memory stream.
                 PacketStateSnapshot packetStateSnapshot;
                 SnapshotSaveLoad snapshotSave(m_gameInstance);
+
                 if(!snapshotSave.save(packetStateSnapshot.serializedGameInstance))
                 {
                     LOG_ERROR("Coult not save snapshot into packet memoty!");
                     continue;
                 }
 
-                // Send serialized packet.
-                if(!sendPacket(*clientEntry.socket, packetStateSnapshot, false))
+                // Send reliable snapshot packet.
+                if(!sendPacket(*clientEntry.socket, packetStateSnapshot, true))
                 {
                     LOG_ERROR("Failed to send state snapshot packet to client!");
                     continue;
@@ -105,7 +119,7 @@ void NetworkServer::tick(float timeDelta)
                     PacketMessage packetMessage;
                     packetMessage.text = "Hello server!";
 
-                    if(!sendPacket(*clientEntry.socket, packetMessage, false))
+                    if(!sendPacket(*clientEntry.socket, packetMessage, true))
                     {
                         LOG_ERROR("Failed to send message packet to client!");
                         continue;

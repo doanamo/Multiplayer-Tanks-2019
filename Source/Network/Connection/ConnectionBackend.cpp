@@ -5,12 +5,8 @@
 #include "Network/Packets/PacketHeader.hpp"
 
 ConnectionBackend::ConnectionBackend() :
-    m_workerThread(),
-    m_socketMutex(),
-    m_udpSocket(),
     m_localPort(0),
     m_defaultSocket(nullptr),
-    m_socketMap(),
     m_initialized(false)
 {
 }
@@ -222,21 +218,19 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                 if(it != backend->m_socketMap.end())
                 {
                     // Push incoming packet entry to connection socket.
-                    bool result = it->second->getConnectionContext().pushIncoming(packetEntry);
-                    ASSERT(result == true, "Pushing packet entry is expected to alawys succeed!");
+                    // Push does not have to succeed if reliable packet was duplicated during transport.
+                    it->second->getConnectionContext().pushIncoming(packetEntry);
                 }
                 else
                 {
                     // Push incoming packet to default connection socket.
-                    // Only unreliable packets can be returned back to default socket.
+                    // Only unreliable packets can be redirected to default socket.
                     if(backend->m_defaultSocket)
                     {
-                        // Reliable packets have no use in default socket and should be dropped.
-                        if(packetEntry.transportMethod != (uint32_t)ConnectionContext::TransformMethod::Reliable)
-                        {
-                            bool result = backend->m_defaultSocket->getConnectionContext().pushIncoming(packetEntry);
-                            ASSERT(result == true, "Pushing packet entry is expected to alawys succeed!");
-                        }
+                        // Reliable packets can be stored in default socket, but should
+                        // be pushed to new connection socket in order for reliability to work.
+                        bool result = backend->m_defaultSocket->getConnectionContext().pushIncoming(packetEntry);
+                        ASSERT(result == true, "Pushing reliable packet to unreliable socket should succeed!");
                     }
                 }
             }
@@ -259,7 +253,7 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                     ConnectionSocket* socket = backend->m_defaultSocket;
                     ConnectionContext::PacketEntry packetEntry;
 
-                    while(socket->getConnectionContext().popOutgoing(packetEntry))
+                    while(socket->getConnectionContext().popOutgoing(&packetEntry))
                     {
                         outgoingPackets.push(packetEntry);
                     }
@@ -270,11 +264,31 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                 {
                     // Pop outgoing packet and save it.
                     ConnectionSocket* socket = socketEntry.second;
+                    ConnectionContext& context = socket->getConnectionContext();
                     ConnectionContext::PacketEntry packetEntry;
 
-                    while(socket->getConnectionContext().popOutgoing(packetEntry))
+                    // Clear reliable queue from acknowledged packets.
+                    while(context.popReliable())
+                    {
+                    }
+
+                    // Resend one reliable packet that has not been acknowledged yet.
+                    if(context.peekReliable(packetEntry))
                     {
                         outgoingPackets.push(packetEntry);
+                    }
+
+                    // Collect packets that need to be sent.
+                    while(context.popOutgoing(&packetEntry))
+                    {
+                        // Add packet to be sent out.
+                        outgoingPackets.push(packetEntry);
+
+                        // Add packet to reliable queue if it is reliable packet.
+                        if(packetEntry.transportMethod == (uint32_t)ConnectionContext::TransformMethod::Reliable)
+                        {
+                            context.pushReliable(packetEntry);
+                        }
                     }
                 }
             }
