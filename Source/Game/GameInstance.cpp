@@ -54,20 +54,28 @@ bool GameInstance::initialize(const NetworkParams& networkParams)
     }
     if(networkParams.mode == NetworkMode::Server)
     {
+        // Change window title.
+        g_window->setTitle(g_window->getInitialTitle() + " - Server");
+
+        // Change logger name.
+        g_logger->setName("Server");
+
         // Create server network interface.
         auto networkServer = std::make_unique<NetworkServer>();
-
         if(!networkServer->initialize(this, networkParams.port))
             return false;
 
         // Set network interface.
         m_network = std::move(networkServer);
-
-        // Change window title.
-        g_window->setTitle(g_window->getInitialTitle() + " - Server");
     }
     else if(networkParams.mode == NetworkMode::Client)
     {
+        // Change window title.
+        g_window->setTitle(g_window->getInitialTitle() + " - Client");
+
+        // Change logger name.
+        g_logger->setName("Client");
+
         // Create client network interface.
         auto networkClient = std::make_unique<NetworkClient>();
         if(!networkClient->initialize(this, sf::IpAddress(networkParams.address), networkParams.port))
@@ -75,9 +83,6 @@ bool GameInstance::initialize(const NetworkParams& networkParams)
 
         // Set network interface.
         m_network = std::move(networkClient);
-
-        // Change window title.
-        g_window->setTitle(g_window->getInitialTitle() + " - Client");
     }
 
     // Success!

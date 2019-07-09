@@ -23,6 +23,14 @@ bool Logger::initialize()
     return true;
 }
 
+void Logger::setName(const char* name)
+{
+    std::scoped_lock<std::mutex> lock(m_mutex);
+
+    // Set logger name.
+    m_name = name;
+}
+
 void Logger::setNextIndent(int indent)
 {
     // Lock logger mutex.
@@ -87,6 +95,12 @@ void Logger::write(LogType type, const char* format, ...)
 
     default:
         ASSERT(false, "Unknown log type!");
+    }
+
+    // Print logger name.
+    if(!m_name.empty())
+    {
+        stream << "[" << m_name << "]";
     }
 
     // Print current indent.

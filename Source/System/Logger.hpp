@@ -29,6 +29,7 @@ public:
     ~Logger();
 
     bool initialize();
+    void setName(const char* name);
     void setNextIndent(int indent);
     void write(LogType type, const char* format, ...);
     const MessageList& getMessages() const;
@@ -40,6 +41,9 @@ private:
     // Message history.
     const int MaxMessageCount = 1000;
     MessageList m_messages;
+
+    // Logger name.
+    std::string m_name;
 
     // Message indent.
     int m_nextIndent;
