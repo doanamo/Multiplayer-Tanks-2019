@@ -64,14 +64,18 @@ public:
     // Pushes reliable packet to queue until it gets acknowledged.
     bool pushReliable(const PacketEntry& packetEntry);
 
-    // Peeks reliable packet that is waiting next for acknowledgment.
-    bool peekReliable(PacketEntry& packetEntry);
+    // Copies all reliable packet that are waiting next for acknowledgment.
+    void copyUnacknowledged(std::queue<PacketEntry>& packetQueue);
 
-    // Pops reliable packet if it has already been acknowledged.
-    bool popReliable(PacketEntry* packetEntry = nullptr);
+    // Pops all reliable packet if it has already been acknowledged.
+    void popAcknowledged();
 
     // Checks if context supports reliability.
     bool supportsReliability() const;
+
+private:
+    // Lock less versions of public methods.
+    bool pushReliable_NoLock(const PacketEntry& packetEntry);
 
 private:
     // Connection socket.
@@ -92,7 +96,8 @@ private:
     uint32_t m_acknowledgmentIndex;
 
     // Reliable packets that need to be acknowledged.
-    std::queue<PacketEntry> m_reliableQueue;
+    // This queue should always be sorted by itself (new sequences are always added last).
+    std::deque<PacketEntry> m_reliableQueue;
     
     // Initialization state.
     bool m_initialized;

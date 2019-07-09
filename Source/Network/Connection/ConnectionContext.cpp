@@ -55,10 +55,9 @@ bool ConnectionContext::pushOutgoing(const PacketEntry& packetEntry)
     // Add outgoing packet to queue.
     PacketEntry& addedEntry = m_outgoingQueue.emplace(packetEntry);
 
-    // Fill packet sequence and acknowledgment indices.
+    // Fill packet sequence.
     addedEntry.sequenceIndex = ++m_sequenceIndex;
-    addedEntry.acknowledgmentIndex = m_acknowledgmentIndex;
-
+    
     // Packet has been added successfully to queue.
     return true;
 }
@@ -86,10 +85,22 @@ bool ConnectionContext::popOutgoing(PacketEntry* packetEntry)
     if(m_outgoingQueue.empty())
         return false;
 
-    // Copy packet data.
+    // Get next outgoing packet.
+    PacketEntry& outgoingPacket = m_outgoingQueue.front();
+
+    // Update with current acknowledgment index.
+    outgoingPacket.acknowledgmentIndex = m_acknowledgmentIndex;
+
+    // Copy packet entry.
     if(packetEntry != nullptr)
     {
-        *packetEntry = m_outgoingQueue.front();
+        *packetEntry = outgoingPacket;
+    }
+
+    // Add packet to reliable queue if it is a reliable packet.
+    if(outgoingPacket.transportMethod == (uint32_t)ConnectionContext::TransformMethod::Reliable)
+    {
+        this->pushReliable_NoLock(outgoingPacket);
     }
 
     // Pop read packet.
@@ -116,10 +127,10 @@ bool ConnectionContext::pushIncoming(const PacketEntry& packetEntry)
             if(packetEntry.sequenceIndex <= m_acknowledgmentIndex)
                 return false;
         }
-    }
 
-    // Increment acknowledgment index.
-    m_acknowledgmentIndex = std::max(m_acknowledgmentIndex, packetEntry.acknowledgmentIndex);
+        // Increment acknowledgment index.
+        m_acknowledgmentIndex = std::max(m_acknowledgmentIndex, packetEntry.sequenceIndex);
+    }
 
     // Add packet to incoming queue.
     m_incomingQueue.push(packetEntry);
@@ -168,38 +179,44 @@ bool ConnectionContext::pushReliable(const PacketEntry& packetEntry)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
+    // Call lock less version of the method.
+    return this->pushReliable_NoLock(packetEntry);
+}
+
+bool ConnectionContext::pushReliable_NoLock(const PacketEntry& packetEntry)
+{
     // Check if reliability is supported.
     ASSERT(m_supportsReliability, "Socket does not support reliability!");
 
-    // Verify packet entry.
+    // Check if packet entry is reliable.
     ASSERT(packetEntry.transportMethod == (uint32_t)TransformMethod::Reliable, "Packet entry must be reliable!");
 
     // Add reliable packet to queue.
-    PacketEntry& addedEntry = m_reliableQueue.emplace(packetEntry);
+    m_reliableQueue.emplace_back(packetEntry);
 
     // Packet has been added successfully to queue.
     return true;
 }
 
-bool ConnectionContext::peekReliable(PacketEntry& packetEntry)
+void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
 {
     std::lock_guard<std::mutex> lock(m_mutex);
 
     // Check if reliability is supported.
     ASSERT(m_supportsReliability, "Socket does not support reliability!");
 
-    // Check if reliable queue is empty.
-    if(m_reliableQueue.empty())
-        return false;
+    // Copy unacknowledged packets to provided queue.
+    for(auto& packetEntry : m_reliableQueue)
+    {
+        // Update acknowledgment index.
+        packetEntry.acknowledgmentIndex = m_acknowledgmentIndex;
 
-    // Retrieve packet from reliable queue.
-    packetEntry = m_reliableQueue.front();
-
-    // Packet has been successfully read.
-    return true;
+        // Push copy to provided queue.
+        packetQueue.push(m_reliableQueue.front());
+    }
 }
 
-bool ConnectionContext::popReliable(PacketEntry* packetEntry)
+void ConnectionContext::popAcknowledged()
 {
     std::lock_guard<std::mutex> lock(m_mutex);
     
@@ -207,29 +224,22 @@ bool ConnectionContext::popReliable(PacketEntry* packetEntry)
     ASSERT(m_supportsReliability, "Socket does not support reliability!");
 
     // Check if reliable queue is empty.
-    if(m_reliableQueue.empty())
-        return false;
-
-    // Check if packet has already been acknowledged.
-    PacketEntry& reliableEntry = m_reliableQueue.front();
-
-    if(reliableEntry.sequenceIndex > m_acknowledgmentIndex)
+    // This should be always empty for sockets that do not support reliability.
+    while(!m_reliableQueue.empty())
     {
-        // Packet has not been acknowledged yet.
-        return false;
+        // Check if packet has already been acknowledged.
+        PacketEntry& reliableEntry = m_reliableQueue.front();
+
+        if(reliableEntry.sequenceIndex > m_acknowledgmentIndex)
+        {
+            // Packet has not been acknowledged yet.
+            // Remaining packets are not acknowledged either.
+            return;
+        }
+
+        // Pop acknowledged packet from queue.
+        m_reliableQueue.pop_front();
     }
-
-    // Copy packet data.
-    if(packetEntry != nullptr)
-    {
-        *packetEntry = reliableEntry;
-    }
-
-    // Pop acknowledged packet from queue.
-    m_reliableQueue.pop();
-
-    // Acknowledged packet has been popped.
-    return true;
 }
 
 bool ConnectionContext::supportsReliability() const

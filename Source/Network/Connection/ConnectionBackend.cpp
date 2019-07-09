@@ -251,9 +251,10 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                 {
                     // Pop outgoing packet and save it.
                     ConnectionSocket* socket = backend->m_defaultSocket;
+                    ConnectionContext& context = socket->getConnectionContext();
                     ConnectionContext::PacketEntry packetEntry;
 
-                    while(socket->getConnectionContext().popOutgoing(&packetEntry))
+                    while(context.popOutgoing(&packetEntry))
                     {
                         outgoingPackets.push(packetEntry);
                     }
@@ -268,27 +269,16 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                     ConnectionContext::PacketEntry packetEntry;
 
                     // Clear reliable queue from acknowledged packets.
-                    while(context.popReliable())
-                    {
-                    }
+                    context.popAcknowledged();
 
-                    // Resend one reliable packet that has not been acknowledged yet.
-                    if(context.peekReliable(packetEntry))
-                    {
-                        outgoingPackets.push(packetEntry);
-                    }
+                    // Copy still unacknowledged packets before new unreliable/reliable packets.
+                    context.copyUnacknowledged(outgoingPackets);
 
                     // Collect packets that need to be sent.
                     while(context.popOutgoing(&packetEntry))
                     {
                         // Add packet to be sent out.
                         outgoingPackets.push(packetEntry);
-
-                        // Add packet to reliable queue if it is reliable packet.
-                        if(packetEntry.transportMethod == (uint32_t)ConnectionContext::TransformMethod::Reliable)
-                        {
-                            context.pushReliable(packetEntry);
-                        }
                     }
                 }
             }
