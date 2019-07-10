@@ -174,9 +174,12 @@ bool MemoryStream::onDeserialize(MemoryStream& buffer)
     if(!deserialize(buffer, &bufferSize))
         return false;
 
-    m_buffer.resize(bufferSize);
-    if(!buffer.readData(m_buffer.data(), m_buffer.size()))
-        return false;
+    if(bufferSize != 0)
+    {
+        m_buffer.resize(bufferSize);
+        if(!buffer.readData(m_buffer.data(), m_buffer.size()))
+            return false;
+    }
 
     return true;
 }
@@ -193,5 +196,8 @@ const char* MemoryStream::data() const
 
 char* MemoryStream::data()
 {
+    if(m_buffer.empty())
+        return nullptr;
+
     return &m_buffer[0];
 }
