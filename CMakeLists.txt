@@ -56,6 +56,8 @@ set(SOURCE_FILES
     "Source/Network/Interfaces/NetworkServer.cpp"
     "Source/Network/Interfaces/NetworkClient.hpp"
     "Source/Network/Interfaces/NetworkClient.cpp"
+    "Source/Network/Replication/Replication.hpp"
+    "Source/Network/Replication/Replication.cpp"
     "Source/Network/Packets/Protocol.hpp"
     "Source/Network/Packets/Protocol.cpp"
     "Source/Network/Packets/PacketHeader.hpp"
