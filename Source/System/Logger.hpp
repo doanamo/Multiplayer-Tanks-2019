@@ -32,7 +32,7 @@ public:
     void setName(const char* name);
     void setNextIndent(int indent);
     void write(LogType type, const char* format, ...);
-    const MessageList& getMessages() const;
+    const MessageList& getMessages();
 
 private:
     // Logger mutex.

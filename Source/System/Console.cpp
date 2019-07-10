@@ -206,8 +206,11 @@ void Console::display()
         // Console message history.
         if(ImGui::BeginChild("ConsoleMessages", ImVec2(0.0f, windowSize.y - 40.0f)))
         {
-            const auto& messages = g_logger->getMessages();
+            // Make copy of message buffer to avoid race conditions.
+            // This will be very slow if there is a lot of messages.
+            const auto messages = g_logger->getMessages();
 
+            // Print all messages.
             for(const auto& message : messages)
             {
                 switch(message.type)

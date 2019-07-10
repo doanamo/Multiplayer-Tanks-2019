@@ -137,7 +137,9 @@ void Logger::write(LogType type, const char* format, ...)
     m_messages.emplace_back(std::move(message));
 }
 
-const Logger::MessageList& Logger::getMessages() const
+const Logger::MessageList& Logger::getMessages()
 {
+    std::scoped_lock<std::mutex> lock(m_mutex);
+
     return m_messages;
 }
