@@ -7,9 +7,10 @@ static const std::size_t MagicSize = staticArraySize(MagicValue);
 PacketHeader::PacketHeader() :
     checksum(0),
     sequenceIndex(0),
+    previousReliableIndex(0),
     acknowledgmentIndex(0),
-    transformMethod(0),
-    transformExtra(0)
+    transportMethod(0),
+    transportExtra(0)
 {
 }
 
@@ -21,9 +22,10 @@ uint32_t PacketHeader::calculateChecksum(const char* data, std::size_t size) con
 {
     uint32_t crc = 0;
     crc = calculateCRC32(crc, (const char*)&sequenceIndex, sizeof(sequenceIndex));
+    crc = calculateCRC32(crc, (const char*)&previousReliableIndex, sizeof(previousReliableIndex));
     crc = calculateCRC32(crc, (const char*)&acknowledgmentIndex, sizeof(acknowledgmentIndex));
-    crc = calculateCRC32(crc, (const char*)&transformMethod, sizeof(transformMethod));
-    crc = calculateCRC32(crc, (const char*)&transformExtra, sizeof(transformExtra));
+    crc = calculateCRC32(crc, (const char*)&transportMethod, sizeof(transportMethod));
+    crc = calculateCRC32(crc, (const char*)&transportExtra, sizeof(transportExtra));
     crc = calculateCRC32(crc, data, size);
     return crc;
 }
@@ -42,13 +44,16 @@ bool PacketHeader::onSerialize(MemoryStream& buffer) const
     if(!serialize(buffer, sequenceIndex))
         return false;
 
+    if(!serialize(buffer, previousReliableIndex))
+        return false;
+
     if(!serialize(buffer, acknowledgmentIndex))
         return false;
 
-    if(!serialize(buffer, transformMethod))
+    if(!serialize(buffer, transportMethod))
         return false;
 
-    if(!serialize(buffer, transformExtra))
+    if(!serialize(buffer, transportExtra))
         return false;
 
 
@@ -76,13 +81,16 @@ bool PacketHeader::onDeserialize(MemoryStream& buffer)
     if(!deserialize(buffer, &sequenceIndex))
         return false;
 
+    if(!deserialize(buffer, &previousReliableIndex))
+        return false;
+
     if(!deserialize(buffer, &acknowledgmentIndex))
         return false;
 
-    if(!deserialize(buffer, &transformMethod))
+    if(!deserialize(buffer, &transportMethod))
         return false;
 
-    if(!deserialize(buffer, &transformExtra))
+    if(!deserialize(buffer, &transportExtra))
         return false;
 
     return true;

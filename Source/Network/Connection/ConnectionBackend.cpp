@@ -127,6 +127,13 @@ bool ConnectionBackend::hasSocketRegistered(const sf::IpAddress& address, unsign
     return m_socketMap.find(std::make_pair(address, port)) != m_socketMap.end();
 }
 
+ConnectionSocket* ConnectionBackend::getDefaultListenSocket() const
+{
+    ASSERT(m_initialized);
+
+    return m_defaultSocket;
+}
+
 void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
 {
     ASSERT(backend);
@@ -138,6 +145,9 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
     {
         // Get start time of this iteration.
         auto startTime = std::chrono::steady_clock::now();
+
+        // Count number of collected packets.
+        uint32_t receivedPacketCount = 0;
 
         // Receive packets from UDP socket and redirect as incoming packets to connection sockets.
         while(true)
@@ -181,17 +191,11 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
             datagramBuffer.resize(bytesReceived);
 
             // Deserialize packet header.
-            PacketHeader packetHeader;
-            if(!deserialize(datagramBuffer, &packetHeader))
+            if(!deserialize(datagramBuffer, &packetEntry.header))
             {
                 LOG_WARNING("Could not deserialize packet header! Possible packet corruption.");
                 continue;
             }
-
-            packetEntry.sequenceIndex = packetHeader.sequenceIndex;
-            packetEntry.acknowledgmentIndex = packetHeader.acknowledgmentIndex;
-            packetEntry.transportMethod = packetHeader.transformMethod;
-            packetEntry.transportExtra = packetHeader.transformExtra;
 
             // Deserialize packet data.
             if(!deserialize(datagramBuffer, &packetEntry.packet))
@@ -201,7 +205,7 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
             }
 
             // Check CRC checksum.
-            if(packetHeader.checksum != packetHeader.calculateChecksum(packetEntry.packet.data(), packetEntry.packet.size()))
+            if(packetEntry.header.checksum != packetEntry.header.calculateChecksum(packetEntry.packet.data(), packetEntry.packet.size()))
             {
                 LOG_WARNING("Invalid packet checksum detected! Dropping corrupted packet.");
                 continue;
@@ -229,11 +233,18 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                     {
                         // Reliable packets can be stored in default socket, but should
                         // be pushed to new connection socket in order for reliability to work.
-                        bool result = backend->m_defaultSocket->getConnectionContext().pushIncoming(packetEntry);
-                        ASSERT(result == true, "Pushing reliable packet to unreliable socket should succeed!");
+                        backend->m_defaultSocket->getConnectionContext().pushIncoming(packetEntry);
                     }
                 }
+
+                // Increment received packet count.
+                receivedPacketCount++;
             }
+        }
+
+        if(receivedPacketCount != 0)
+        {
+            LOG_TRACE("Received incoming packets. (%u packets)", receivedPacketCount);
         }
 
         // Send outgoing packets from connections sockets via UDP socket.
@@ -286,24 +297,19 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
             // Send collected outgoing packets.
             while(!outgoingPackets.empty())
             {
+                LOG_TRACE("Sending outgoing packets. (%u packets)", outgoingPackets.size());
+
                 // Extract packet entry from queue.
-                const ConnectionContext::PacketEntry packetEntry = outgoingPackets.front();
+                ConnectionContext::PacketEntry packetEntry = outgoingPackets.front();
                 outgoingPackets.pop();
 
-                // Prepare packet header.
-                PacketHeader packetHeader;
-                packetHeader.sequenceIndex = packetEntry.sequenceIndex;
-                packetHeader.acknowledgmentIndex = packetEntry.acknowledgmentIndex;
-                packetHeader.transformMethod = packetEntry.transportMethod;
-                packetHeader.transformExtra = packetEntry.transportExtra;
-
                 // Calculate packet CRC checksum.
-                packetHeader.checksum = packetHeader.calculateChecksum(packetEntry.packet.data(), packetEntry.packet.size());
+                packetEntry.header.checksum = packetEntry.header.calculateChecksum(packetEntry.packet.data(), packetEntry.packet.size());
 
                 // Serialize packet header and data.
                 MemoryStream datagramBuffer;
 
-                if(!serialize(datagramBuffer, packetHeader))
+                if(!serialize(datagramBuffer, packetEntry.header))
                 {
                     LOG_ERROR("Could not serialize packet header!");
                     continue;

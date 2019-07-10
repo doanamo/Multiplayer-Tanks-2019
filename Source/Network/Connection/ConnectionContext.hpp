@@ -1,6 +1,7 @@
 #pragma once
 
 #include "Precompiled.hpp"
+#include "Network/Packets/PacketHeader.hpp"
 
 // Forward declarations.
 class ConnectionSocket;
@@ -27,14 +28,26 @@ public:
         unsigned short port;
 
         // Packet header.
-        uint32_t sequenceIndex;
-        uint32_t acknowledgmentIndex;
-        uint32_t transportMethod;
-        uint32_t transportExtra;
+        PacketHeader header;
 
         // Packet data.
         MemoryStream packet;
     };
+
+    // Outgoing packet priority queue.
+    using OutgoingQueue = std::queue<PacketEntry>;
+
+    // Incoming packet priority queue.
+    struct IncomingPacketCompare
+    {
+        bool operator()(const PacketEntry& left, const PacketEntry& right) const
+        {
+            // Make lower sequence indices appear at the top of queue.
+            return left.header.sequenceIndex > right.header.sequenceIndex;
+        }
+    };
+
+    using IncomingQueue = std::priority_queue<PacketEntry, std::deque<PacketEntry>, IncomingPacketCompare>;
 
 public:
     ConnectionContext(ConnectionSocket* connectionSocket);
@@ -46,17 +59,11 @@ public:
     // Pushes outgoing packet that will be processed for sending.
     bool pushOutgoing(const PacketEntry& packetEntry);
     
-    // Peeks outgoing packet that will be processed next for sending.
-    bool peekOutgoing(PacketEntry& packetEntry);
-
     // Pops outgoing packet that will be processed for sending.
     bool popOutgoing(PacketEntry* packetEntry = nullptr);
 
     // Pushes incoming packet that will be processed for receiving.
     bool pushIncoming(const PacketEntry& packetEntry);
-
-    // Peeks incoming packet that will be processed next for receiving.
-    bool peekIncoming(PacketEntry& packetEntry);
 
     // Pops incoming packet that will be processed for receiving.
     bool popIncoming(PacketEntry* packetEntry = nullptr);
@@ -75,6 +82,7 @@ public:
 
 private:
     // Lock less versions of public methods.
+    bool pushOutgoing_NoLock(const PacketEntry& packetEntry);
     bool pushReliable_NoLock(const PacketEntry& packetEntry);
 
 private:
@@ -85,20 +93,43 @@ private:
     std::mutex m_mutex;
 
     // Outgoing and incoming packet queues.
-    std::queue<PacketEntry> m_outgoingQueue;
-    std::queue<PacketEntry> m_incomingQueue;
+    OutgoingQueue m_outgoingQueue;
+    IncomingQueue m_incomingQueue;
 
-    // Whether connection using this context supports reliability.
-    bool m_supportsReliability;
-
-    // Current sequence indices.
-    uint32_t m_sequenceIndex;
-    uint32_t m_acknowledgmentIndex;
-
-    // Reliable packets that need to be acknowledged.
-    // This queue should always be sorted by itself (new sequences are always added last).
+    // List of reliable packet that still need to be acknowledged.
     std::deque<PacketEntry> m_reliableQueue;
     
+    // Last outgoing sequence index.
+    // Incremented with each new outgoing packet.
+    uint32_t m_outgoingSequenceIndex;
+
+    // Last incoming sequence index.
+    // Most recent sequence index that was received from remote.
+    uint32_t m_incomingSequenceIndex;
+    
+    // Last outgoing sequence index.
+    // Most recent reliable index that was sent to remote.
+    uint32_t m_outgoingReliableIndex;
+
+    // Last incoming reliable index.
+    // Most recent reliable index that was received from remote.
+    // Both immediate and deferred values represent the same thing.
+    // Difference between both is that they are updated and used at different times.
+    // Immediate is used when packet is received to immediately respond with acknowledgment if possible.
+    // Deferred is used after incoming queue is filled to verify integrity of reliable sequence in more robust way.
+    uint32_t m_immediateIncomingReliableIndex;
+    uint32_t m_deferredIncomingReliableIndex;
+
+    // Last acknowledgment index returned from remote.
+    // Acknowledgment index must include all past reliable indices, but not necessarily all unreliable.
+    uint32_t m_acknowledgmentIndex;
+
+    // Whether acknowledgment for remote should be sent.
+    bool m_sendAcknowledgment;
+
+    // Whether context supports reliability.
+    bool m_supportsReliability;
+
     // Initialization state.
     bool m_initialized;
 };

@@ -26,12 +26,15 @@ public:
     // Packet sequence index.
     uint32_t sequenceIndex;
 
+    // Packet previous reliable index.
+    uint32_t previousReliableIndex;
+
     // Packet acknowledgment index.
     uint32_t acknowledgmentIndex;
 
-    // Packet transform method.
-    uint32_t transformMethod;
+    // Packet transport method.
+    uint32_t transportMethod;
 
-    // Extra field used for specified transform method.
-    uint32_t transformExtra;
+    // Extra field used for specified transport method.
+    uint32_t transportExtra;
 };

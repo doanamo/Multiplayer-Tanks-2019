@@ -104,11 +104,11 @@ bool ConnectionSocket::send(const MemoryStream& packet, bool reliable, const sf:
 
     if(reliable)
     {
-        packetEntry.transportMethod = (uint32_t)ConnectionContext::TransformMethod::Reliable;
+        packetEntry.header.transportMethod = (uint32_t)ConnectionContext::TransformMethod::Reliable;
     }
     else
     {
-        packetEntry.transportMethod = (uint32_t)ConnectionContext::TransformMethod::Unreliable;
+        packetEntry.header.transportMethod = (uint32_t)ConnectionContext::TransformMethod::Unreliable;
     }
 
     if(!reliable && address && port)
@@ -140,7 +140,7 @@ bool ConnectionSocket::receive(MemoryStream& packet, bool* reliable, sf::IpAddre
 
     if(reliable)
     {
-        *reliable = (packetEntry.transportMethod == (uint32_t)ConnectionContext::TransformMethod::Reliable);
+        *reliable = (packetEntry.header.transportMethod == (uint32_t)ConnectionContext::TransformMethod::Reliable);
     }
 
     if(address)

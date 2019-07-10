@@ -117,7 +117,7 @@ void NetworkServer::tick(float timeDelta)
                 // Send response packet.
                 {
                     PacketMessage packetMessage;
-                    packetMessage.text = "Hello server!";
+                    packetMessage.text = "Hello client!";
 
                     if(!sendPacket(*clientEntry.socket, packetMessage, true))
                     {

@@ -29,6 +29,9 @@ public:
     // Checks if there is socket with specified remote address and port registered.
     bool hasSocketRegistered(const sf::IpAddress& address, unsigned short port);
 
+    // Gets default listen socket.
+    ConnectionSocket* getDefaultListenSocket() const;
+
     // Gets listen port.
     unsigned short getLocalPort() const;
 
