@@ -60,7 +60,7 @@ World* Object::getWorld() const
     return m_world;
 }
 
-Handle Object::getHandle() const
+ObjectHandle Object::getHandle() const
 {
     // Calling this before being added to a world does not make sense.
     ASSERT(m_world != nullptr, "Attempting to get handle to an object that does not belong to a world!");

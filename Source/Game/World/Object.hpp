@@ -1,12 +1,32 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Handle.hpp"
 #include "Transform.hpp"
 #include "System/Globals.hpp"
+#include "Common/HandleMap.hpp"
 
+// Forward declarations.
+class Object;
 class World;
 
+// Object entry handle type declaration.
+struct ObjectEntry
+{
+    using ObjectPtr = std::unique_ptr<Object>;
+
+    ObjectEntry() :
+        object(nullptr),
+        created(false)
+    {
+    }
+
+    ObjectPtr object;
+    bool created;
+};
+
+using ObjectHandle = Handle<ObjectEntry>;
+
+// Object class.
 class Object : public Serializable
 {
     TYPE_DECLARE(Object);
@@ -40,7 +60,7 @@ public:
     World* getWorld() const;
 
     // Gets handle to this object.
-    Handle getHandle() const;
+    ObjectHandle getHandle() const;
 
     // Gets object's unique name.
     const std::string& getName() const;
@@ -61,7 +81,7 @@ private:
     World* m_world;
 
     // Handle to self.
-    Handle m_handle;
+    ObjectHandle m_handle;
 
     // Unique name.
     std::string m_name;

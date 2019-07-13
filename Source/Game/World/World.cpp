@@ -10,15 +10,6 @@ World::World() :
 
 World::~World()
 {
-    // Delete all objects without calling on destroy methods.
-    // We do not care if objects die peacefully, if the entire world is being destroyed.
-    for(ObjectEntry& objectEntry : m_objects)
-    {
-        if(objectEntry.object != nullptr)
-        {
-            delete objectEntry.object;
-        }
-    }
 }
 
 bool World::initialize()
@@ -38,7 +29,7 @@ void World::flushObjects()
         // Check iteration count.
         ++currentIteration;
 
-        ASSERT(currentIteration <= 100, "Maximum iteration of object processing loop has been reached! Possible infinite loop detected.")
+        ASSERT(currentIteration <= 100, "Infinite loop detected! Maximum iteration of object processing loop has been reached!")
 
         // Copy and empty command list.
         CommandList commands;
@@ -58,6 +49,7 @@ void World::flushObjects()
 
             // Check object state.
             ASSERT(objectEntry->object != nullptr, "Object entry pointed by command has null object!");
+            ASSERT(objectEntry->object->getHandle() == command.handle, "Object handle mismatch!");
 
             // Process commands sequentially.
             switch(command.type)
@@ -88,22 +80,11 @@ void World::flushObjects()
                     --m_objectCount;
 
                     // Reset object name and group to remove them from registry.
-                    this->setObjectName(objectEntry->handle, "");
-                    this->setObjectGroup(objectEntry->handle, "");
+                    this->setObjectName(command.handle, "");
+                    this->setObjectGroup(command.handle, "");
 
-                    // Invalidate object handle.
-                    objectEntry->handle.version++;
-
-                    // Delete object from memory.
-                    delete objectEntry->object;
-                    objectEntry->object = nullptr;
-
-                    // Reset object entry state.
-                    objectEntry->created = false;
-
-                    // Add entry index to free list.
-                    ASSERT(objectEntry->handle.identifier != 0);
-                    m_freeList.push(objectEntry->handle.identifier - 1);
+                    // Remove object from handle map.
+                    m_objects.removeHandle(command.handle);
                 }
                 break;
             }
@@ -114,16 +95,15 @@ void World::flushObjects()
 void World::update(float timeDelta)
 {
     // Update all objects.
-    std::size_t index = 0;
-    while(index < m_objects.size())
+    for(auto handleEntry : m_objects)
     {
-        ObjectEntry& objectEntry = m_objects[index++];
+        ASSERT(handleEntry.value != nullptr);
+        ObjectEntry& objectEntry = *handleEntry.value;
 
         if(objectEntry.created)
         {
-            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
-
             // Call on update method.
+            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
             objectEntry.object->onUpdate(timeDelta);
         }
     }
@@ -136,16 +116,15 @@ void World::tick(float timeDelta)
     flushObjects();
 
     // Tick all objects.
-    std::size_t index = 0;
-    while(index < m_objects.size())
+    for(auto handleEntry : m_objects)
     {
-        ObjectEntry& objectEntry = m_objects[index++];
+        ASSERT(handleEntry.value != nullptr);
+        ObjectEntry& objectEntry = *handleEntry.value;
 
         if(objectEntry.created)
         {
-            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
-
             // Call on tick method.
+            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
             objectEntry.object->onTick(timeDelta);
         }
     }
@@ -154,16 +133,16 @@ void World::tick(float timeDelta)
 void World::draw(float timeAlpha)
 {
     // Draw all objects.
-    std::size_t index = 0;
-    while(index < m_objects.size())
+
+    for(auto handleEntry : m_objects)
     {
-        ObjectEntry& objectEntry = m_objects[index++];
+        ASSERT(handleEntry.value != nullptr);
+        ObjectEntry& objectEntry = *handleEntry.value;
 
         if(objectEntry.created)
         {
-            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
-
             // Call on update method.
+            ASSERT(objectEntry.object != nullptr, "Created object entry does not have an object set!");
             objectEntry.object->onDraw(timeAlpha);
         }
     }
@@ -172,73 +151,70 @@ void World::draw(float timeAlpha)
     if(cv_showWorldInfo.value)
     {
         // Function lambda for printing objects.
-        auto PrintObjectEntry = [](const ObjectEntry* objectEntry)
+        auto PrintObjectEntry = [](const ObjectEntry& objectEntry)
         {
-            ASSERT(objectEntry != nullptr);
+            ASSERT(objectEntry.object != nullptr);
 
-            if(objectEntry->object != nullptr)
+            if(!objectEntry.object->getName().empty())
             {
-                if(!objectEntry->object->getName().empty())
-                {
-                    ImGui::BulletText("%i/%i : %s (%s)",
-                        objectEntry->handle.identifier,
-                        objectEntry->handle.version,
-                        objectEntry->object->getTypeInfo().getName(),
-                        objectEntry->object->getName().c_str());
-                }
-                else
-                {
-                    ImGui::BulletText("%i/%i : %s",
-                        objectEntry->handle.identifier,
-                        objectEntry->handle.version,
-                        objectEntry->object->getTypeInfo().getName());
-                }
+                ImGui::BulletText("%i/%i : %s (%s)",
+                    objectEntry.object->getHandle().getIdentifier(),
+                    objectEntry.object->getHandle().getVersion(),
+                    objectEntry.object->getTypeInfo().getName(),
+                    objectEntry.object->getName().c_str());
             }
             else
             {
-                ImGui::BulletText("%i/%i : -",
-                    objectEntry->handle.identifier,
-                    objectEntry->handle.version);
+                ImGui::BulletText("%i/%i : %s",
+                    objectEntry.object->getHandle().getIdentifier(),
+                    objectEntry.object->getHandle().getVersion(),
+                    objectEntry.object->getTypeInfo().getName());
             }
         };
 
         // Draw ImGui window.
         if(ImGui::Begin("World Info", &cv_showWorldInfo.value))
         {
-            ImGui::Text("List of object entries (%i total, %u active):", m_objects.size(), m_objectCount);
+            ImGui::Text("List of object entries (%u total):", m_objectCount);
 
-            int groupedEntityCount = 0;
+            int groupedObjectCount = 0;
 
-            for(const ObjectGroupIndices& groupEntry : m_groups)
+            for(const ObjectGroupHandles& groupEntry : m_groups)
             {
-                ASSERT(groupEntry.entryIndices.get() != nullptr, "Group object set is null!");
+                ASSERT(groupEntry.entryHandles.get() != nullptr, "Group object set is null!");
 
-                if(ImGui::TreeNodeEx(groupEntry.group.c_str(), ImGuiTreeNodeFlags_DefaultOpen, "%s (%i)", groupEntry.group.c_str(), groupEntry.entryIndices->size()))
+                if(ImGui::TreeNodeEx(groupEntry.group.c_str(), ImGuiTreeNodeFlags_DefaultOpen, "%s (%i)", groupEntry.group.c_str(), groupEntry.entryHandles->size()))
                 {
-                    const auto& objectEntries = groupEntry.entryIndices.get();
+                    const auto& objectEntries = groupEntry.entryHandles.get();
 
-                    for(const auto& objectIndex : *objectEntries)
+                    for(const auto& objectHandle : *objectEntries)
                     {
-                        ObjectEntry& objectEntry = m_objects[objectIndex];
+                        ObjectList::HandleEntryRef& handleEntry = m_objects.fetchHandle(objectHandle);
 
-                        PrintObjectEntry(&objectEntry);
+                        ASSERT(handleEntry.value != nullptr);
+                        ObjectEntry& objectEntry = *handleEntry.value;
 
-                        groupedEntityCount++;
+                        PrintObjectEntry(objectEntry);
+
+                        groupedObjectCount++;
                     }
 
                     ImGui::TreePop();
                 }
             }
 
-            if(ImGui::TreeNodeEx("Ungrouped", ImGuiTreeNodeFlags_DefaultOpen, "Ungrouped (%i)", m_objects.size() - m_freeList.size() - groupedEntityCount))
+            if(ImGui::TreeNodeEx("Ungrouped", ImGuiTreeNodeFlags_DefaultOpen, "Ungrouped (%i)", m_objects.getValidHandleCount() - groupedObjectCount))
             {
-                for(const ObjectEntry& objectEntry : m_objects)
+                for(auto handleEntry : m_objects)
                 {
+                    ASSERT(handleEntry.value != nullptr);
+                    ObjectEntry& objectEntry = *handleEntry.value;
+
                     if(objectEntry.object != nullptr)
                     {
                         if(objectEntry.object->getGroup().empty())
                         {
-                            PrintObjectEntry(&objectEntry);
+                            PrintObjectEntry(objectEntry);
                         }
                     }
                 }
@@ -246,16 +222,9 @@ void World::draw(float timeAlpha)
                 ImGui::TreePop();
             }
 
-            if(ImGui::TreeNodeEx("Unused", ImGuiTreeNodeFlags_DefaultOpen, "Unused (%i)", m_freeList.size()))
+            if(ImGui::TreeNodeEx("Unused", ImGuiTreeNodeFlags_DefaultOpen, "Unused (%i)", m_objects.getUnusedHandleCount()))
             {
-                for(const ObjectEntry& objectEntry : m_objects)
-                {
-                    if(objectEntry.object == nullptr)
-                    {
-                        PrintObjectEntry(&objectEntry);
-                    }
-                }
-
+                // #todo: Print unused handles.
                 ImGui::TreePop();
             }
         }
@@ -263,54 +232,44 @@ void World::draw(float timeAlpha)
     }
 }
 
-Handle World::addObject(Object* object, std::string name, std::string group)
+ObjectHandle World::addObject(ObjectEntry::ObjectPtr&& object, std::string name, std::string group)
 {
     // Makes no sense to call this function with null.
     ASSERT(object != nullptr, "Cannot add nullptr object!");
 
-    // Create new object entry if free list is empty.
-    if(m_freeList.empty())
-    {
-        // Create object entry with new index.
-        Handle::ValueType newHandleIndex = (Handle::ValueType)(m_objects.size() + 1);
-        m_objects.emplace_back(newHandleIndex);
+    // Create new handle.
+    ObjectList::HandleEntryRef handleEntry = m_objects.createHandle();
+    ASSERT(handleEntry.value != nullptr);
 
-        // Add new object entry to free list.
-        std::size_t currentObjectEntryCount = m_objects.size();
-        m_freeList.push((Handle::ValueType)(currentObjectEntryCount - 1));
-    }
-
-    // Get free object entry from free list queue.
-    std::size_t entryIndex = m_freeList.front();
-    ObjectEntry& objectEntry = m_objects[entryIndex];
-    m_freeList.pop();
-
-    ASSERT(!objectEntry.created, "Free object entry should not be marked as already created!");
+    // Retrieve object entry.
+    ObjectEntry& objectEntry = *handleEntry.value;
+    ASSERT(!objectEntry.object, "Invalid state of new object entry!");
+    ASSERT(!objectEntry.created, "Invalid state of new object entry!");
 
     // Assign new object to entry.
-    objectEntry.object = object;
+    objectEntry.object = std::move(object);
 
     // Assign handle and world to new object.
-    ASSERT(object->m_world == nullptr, "Object is already assigned to a world!");
+    ASSERT(objectEntry.object->m_world == nullptr, "Object is already assigned to a world!");
 
-    object->m_handle = objectEntry.handle;
-    object->m_world = this;
+    objectEntry.object->m_handle = handleEntry.handle;
+    objectEntry.object->m_world = this;
 
     // Register object name and group.
-    this->setObjectName(objectEntry.handle, name);
-    this->setObjectGroup(objectEntry.handle, group);
+    this->setObjectName(handleEntry.handle, name);
+    this->setObjectGroup(handleEntry.handle, group);
 
     // Add command to create object.
     ObjectCommand command;
     command.type = ObjectCommandType::Create;
-    command.handle = objectEntry.handle;
+    command.handle = handleEntry.handle;
     m_commands.push(command);
 
     // Return object handle.
-    return objectEntry.handle;
+    return handleEntry.handle;
 }
 
-void World::destroyObject(Handle handle)
+void World::destroyObject(ObjectHandle handle)
 {
     // Add command to destroy object.
     ObjectCommand command;
@@ -319,7 +278,7 @@ void World::destroyObject(Handle handle)
     m_commands.push(command);
 }
 
-bool World::setObjectName(Handle handle, std::string name, bool force)
+bool World::setObjectName(ObjectHandle handle, std::string name, bool force)
 {
     // Get object entry if handle is valid.
     ObjectEntry* objectEntry = getEntryByHandle(handle);
@@ -336,7 +295,7 @@ bool World::setObjectName(Handle handle, std::string name, bool force)
     if(!objectEntry->object->m_name.empty())
     {
         // Find and remove object from name registry.
-        auto it = m_names.find(ObjectNameIndex(objectEntry->object->m_name));
+        auto it = m_names.find(ObjectNameHandle(objectEntry->object->m_name));
         ASSERT(it != m_names.end(), "Object with non empty name is not registered!");
         m_names.erase(it);
 
@@ -352,14 +311,18 @@ bool World::setObjectName(Handle handle, std::string name, bool force)
     if(force)
     {
         // Find object using requested name.
-        auto it = m_names.find(ObjectNameIndex(name));
+        auto it = m_names.find(ObjectNameHandle(name));
 
         if(it != m_names.end())
         {
             // Reset existing object name.
-            ObjectEntry& registeredEntry = m_objects[it->entryIndex];
-            ASSERT(registeredEntry.object != nullptr, "Registered object with name is null!");
-            registeredEntry.object->m_name = std::string();
+            ObjectList::HandleEntryRef handleEntry = m_objects.fetchHandle(it->handle);
+
+            ASSERT(handleEntry.value != nullptr);
+            ObjectEntry& objectEntry = *handleEntry.value;
+
+            ASSERT(objectEntry.object != nullptr);
+            objectEntry.object->m_name = std::string();
 
             // Erase entry from name registry.
             m_names.erase(it);
@@ -367,10 +330,10 @@ bool World::setObjectName(Handle handle, std::string name, bool force)
     }
 
     // Register new object name.
-    ObjectNameIndex objectNameIndex(name);
-    objectNameIndex.entryIndex = objectEntry->handle.identifier - 1;
+    ObjectNameHandle objectNameHandle(name);
+    objectNameHandle.handle = handle;
     
-    auto result = m_names.insert(objectNameIndex);
+    auto result = m_names.emplace(objectNameHandle);
     ASSERT(result.second || !force, "Object name insertion failed despite being forced!");
 
     if(result.second)
@@ -387,7 +350,7 @@ bool World::setObjectName(Handle handle, std::string name, bool force)
     }
 }
 
-void World::setObjectGroup(Handle handle, std::string group)
+void World::setObjectGroup(ObjectHandle handle, std::string group)
 {
     // Get object entry if handle is valid.
     ObjectEntry* objectEntry = getEntryByHandle(handle);
@@ -404,14 +367,14 @@ void World::setObjectGroup(Handle handle, std::string group)
     if(!objectEntry->object->m_group.empty())
     {
         // Find and remove object from group registry.
-        auto groupIter = m_groups.find(ObjectGroupIndices(objectEntry->object->m_group));
+        auto groupIter = m_groups.find(ObjectGroupHandles(objectEntry->object->m_group));
         ASSERT(groupIter != m_groups.end(), "Object with non empty group is not registered!");
         
         // Find object and remove it.
-        GroupEntrySet* groupEntries = groupIter->entryIndices.get();
+        GroupEntrySet* groupEntries = groupIter->entryHandles.get();
         ASSERT(groupEntries != nullptr, "Groupt entry set is null!");
 
-        auto objectIter = groupEntries->find(objectEntry->handle.identifier - 1);
+        auto objectIter = groupEntries->find(handle);
         ASSERT(objectIter != groupEntries->end(), "Object with non empty group is not registered!");
         groupEntries->erase(objectIter);
 
@@ -430,46 +393,34 @@ void World::setObjectGroup(Handle handle, std::string group)
         return;
 
     // Register object group.
-    auto groupResult = m_groups.insert(ObjectGroupIndices(group, std::make_unique<GroupEntrySet>()));
+    auto groupResult = m_groups.insert(ObjectGroupHandles(group, std::make_unique<GroupEntrySet>()));
 
     // Add object to group's entry set.
-    GroupEntrySet* groupEntries = groupResult.first->entryIndices.get();
+    GroupEntrySet* groupEntries = groupResult.first->entryHandles.get();
     ASSERT(groupEntries != nullptr, "Group entry set is null!");
 
-    auto entryResult = groupEntries->insert(objectEntry->handle.identifier - 1);
+    auto entryResult = groupEntries->insert(handle);
     ASSERT(entryResult.second, "Insertion to group entry must always succeed!");
 
     // Update object group.
     objectEntry->object->m_group = group;
 }
 
-World::ObjectEntry* World::getEntryByHandle(Handle handle)
+ObjectEntry* World::getEntryByHandle(ObjectHandle handle)
 {
-    // Make sure identifier is within objects array range and return null otherwise.
-    if(handle.identifier <= 0 && handle.identifier > (Handle::ValueType)m_objects.size())
-        return nullptr;
-
-    // Make sure versions are matching.
-    ObjectEntry& objectEntry = m_objects[handle.identifier - 1];
-
-    if(handle.version == objectEntry.handle.version)
-    {
-        return &objectEntry;
-    }
-    else
-    {
-        return nullptr;
-    }
+    // Return object entry if it exists.
+    ObjectList::HandleEntryRef handleEntry = m_objects.fetchHandle(handle);
+    return handleEntry.value;
 }
 
-Object* World::getObjectByHandle(Handle handle)
+Object* World::getObjectByHandle(ObjectHandle handle)
 {
     // Return object pointer if handle is valid.
     ObjectEntry* objectEntry = getEntryByHandle(handle);
 
     if(objectEntry != nullptr)
     {
-        return objectEntry->object;
+        return objectEntry->object.get();
     }
 
     return nullptr;
@@ -478,13 +429,17 @@ Object* World::getObjectByHandle(Handle handle)
 Object* World::getObjectByName(std::string name)
 {
     // Find object using name registry.
-    auto it = m_names.find(ObjectNameIndex(name));
+    auto it = m_names.find(ObjectNameHandle(name));
     
     if(it != m_names.end())
     {
-        ObjectEntry& registeredEntry = m_objects[it->entryIndex];
-        ASSERT(registeredEntry.object != nullptr, "Registered object with name is null!");
-        return registeredEntry.object;
+        ObjectList::HandleEntryRef& handleEntry = m_objects.fetchHandle(it->handle);
+
+        ASSERT(handleEntry.value != nullptr);
+        ObjectEntry& objectEntry = *handleEntry.value;
+
+        ASSERT(objectEntry.object != nullptr);
+        return objectEntry.object.get();
     }
     else
     {
@@ -497,15 +452,19 @@ std::vector<Object*> World::getObjectsByGroup(std::string group)
     std::vector<Object*> results;
 
     // Find objects using group registry.
-    auto it = m_groups.find(ObjectGroupIndices(group));
+    auto it = m_groups.find(ObjectGroupHandles(group));
 
     if(it != m_groups.end())
     {
-        for(auto& objectEntryIndex : *(it->entryIndices))
+        for(auto& objectEntryHandle : *(it->entryHandles))
         {
-            ObjectEntry& objectEntry = m_objects[objectEntryIndex];
-            ASSERT(objectEntry.object, "Found null object in group registry!");
-            results.push_back(objectEntry.object);
+            ObjectList::HandleEntryRef& handleEntry = m_objects.fetchHandle(objectEntryHandle);
+
+            ASSERT(handleEntry.value != nullptr);
+            ObjectEntry & objectEntry = *handleEntry.value;
+
+            ASSERT(objectEntry.object != nullptr);
+            results.push_back(objectEntry.object.get());
         }
     }
 
@@ -523,25 +482,20 @@ bool World::onSerialize(MemoryStream& buffer) const
     // Call flushObjects() before serialization to avoid failures.
     ASSERT(m_commands.empty(), "Cannot serialize while command list is not empty!");
 
-    // Function for checking if object is eligible for serialization.
-    auto ShouldSerializeObject = [](const ObjectEntry& entry)
-    {
-        return entry.object != nullptr;
-    };
-
-    // Count object that are going to be written.
-    int objectCount = (int)std::count_if(m_objects.begin(), m_objects.end(), ShouldSerializeObject);
-
-    if(!serialize(buffer, objectCount))
+    // Write valid object count.
+    if(!serialize(buffer, m_objects.getValidHandleCount()))
         return false;
 
     // Serialize created objects.
     // All objects marked for destruction should be already flushed at this point.
     // All created objects should be already marked as created at this point.
-    for(const ObjectEntry& objectEntry : m_objects)
+    for(const auto handleEntry : m_objects)
     {
-        if(!ShouldSerializeObject(objectEntry))
-            continue;
+        ASSERT(handleEntry.value != nullptr);
+        const ObjectEntry& objectEntry = *handleEntry.value;
+
+        ASSERT(objectEntry.object != nullptr);
+        ASSERT(objectEntry.created == true);
 
         if(!serialize(buffer, getTypeIdentifier(*objectEntry.object)))
             return false;
@@ -580,13 +534,13 @@ bool World::onDeserialize(MemoryStream& buffer)
         if(!deserialize(buffer, &group))
             return false;
 
-        Object* object = Object::create(objectType);
+        std::unique_ptr<Object> object(Object::create(objectType));
         ASSERT(object != nullptr, "Runtime type allocation returned null!");
 
-        if(!deserialize(buffer, object))
+        if(!deserialize(buffer, object.get()))
             return false;
 
-        this->addObject(object, name, group);
+        this->addObject(std::move(object), name, group);
     }
 
     return true;

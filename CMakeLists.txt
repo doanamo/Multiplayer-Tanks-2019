@@ -14,6 +14,7 @@ set(SOURCE_FILES
     "Source/Common/Utility.hpp"
     "Source/Common/Utility.cpp"
     "Source/Common/StateMachine.hpp"
+    "Source/Common/HandleMap.hpp"
 
     "Source/Types/RuntimeTypes.hpp"
     "Source/Types/RuntimeTypes.cpp"
@@ -87,7 +88,6 @@ set(SOURCE_FILES
     "Source/Game/GameStates/GameStateSession.cpp"
     "Source/Game/World/Transform.hpp"
     "Source/Game/World/Transform.cpp"
-    "Source/Game/World/Handle.hpp"
     "Source/Game/World/Object.hpp"
     "Source/Game/World/Object.cpp"
     "Source/Game/World/World.hpp"

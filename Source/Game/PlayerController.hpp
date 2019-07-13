@@ -12,7 +12,7 @@ public:
     ~PlayerController();
 
     bool initialize(World* world);
-    void control(Handle handle);
+    void control(ObjectHandle handle);
     void handleEvent(const sf::Event& event);
     void tick(float timeDelta);
 
@@ -24,7 +24,7 @@ protected:
 private:
     // Controlled object.
     World* m_world;
-    Handle m_object;
+    ObjectHandle m_object;
 
     // Movement direction.
     enum class MovementDirection

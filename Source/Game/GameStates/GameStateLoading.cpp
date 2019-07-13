@@ -68,14 +68,14 @@ bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& sessi
         m_params.provisionMode == GameProvisionMode::Host)
     {
         // Create player tank object.
-        Tank* playerTank = new Tank();
-        Handle playerHandle = gameInstance->getWorld()->addObject(playerTank, "Player1_Tank", "Players");
+        std::unique_ptr<Tank> playerTank(new Tank());
+        Handle playerHandle = gameInstance->getWorld()->addObject(std::move(playerTank), "Player1_Tank", "Players");
         gameInstance->getPlayerController()->control(playerHandle);
 
         // Test instantiation from runtime type.
-        Object* enemyTank = Object::create(getTypeIdentifier<Tank>());
+        std::unique_ptr<Object> enemyTank(Object::create(getTypeIdentifier<Tank>()));
         enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
-        gameInstance->getWorld()->addObject(enemyTank);
+        gameInstance->getWorld()->addObject(std::move(enemyTank));
     }
 
     // Load snapshot file.

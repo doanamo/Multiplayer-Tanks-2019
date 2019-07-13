@@ -18,10 +18,10 @@ Tank::~Tank()
 void Tank::shootProjectile()
 {
     // Create projectile.
-    Projectile* projectile = new Projectile();
+    std::unique_ptr<Projectile> projectile(new Projectile());
     projectile->setPosition(m_transform.getPosition() + m_transform.getDirection() * 0.4f);
     projectile->setDirection(m_transform.getDirection());
-    getWorld()->addObject(projectile, "", "Projectiles");
+    getWorld()->addObject(std::move(projectile), "", "Projectiles");
 }
 
 void Tank::setMovementInput(sf::Vector2f movement)

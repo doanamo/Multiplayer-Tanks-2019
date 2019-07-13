@@ -22,7 +22,7 @@ bool PlayerController::initialize(World* world)
     return true;
 }
 
-void PlayerController::control(Handle object)
+void PlayerController::control(ObjectHandle object)
 {
     m_object = object;
 }
@@ -113,9 +113,7 @@ bool PlayerController::onSerialize(MemoryStream& buffer) const
 
 bool PlayerController::onDeserialize(MemoryStream& buffer)
 {
-    // Temporary workaround since we cannot resolve handles yet.
-    m_object.identifier = 1;
-    m_object.version = 1;
+    // #todo: Regain control over own player object after game load.
 
     return true;
 }

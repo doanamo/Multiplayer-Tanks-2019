@@ -1,29 +1,14 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Handle.hpp"
+#include "Common/HandleMap.hpp"
 #include "Object.hpp"
 
 class World : public Serializable
 {
 public:
-    // Object entry.
-    struct ObjectEntry
-    {
-        ObjectEntry(int index = 0) :
-            handle(index),
-            object(nullptr),
-            created(false)
-        {
-        }
-
-        Handle handle;
-        Object* object;
-        bool created;
-    };
-
-    using ObjectList = std::vector<ObjectEntry>;
-    using FreeList = std::queue<Handle::ValueType>;
+    // Object handle map.
+    using ObjectList = HandleMap<ObjectEntry>;
 
     // Objects command.
     enum class ObjectCommandType
@@ -40,63 +25,63 @@ public:
         {
         }
 
-        Handle handle;
+        ObjectHandle handle;
         ObjectCommandType type;
     };
 
     using CommandList = std::queue<ObjectCommand>;
 
     // Object name registry.
-    struct ObjectNameIndex
+    struct ObjectNameHandle
     {
-        ObjectNameIndex(std::string name) :
-            name(name), entryIndex(0)
+        ObjectNameHandle(std::string name) :
+            name(name), handle()
         {
         }
 
         std::string name;
-        std::size_t entryIndex;
+        ObjectHandle handle;
     };
 
     struct ObjectNameCompare
     {
-        bool operator()(const ObjectNameIndex& first, const ObjectNameIndex& second) const
+        bool operator()(const ObjectNameHandle& first, const ObjectNameHandle& second) const
         {
             return first.name < second.name;
         }
     };
 
-    using NameRegistry = std::set<ObjectNameIndex, ObjectNameCompare>;
+    using NameRegistry = std::set<ObjectNameHandle, ObjectNameCompare>;
 
     // Object group registry.
-    using GroupEntrySet = std::set<std::size_t>;
+    using GroupEntrySet = std::set<ObjectHandle>;
     using GroupEntrySetPtr = std::unique_ptr<GroupEntrySet>;
 
-    struct ObjectGroupIndices
+    struct ObjectGroupHandles
     {
-        ObjectGroupIndices(std::string group) :
-            group(group), entryIndices(nullptr)
+        ObjectGroupHandles(std::string group) :
+            group(group), entryHandles(nullptr)
         {
         }
 
-        ObjectGroupIndices(std::string group, GroupEntrySetPtr&& entrySet) :
-            group(group), entryIndices(std::move(entrySet))
+        ObjectGroupHandles(std::string group, GroupEntrySetPtr&& entrySet) :
+            group(group), entryHandles(std::move(entrySet))
         {
         }
 
         std::string group;
-        GroupEntrySetPtr entryIndices;
+        GroupEntrySetPtr entryHandles;
     };
 
     struct ObjectGroupCompare
     {
-        bool operator()(const ObjectGroupIndices& first, const ObjectGroupIndices& second) const
+        bool operator()(const ObjectGroupHandles& first, const ObjectGroupHandles& second) const
         {
             return first.group < second.group;
         }
     };
 
-    using GroupRegistry = std::set<ObjectGroupIndices, ObjectGroupCompare>;
+    using GroupRegistry = std::set<ObjectGroupHandles, ObjectGroupCompare>;
 
 public:
     World();
@@ -115,22 +100,22 @@ public:
     void draw(float timeAlpha);
 
     // Adds object to world.
-    Handle addObject(Object* object, std::string name = "", std::string group = "");
+    ObjectHandle addObject(ObjectEntry::ObjectPtr&& object, std::string name = "", std::string group = "");
 
     // Destroys object in world.
-    void destroyObject(Handle handle);
+    void destroyObject(ObjectHandle handle);
 
     // Processes pending objects.
     void flushObjects();
 
     // Sets object's unique name.
-    bool setObjectName(Handle handle, std::string name, bool force = false);
+    bool setObjectName(ObjectHandle handle, std::string name, bool force = false);
 
     // Sets object's group name.
-    void setObjectGroup(Handle handle, std::string group);
+    void setObjectGroup(ObjectHandle handle, std::string group);
 
     // Gets object in world by handle.
-    Object* getObjectByHandle(Handle handle);
+    Object* getObjectByHandle(ObjectHandle handle);
 
     // Gets object in world by name.
     Object* getObjectByName(std::string name);
@@ -144,7 +129,7 @@ public:
 
 private:
     // Gets object entry by handle.
-    ObjectEntry* getEntryByHandle(Handle handle);
+    ObjectEntry* getEntryByHandle(ObjectHandle handle);
 
     // Serialization methods.
     virtual bool onSerialize(MemoryStream& buffer) const override;
@@ -157,7 +142,6 @@ private:
     // List of objects.
     ObjectList m_objects;
     uint32_t m_objectCount;
-    FreeList m_freeList;
 
     // Registry of objects.
     NameRegistry m_names;
