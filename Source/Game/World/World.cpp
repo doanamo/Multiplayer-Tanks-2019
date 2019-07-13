@@ -189,7 +189,7 @@ void World::draw(float timeAlpha)
 
                     for(const auto& objectHandle : *objectEntries)
                     {
-                        ObjectList::HandleEntryRef& handleEntry = m_objects.fetchHandle(objectHandle);
+                        ObjectList::HandleEntryRef handleEntry = m_objects.fetchHandle(objectHandle);
 
                         ASSERT(handleEntry.value != nullptr);
                         ObjectEntry& objectEntry = *handleEntry.value;
@@ -433,7 +433,7 @@ Object* World::getObjectByName(std::string name)
     
     if(it != m_names.end())
     {
-        ObjectList::HandleEntryRef& handleEntry = m_objects.fetchHandle(it->handle);
+        ObjectList::HandleEntryRef handleEntry = m_objects.fetchHandle(it->handle);
 
         ASSERT(handleEntry.value != nullptr);
         ObjectEntry& objectEntry = *handleEntry.value;
@@ -458,7 +458,7 @@ std::vector<Object*> World::getObjectsByGroup(std::string group)
     {
         for(auto& objectEntryHandle : *(it->entryHandles))
         {
-            ObjectList::HandleEntryRef& handleEntry = m_objects.fetchHandle(objectEntryHandle);
+            ObjectList::HandleEntryRef handleEntry = m_objects.fetchHandle(objectEntryHandle);
 
             ASSERT(handleEntry.value != nullptr);
             ObjectEntry & objectEntry = *handleEntry.value;
