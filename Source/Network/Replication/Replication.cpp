@@ -3,7 +3,8 @@
 
 /*
     Replication Design Draft
-    - Extract versioned handles functionality from World and make it as a custom container that can be used here as well
+    - DONE: Extract versioned handles functionality from World and make it as a custom container that can be used here as well
+    - Implement registration and unregistration of replicable objects in Replication system
     - Objects should inherit from Replicated interface and have following methods isReplicated() and onReplication()
     - Inside onReplication() object should write type of replication and then own data directly into memory stream, just like serialization
     - Replication system that calls onReplication() on each object will first write networkObjectID

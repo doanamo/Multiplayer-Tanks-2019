@@ -89,6 +89,7 @@ class HandleMap
 public:
     // Type declarations.
     using HandleType = Handle<Type>;
+    using HandleValueType = typename HandleType::ValueType;
     
     // Handle entry.
     struct HandleEntry
@@ -253,12 +254,12 @@ public:
         if(m_freeList.empty())
         {
             // Create handle entry with new index.
-            HandleType::ValueType newHandleIdentifier = (HandleType::ValueType)(m_handles.size() + 1);
+            HandleValueType newHandleIdentifier = (HandleValueType)(m_handles.size() + 1);
             m_handles.emplace_back(HandleType(newHandleIdentifier));
 
             // Add new object entry to free list.
             std::size_t currentObjectEntryCount = m_handles.size();
-            m_freeList.push((HandleType::ValueType)(currentObjectEntryCount - 1));
+            m_freeList.push((HandleValueType)(currentObjectEntryCount - 1));
         }
 
         // Get free handle entry from free list queue.
@@ -349,7 +350,7 @@ private:
     HandleEntry* fetchHandleEntry(HandleType handle)
     {
         // Make sure identifier is within handle array's range and return null otherwise.
-        if(handle.getIdentifier() <= 0 && handle.getIdentifier() > (HandleType::ValueType)m_handles.size())
+        if(handle.getIdentifier() <= 0 && handle.getIdentifier() > (HandleValueType)m_handles.size())
             return nullptr;
 
         // Make sure handle versions are matching.
