@@ -108,11 +108,12 @@ int main(int argc, char* argv[])
         // Display launcher menu.
         std::cout << "Welcome to Tanks launcher!\n\n";
         std::cout << "Please select an option:\n";
-        std::cout << "1. Start single instance as host (other players will be able to connect)\n";
-        std::cout << "2. Start single instance as client (you will be prompted for server info)\n";
-        std::cout << "3. Start two instances in local session (one host and one client)\n";
-        std::cout << "4. Start four instances in local session (one host and three clients)\n";
-        std::cout << "5. Start six instances in local session (one host and five client)\n";
+        std::cout << "1. Start single instance in main menu (for non-networking tests)\n";
+        std::cout << "2. Start single instance as host (other players will be able to connect)\n";
+        std::cout << "3. Start single instance as client (you will be prompted for server info)\n";
+        std::cout << "4. Start two instances in local session (one host and one client)\n";
+        std::cout << "5. Start four instances in local session (one host and three clients)\n";
+        std::cout << "6. Start six instances in local session (one host and five client)\n";
         std::cout << std::endl;
 
         // Get user input.
@@ -122,6 +123,7 @@ int main(int argc, char* argv[])
         std::cin >> menuInput;
 
         // Parse user input.
+        bool provision = true;
         int localPlayerCount = 0;
         bool firstPlayerHosts = true;
 
@@ -131,12 +133,17 @@ int main(int argc, char* argv[])
         if(menuInput == "1")
         {
             localPlayerCount = 1;
+            provision = false;
+        }
+        else if(menuInput == "2")
+        {
+            localPlayerCount = 1;
             firstPlayerHosts = true;
 
             std::cout << "Please enter listen port: ";
             std::cin >> serverPort;
         }
-        else if(menuInput == "2")
+        else if(menuInput == "3")
         {
             localPlayerCount = 1;
             firstPlayerHosts = false;
@@ -147,17 +154,17 @@ int main(int argc, char* argv[])
             std::cout << "Please enter server port: ";
             std::cin >> serverPort;
         }
-        else if(menuInput == "3")
+        else if(menuInput == "4")
         {
             localPlayerCount = 2;
             firstPlayerHosts = true;
         }
-        else if(menuInput == "4")
+        else if(menuInput == "5")
         {
             localPlayerCount = 4;
             firstPlayerHosts = true;
         }
-        else if(menuInput == "5")
+        else if(menuInput == "6")
         {
             localPlayerCount = 6;
             firstPlayerHosts = true;
@@ -180,17 +187,24 @@ int main(int argc, char* argv[])
             gameProcesses[i].index = i;
             gameProcesses[i].path = gamePath;
             gameProcesses[i].arguments += gamePath + " ";
-            gameProcesses[i].arguments += "-showConsole 1 ";
-            gameProcesses[i].arguments += "-showNetwork 1 ";
+
+            if(provision)
+            {
+                gameProcesses[i].arguments += "-showConsole 1 ";
+                gameProcesses[i].arguments += "-showNetwork 1 ";
+            }
 
             // Make the first player a host.
-            if(i == 0 && firstPlayerHosts)
+            if(provision)
             {
-                gameProcesses[i].arguments += "-host -port " + serverPort;
-            }
-            else
-            {
-                gameProcesses[i].arguments += "-connect -address " + serverAddress + " -port " + serverPort;
+                if(i == 0 && firstPlayerHosts)
+                {
+                    gameProcesses[i].arguments += "-host -port " + serverPort;
+                }
+                else
+                {
+                    gameProcesses[i].arguments += "-connect -address " + serverAddress + " -port " + serverPort;
+                }
             }
 
             // Spawn new thread.
