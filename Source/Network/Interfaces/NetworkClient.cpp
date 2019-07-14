@@ -39,7 +39,7 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
             continue;
 
         // Check if packet type matches expected type.
-        PacketStateSnapshot* snapshotPacket = receivedPacket->as<PacketStateSnapshot>();
+        PacketServerSnapshot* snapshotPacket = receivedPacket->as<PacketServerSnapshot>();
         if(receivedPacket == nullptr)
             continue;
 

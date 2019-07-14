@@ -3,13 +3,13 @@
 #include "Precompiled.hpp"
 #include "PacketBase.hpp"
 
-class PacketStateUpdate : public PacketBase
+class PacketServerUpdate : public PacketBase
 {
-    TYPE_DECLARE(PacketStateUpdate, PacketBase);
+    TYPE_DECLARE(PacketServerUpdate, PacketBase);
 
 public:
-    PacketStateUpdate();
-    ~PacketStateUpdate();
+    PacketServerUpdate();
+    ~PacketServerUpdate();
 
     bool onSerialize(MemoryStream& buffer) const;
     bool onDeserialize(MemoryStream& buffer);
@@ -17,6 +17,8 @@ public:
 public:
     // Last processed tick frame.
     // Used too determine last reliable data processed.
+    // We may actually not be needing this as packets are always ordered.
+    uint64_t tickFrame;
 
     // Reliable data delta.
     // Spawning and destroying objects.

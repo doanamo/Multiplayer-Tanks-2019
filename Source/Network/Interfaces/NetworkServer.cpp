@@ -93,7 +93,7 @@ void NetworkServer::tick(float timeDelta)
             if(receivedPacket->is<PacketConnect>())
             {
                 // Save game snapshot into packet memory stream.
-                PacketStateSnapshot packetStateSnapshot;
+                PacketServerSnapshot packetStateSnapshot;
                 SnapshotSaveLoad snapshotSave(m_gameInstance);
 
                 if(!snapshotSave.save(packetStateSnapshot.serializedGameInstance))

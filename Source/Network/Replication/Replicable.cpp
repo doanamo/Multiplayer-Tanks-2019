@@ -9,22 +9,32 @@ Replicable::~Replicable()
 {
 }
 
-bool Replicable::onReliableReplicationWrite(MemoryStream& stream)
+bool Replicable::serializeInitialReplication(MemoryStream& stream)
 {
     return true;
 }
 
-bool Replicable::onReliableReplicationRead(MemoryStream& stream)
+bool Replicable::deserializeInitialReplication(MemoryStream& stream)
 {
     return true;
 }
 
-bool Replicable::onUnreliableReplicationWrite(MemoryStream& stream)
+bool Replicable::serializeReliableTickReplication(MemoryStream& stream)
 {
     return true;
 }
 
-bool Replicable::onUnreliableReplicationRead(MemoryStream& stream)
+bool Replicable::deserializeReliableTickReplication(MemoryStream& stream)
+{
+    return true;
+}
+
+bool Replicable::serializeUnreliableTickReplication(MemoryStream& stream)
+{
+    return true;
+}
+
+bool Replicable::deserializeUnreliableTickReplication(MemoryStream& stream)
 {
     return true;
 }

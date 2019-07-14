@@ -11,6 +11,9 @@
     - DONE: There should be a way for objects/systems to do both onReliableReplication() and onUnreliableReplication(), whetever they choose
     - DONE: Register world for replication and subscribe to important events such as object creation and destruction
     - DONE: Create a replicated object map, we need our own network IDs as every client will have different object IDs
+    - Sent server snapshot does not contain replicable handles. Objects are saved one by one from the list and then recreated with different handles.
+      We need to serialize network handles and HandleMap should be able to recreate handle identifier in any order (not starting sequentially from 0).
+      This cam be accomplished by creating new handle identifiers and pushing them to free list until we get the one we want (slow, but we only want this once).
     - Register systems that need onReliableReplication() and onUnreliableReplication() methods called, using common interface
     - Inside onReplication() object should write type of replication and then own data directly into memory stream, just like serialization
     - Replication system that calls onReplication() on each object will first write networkObjectID (base class)

@@ -37,17 +37,23 @@ public:
     // Virtual destructor.
     virtual ~Replicable();
 
-    // Serializes reliable replication data.
-    virtual bool onReliableReplicationWrite(MemoryStream& stream);
+    // Serializes initial replication.
+    virtual bool serializeInitialReplication(MemoryStream& stream);
 
-    // Deserializes reliable replication data.
-    virtual bool onReliableReplicationRead(MemoryStream& stream);
+    // Deserializes initial replication.
+    virtual bool deserializeInitialReplication(MemoryStream& stream);
 
-    // Serializes unreliable replication data.
-    virtual bool onUnreliableReplicationWrite(MemoryStream& stream);
+    // Serializes reliable tick replication.
+    virtual bool serializeReliableTickReplication(MemoryStream& stream);
 
-    // Deserializes unreliable replication data.
-    virtual bool onUnreliableReplicationRead(MemoryStream& stream);
+    // Deserializes reliable tick replication.
+    virtual bool deserializeReliableTickReplication(MemoryStream& stream);
+
+    // Serializes unreliable tick replication.
+    virtual bool serializeUnreliableTickReplication(MemoryStream& stream);
+
+    // Deserializes unreliable tick replication.
+    virtual bool deserializeUnreliableTickReplication(MemoryStream& stream);
 
     // Gets object's replicable handle.
     ReplicableHandle getReplicableHandle() const;
