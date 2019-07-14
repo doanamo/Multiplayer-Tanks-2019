@@ -137,13 +137,21 @@ TypeInfo::IdentifierType getTypeIdentifier(const Type& type)
         TypeInfo::IdentifierType typeIdentifier = getTypeIdentifier<Type>(); \
         return typeInfo.isSame(typeIdentifier) || typeInfo.isBase(typeIdentifier); \
     } \
-    \
     template<typename Type> \
     Type* as() \
     { \
         if(this->is<Type>()) \
         { \
             return reinterpret_cast<Type*>(this); \
+        } \
+        return nullptr; \
+    }\
+    template<typename Type> \
+    const Type* as() const \
+    { \
+        if(this->is<Type>()) \
+        { \
+            return reinterpret_cast<const Type*>(this); \
         } \
         return nullptr; \
     }

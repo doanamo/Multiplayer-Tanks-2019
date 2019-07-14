@@ -24,7 +24,7 @@ TypeInfo::TypeInfo(const char* typeName, AllocateFunction allocateFunction, Type
 
 TypeInfo::IdentifierType TypeInfo::getIdentifier() const
 {
-    ASSERT(m_typeIdentifier != InvalidIdentifier);
+    ASSERT(m_typeIdentifier != InvalidIdentifier, "Type has not been registered yet!");
     return m_typeIdentifier;
 }
 
