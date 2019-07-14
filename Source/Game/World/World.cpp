@@ -93,7 +93,8 @@ void World::flushObjects()
                     this->setObjectGroup(command.handle, "");
 
                     // Remove object from handle map.
-                    m_objects.removeHandle(command.handle);
+                    bool result = m_objects.removeHandle(command.handle);
+                    ASSERT(result, "Failed to remove object handle that should exist!");
 
                     // Decrement object count.
                     --m_objectCount;

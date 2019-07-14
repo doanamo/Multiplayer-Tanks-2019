@@ -11,6 +11,7 @@
     - DONE: There should be a way for objects/systems to do both onReliableReplication() and onUnreliableReplication(), whetever they choose
     - DONE: Register world for replication and subscribe to important events such as object creation and destruction
     - DONE: Create a replicated object map, we need our own network IDs as every client will have different object IDs
+    - Client should not be able to create replicated objects. There should be an assert in place that will catch attempts to spawn on client.
     - Sent server snapshot does not contain replicable handles. Objects are saved one by one from the list and then recreated with different handles.
       We need to serialize network handles and HandleMap should be able to recreate handle identifier in any order (not starting sequentially from 0).
       This cam be accomplished by creating new handle identifiers and pushing them to free list until we get the one we want (slow, but we only want this once).
@@ -79,7 +80,8 @@ void Replication::onObjectDestroyed(Object& object)
     ASSERT(replicableHandle.isValid(), "Replicable objects has invalid replicable handle!");
 
     // Remove replicable object entry.
-    m_replicables.removeHandle(replicableHandle);
+    bool result = m_replicables.removeHandle(replicableHandle);
+    ASSERT(result, "Failed to remove replicable handle that should exist!");
 }
 
 void Replication::draw()
