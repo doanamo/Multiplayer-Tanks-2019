@@ -9,6 +9,7 @@ extern ConsoleVariable<bool> cv_showNetwork;
 
 // Forward declarations.
 class GameInstance;
+class Replication;
 
 // Network base class.
 class NetworkBase : public NetworkInterface
@@ -26,6 +27,9 @@ public:
     virtual void tick(float timeDelta) override;
     virtual void draw() override;
 
+    // Gets replication system.
+    Replication* getReplication();
+
 protected:
     // Serializes and sends packet.
     bool sendPacket(ConnectionSocket& socket, PacketBase& packet, bool reliable, const sf::IpAddress* address = nullptr, const unsigned short* port = nullptr);
@@ -41,6 +45,9 @@ protected:
     // Every client and server has at least one main socket.
     ConnectionSocket m_socket;
 
-    // Game instance.
+    // Game instance reference.
     GameInstance* m_gameInstance;
+
+    // Replication system.
+    std::unique_ptr<Replication> m_replication;
 };

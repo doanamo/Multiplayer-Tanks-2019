@@ -33,10 +33,13 @@ bool NetworkServer::initialize(GameInstance* gameInstance, unsigned short port)
 
 void NetworkServer::update(float timeDelta)
 {
+    NetworkBase::update(timeDelta);
 }
 
 void NetworkServer::tick(float timeDelta)
 {
+    NetworkBase::tick(timeDelta);
+
     // Receive packet from default socket.
     // This needs another solution, either simplify or creating ConnectionSwitch for handling connections.
     ConnectionContext& socketContext = m_socket.getConnectionContext();
@@ -132,6 +135,8 @@ void NetworkServer::tick(float timeDelta)
 
 void NetworkServer::draw()
 {
+    NetworkBase::draw();
+
     // Draw ImGui debug window.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
     if(ImGui::Begin("Network State (Server)##NetworkState", &cv_showNetwork.value))

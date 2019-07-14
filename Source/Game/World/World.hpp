@@ -135,6 +135,11 @@ private:
     virtual bool onSerialize(MemoryStream& buffer) const override;
     virtual bool onDeserialize(MemoryStream& buffer) override;
 
+public:
+    // Public list of callbacks that other system can hook into.
+    std::function<void(Object&)> replicationObjectCreated;
+    std::function<void(Object&)> replicationObjectDestroyed;
+
 private:
     // List of commands.
     CommandList m_commands;

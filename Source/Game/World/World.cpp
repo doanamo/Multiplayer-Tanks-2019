@@ -68,6 +68,12 @@ void World::flushObjects()
 
                     // Mark object as created.
                     objectEntry->created = true;
+
+                    // Notify replication system about created object.
+                    if(replicationObjectCreated != nullptr)
+                    {
+                        replicationObjectCreated(*objectEntry->object);
+                    }
                 }
                 break;
 
@@ -76,8 +82,11 @@ void World::flushObjects()
                     // Call on destroy method.
                     objectEntry->object->onDestroy();
 
-                    // Decrement object count.
-                    --m_objectCount;
+                    // Notify replication system about destroyed object.
+                    if(replicationObjectDestroyed != nullptr)
+                    {
+                        replicationObjectDestroyed(*objectEntry->object);
+                    }
 
                     // Reset object name and group to remove them from registry.
                     this->setObjectName(command.handle, "");
@@ -85,6 +94,9 @@ void World::flushObjects()
 
                     // Remove object from handle map.
                     m_objects.removeHandle(command.handle);
+
+                    // Decrement object count.
+                    --m_objectCount;
                 }
                 break;
             }
@@ -133,7 +145,6 @@ void World::tick(float timeDelta)
 void World::draw(float timeAlpha)
 {
     // Draw all objects.
-
     for(auto handleEntry : m_objects)
     {
         ASSERT(handleEntry.value != nullptr);
@@ -157,7 +168,7 @@ void World::draw(float timeAlpha)
 
             if(!objectEntry.object->getName().empty())
             {
-                ImGui::BulletText("%i/%i : %s (%s)",
+                ImGui::BulletText("%u/%u : %s (%s)",
                     objectEntry.object->getHandle().getIdentifier(),
                     objectEntry.object->getHandle().getVersion(),
                     objectEntry.object->getTypeInfo().getName(),
@@ -165,7 +176,7 @@ void World::draw(float timeAlpha)
             }
             else
             {
-                ImGui::BulletText("%i/%i : %s",
+                ImGui::BulletText("%u/%u : %s",
                     objectEntry.object->getHandle().getIdentifier(),
                     objectEntry.object->getHandle().getVersion(),
                     objectEntry.object->getTypeInfo().getName());

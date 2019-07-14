@@ -1,13 +1,12 @@
 #include "Precompiled.hpp"
 #include "NetworkBase.hpp"
+#include "Network/Replication/Replication.hpp"
 #include "Network/Packets/PacketHeader.hpp"
 #include "Game/GameInstance.hpp"
 
 ConsoleVariable<bool> cv_showNetwork("showNetwork", false);
 
-NetworkBase::NetworkBase() :
-    m_socket(),
-    m_gameInstance(nullptr)
+NetworkBase::NetworkBase()
 {
 }
 
@@ -27,6 +26,11 @@ bool NetworkBase::initialize(GameInstance* gameInstance)
 
     m_gameInstance = gameInstance;
 
+    // Initialize replication system.
+    m_replication = std::make_unique<Replication>();
+    if(!m_replication->initialize(gameInstance))
+        return false;
+    
     // Success!
     return true;
 }
@@ -41,6 +45,8 @@ void NetworkBase::tick(float timeDelta)
 
 void NetworkBase::draw()
 {
+    // Draw replication debug.
+    m_replication->draw();
 }
 
 bool NetworkBase::sendPacket(ConnectionSocket& socket, PacketBase& packet, bool reliable, const sf::IpAddress* address, const unsigned short* port)
@@ -116,4 +122,9 @@ bool NetworkBase::readPacket(MemoryStream& packetData, std::unique_ptr<PacketBas
 
     // Success!
     return true;
+}
+
+Replication* NetworkBase::getReplication()
+{
+    return m_replication.get();
 }

@@ -19,11 +19,20 @@ public:
     void tick(float timeDelta);
     void draw(float timeAlpha);
 
-    uint64_t          getTickFrame() const;
-    NetworkInterface* getNetwork();
-    World*            getWorld();
-    Level*            getLevel();
+    // Gets current frame tick.
+    uint64_t getTickFrame() const;
+
+    // Gets world with objects.
+    World* getWorld();
+
+    // Gets level instance.
+    Level* getLevel();
+
+    // Gets player controller.
     PlayerController* getPlayerController();
+    
+    // Gets network interface.
+    NetworkInterface* getNetwork();
 
 protected:
     // Serialization methods.

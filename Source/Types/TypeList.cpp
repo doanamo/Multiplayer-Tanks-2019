@@ -4,6 +4,7 @@
 #include "Game/World/Object.hpp"
 #include "Game/Objects/Tank.hpp"
 #include "Game/Objects/Projectile.hpp"
+#include "Network/Replication/Replicable.hpp"
 #include "Network/Packets/Protocol.hpp"
 
 #define REGISTER_TYPE(type) g_runtimeTypes->registerType(type::staticTypeInfo());
@@ -15,6 +16,7 @@ bool registerTypes()
     ASSERT(g_runtimeTypes != nullptr);
 
     REGISTER_TYPE(Object);
+    REGISTER_TYPE(Replicable);
     REGISTER_TYPE(Tank);
     REGISTER_TYPE(Projectile);
 

@@ -1,10 +1,11 @@
 #pragma once
 
 #include "Game/World/Object.hpp"
+#include "Network/Replication/Replicable.hpp"
 
-class Projectile : public Object
+class Projectile : public Replicable
 {
-    TYPE_DECLARE(Projectile, Object);
+    TYPE_DECLARE(Projectile, Replicable);
 
 public:
     Projectile();

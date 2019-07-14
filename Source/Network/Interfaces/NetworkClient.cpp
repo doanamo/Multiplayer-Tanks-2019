@@ -61,6 +61,8 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
 
 void NetworkClient::update(float timeDelta)
 {
+    NetworkBase::update(timeDelta);
+
     // Send periodical packet.
     m_hearbeatTimer = std::max(0.0f, m_hearbeatTimer - timeDelta);
 
@@ -91,10 +93,13 @@ void NetworkClient::update(float timeDelta)
 
 void NetworkClient::tick(float timeDelta)
 {
+    NetworkBase::tick(timeDelta);
 }
 
 void NetworkClient::draw()
 {
+    NetworkBase::draw();
+
     // Draw ImGui debug window.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
     if(ImGui::Begin("Network State (Client)##NetworkState", &cv_showNetwork.value))

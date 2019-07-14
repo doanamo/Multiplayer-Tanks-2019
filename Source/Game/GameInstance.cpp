@@ -12,9 +12,6 @@
 
 GameInstance::GameInstance() :
     m_tickFrame(0),
-    m_world(nullptr),
-    m_level(nullptr),
-    m_playerController(nullptr),
     m_isViewportCentered(false),
     m_isCameraAttachedToPlayer(true)
 {
@@ -22,10 +19,6 @@ GameInstance::GameInstance() :
 
 GameInstance::~GameInstance()
 {
-    // Shutdown systems in reverse order.
-    m_playerController = nullptr;
-    m_level = nullptr;
-    m_world = nullptr;
 }
 
 bool GameInstance::initialize(const NetworkParams& networkParams)
