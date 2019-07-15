@@ -62,6 +62,9 @@ void Replication::onObjectCreated(Object& object)
 
     // Create replicable object entry.
     ReplicableList::HandleEntryRef handleEntry = m_replicables.createHandle();
+    ASSERT(handleEntry.value != nullptr, "Failed to create handle entry!");
+
+    // Fill handle entry's data.
     handleEntry.value->objectHandle = replicable->getHandle();
     handleEntry.value->object = &object;
 

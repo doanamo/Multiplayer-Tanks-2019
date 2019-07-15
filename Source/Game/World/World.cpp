@@ -251,7 +251,7 @@ ObjectHandle World::addObject(ObjectEntry::ObjectPtr&& object, std::string name,
 
     // Create new handle.
     ObjectList::HandleEntryRef handleEntry = m_objects.createHandle();
-    ASSERT(handleEntry.value != nullptr);
+    ASSERT(handleEntry.value != nullptr, "Failed to create handle entry!");
 
     // Retrieve object entry.
     ObjectEntry& objectEntry = *handleEntry.value;

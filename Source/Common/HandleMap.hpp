@@ -151,7 +151,7 @@ public:
 
     // Container types.
     using HandleList = std::vector<HandleEntry>;
-    using FreeList = std::queue<typename HandleType::ValueType>;
+    using FreeList = std::deque<typename HandleType::ValueType>;
 
     // Iterator class.
     // Forward iterator that skips over invalid handles.
@@ -248,27 +248,90 @@ public:
     }
 
     // Creates new handle.
-    HandleEntryRef createHandle()
+    HandleEntryRef createHandle(HandleType requestedHandle = HandleType())
     {
-        // Create new handle entry if free list is empty.
-        if(m_freeList.empty())
+        // Free list entry index that we want to use.
+        // Initially pointing at invalid end element and needs to be found or created.
+        auto freeEntryIndex = m_freeList.end();
+
+        // Check if requested handle identifier is in free list queue.
+        if(requestedHandle.isValid())
         {
+            // Find handle index in free list queue that interests us.
+            freeEntryIndex = std::find_if(m_freeList.begin(), m_freeList.end(), [requestedHandle](const HandleValueType & identifier)
+            {
+                return identifier == requestedHandle.getIdentifier();
+            });
+
+            // Check if handle with this identifier is already in use.
+            if(freeEntryIndex == m_freeList.end())
+            {
+                HandleValueType currentMaxIdentifier = (HandleValueType)m_handles.size();
+                if(requestedHandle.getIdentifier() <= currentMaxIdentifier)
+                {
+                    // We are unable to create requested handle because it's already in use.
+                    return HandleEntryRef();
+                }
+            }
+        }
+
+        // Create new handles if free list is empty or until we get the requested handle.
+        while(m_freeList.empty() || requestedHandle.isValid())
+        {
+            // Check if we already have our requested handle.
+            if(freeEntryIndex != m_freeList.end())
+                break;
+
             // Create handle entry with new index.
             HandleValueType newHandleIdentifier = (HandleValueType)(m_handles.size() + 1);
             m_handles.emplace_back(HandleType(newHandleIdentifier));
 
             // Add new object entry to free list.
             std::size_t currentObjectEntryCount = m_handles.size();
-            m_freeList.push((HandleValueType)(currentObjectEntryCount - 1));
+            m_freeList.push_back((HandleValueType)(currentObjectEntryCount - 1));
+
+            // Check if this is our requested identifier.
+            if(requestedHandle.isValid())
+            {
+                if(requestedHandle.getIdentifier() == newHandleIdentifier)
+                {
+                    // We got our requested handle. Pop it next.
+                    // We can step back using end iterator as we know free list is not empty at this point.
+                    freeEntryIndex = m_freeList.end() - 1;
+                    break;
+                }
+            }
+            else
+            {
+                // If we want any handle, return one from the beginning of queue.
+                // Removing free entires from front of queue will help keep a healthy pool of handles that will not overflow quick.
+                freeEntryIndex = m_freeList.begin();
+            }
+        }
+
+        // Check if we have our handle candidate.
+        if(freeEntryIndex == m_freeList.end())
+        {
+            // We may still not have a valid free entry selected. Choose the free entry in front.
+            freeEntryIndex = m_freeList.begin();
         }
 
         // Get free handle entry from free list queue.
-        std::size_t entryIndex = m_freeList.front();
-        HandleEntry& handleEntry = m_handles[entryIndex];
-        m_freeList.pop();
+        HandleEntry& handleEntry = m_handles[*freeEntryIndex];
+
+        // Set requested handle version.
+        // There is no harm in bumping handle version.
+        if(requestedHandle.isValid())
+        {
+            ASSERT(handleEntry.handle.m_version <= requestedHandle.m_version, "Requesting handle that will result in handle reuse!");
+            handleEntry.handle.m_version = requestedHandle.m_version;
+        }
 
         // Mark handle entry as valid.
         handleEntry.valid = true;
+
+        // Erase index from free list queue.
+        m_freeList.erase(freeEntryIndex);
 
         // Return handle entry reference.
         return HandleEntryRef(handleEntry);
@@ -307,7 +370,7 @@ public:
         
         // Add entry index to free list.
         ASSERT(handleEntry->handle.getIdentifier() != 0);
-        m_freeList.push(handleEntry->handle.getIdentifier() - 1);
+        m_freeList.push_back(handleEntry->handle.getIdentifier() - 1);
 
         // Successfully removed handle.
         return true;
