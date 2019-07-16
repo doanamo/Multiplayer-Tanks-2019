@@ -58,6 +58,11 @@ public:
     // Gets object's replicable handle.
     ReplicableHandle getReplicableHandle() const;
 
+protected:
+    // Serialization methods.
+    virtual bool onSerialize(MemoryStream& buffer) const override;
+    virtual bool onDeserialize(MemoryStream& buffer) override;
+
 private:
     // Replicable network handle.
     ReplicableHandle m_replicableHandle;

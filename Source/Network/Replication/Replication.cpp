@@ -11,6 +11,8 @@
     - DONE: There should be a way for objects/systems to do both onReliableReplication() and onUnreliableReplication(), whetever they choose
     - DONE: Register world for replication and subscribe to important events such as object creation and destruction
     - DONE: Create a replicated object map, we need our own network IDs as every client will have different object IDs
+    - DONE: Serialize network handles in world serialization, along with objects? Not ideal. Make replication system do that. But how do refer back to those objects???
+      Make serializable interface serialize/deserialize that. But how do we put those back in replication system? In OnCreatw!!!! :D:D:D
     - Client should not be able to create replicated objects. There should be an assert in place that will catch attempts to spawn on client.
     - Sent server snapshot does not contain replicable handles. Objects are saved one by one from the list and then recreated with different handles.
       We need to serialize network handles and HandleMap should be able to recreate handle identifier in any order (not starting sequentially from 0).
@@ -61,15 +63,19 @@ void Replication::onObjectCreated(Object& object)
     if(replicable == nullptr) return;
 
     // Create replicable object entry.
-    ReplicableList::HandleEntryRef handleEntry = m_replicables.createHandle();
+    ReplicableHandle requestedHandle = replicable->getReplicableHandle();
+    ReplicableList::HandleEntryRef handleEntry = m_replicables.createHandle(requestedHandle);
     ASSERT(handleEntry.value != nullptr, "Failed to create handle entry!");
 
     // Fill handle entry's data.
     handleEntry.value->objectHandle = replicable->getHandle();
     handleEntry.value->object = &object;
 
-    // Fill object's replicable handle.
-    replicable->m_replicableHandle = handleEntry.handle;
+    // Set object's replicable handle, unless it already has one (e.g. after deserialization).
+    if(!replicable->getReplicableHandle().isValid())
+    {
+        replicable->m_replicableHandle = handleEntry.handle;
+    }
 }
 
 void Replication::onObjectDestroyed(Object& object)

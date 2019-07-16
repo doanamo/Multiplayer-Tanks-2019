@@ -8,7 +8,7 @@ class HandleMap;
 
 // Handle class.
 template<typename Type>
-class Handle
+class Handle : public Serializable
 {
 public:
     // Type declarations.
@@ -56,6 +56,30 @@ public:
     bool isValid() const
     {
         return m_identifier != 0;
+    }
+
+protected:
+    // Serialization methods.
+    bool onSerialize(MemoryStream& buffer) const override final
+    {
+        if(!serialize(buffer, m_identifier))
+            return false;
+
+        if(!serialize(buffer, m_version))
+            return false;
+
+        return true;
+    }
+
+    bool onDeserialize(MemoryStream& buffer) override final
+    {
+        if(!serialize(buffer, m_identifier))
+            return false;
+        
+        if(!serialize(buffer, m_version))
+            return false;
+
+        return true;
     }
 
 private:

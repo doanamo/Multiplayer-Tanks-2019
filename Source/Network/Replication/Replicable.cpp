@@ -43,3 +43,27 @@ ReplicableHandle Replicable::getReplicableHandle() const
 {
     return m_replicableHandle;
 }
+
+bool Replicable::onSerialize(MemoryStream& buffer) const
+{
+    if(!Super::onSerialize(buffer))
+        return false;
+
+    // Serialize networked handle.
+    if(!serialize(buffer, m_replicableHandle))
+        return false;
+
+    return true;
+}
+
+bool Replicable::onDeserialize(MemoryStream& buffer)
+{
+    if(!Super::onDeserialize(buffer))
+        return false;
+
+    // Serialize networked handle.
+    if(!deserialize(buffer, &m_replicableHandle))
+        return false;
+
+    return true;
+}
