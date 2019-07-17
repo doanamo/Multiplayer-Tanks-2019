@@ -1,5 +1,5 @@
 #include "Precompiled.hpp"
-#include "Replication.hpp"
+#include "ReplicationBase.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
 
@@ -13,26 +13,33 @@
     - DONE: Create a replicated object map, we need our own network IDs as every client will have different object IDs
     - DONE: Serialize network handles in world serialization, along with objects? Not ideal. Make replication system do that. But how do refer back to those objects???
       Make serializable interface serialize/deserialize that. But how do we put those back in replication system? In OnCreatw!!!! :D:D:D
-    - Client should not be able to create replicated objects. There should be an assert in place that will catch attempts to spawn on client.
-    - Sent server snapshot does not contain replicable handles. Objects are saved one by one from the list and then recreated with different handles.
+    - DONE: Sent server snapshot does not contain replicable handles. Objects are saved one by one from the list and then recreated with different handles.
       We need to serialize network handles and HandleMap should be able to recreate handle identifier in any order (not starting sequentially from 0).
       This cam be accomplished by creating new handle identifiers and pushing them to free list until we get the one we want (slow, but we only want this once).
+    - Client should not be able to create replicated objects. There should be an assert in place that will catch attempts to spawn on client.
+    - Sending create/destroy (always reliable) and tick (either reliable or unreliable) commands to clients.
     - Register systems that need onReliableReplication() and onUnreliableReplication() methods called, using common interface
-    - Inside onReplication() object should write type of replication and then own data directly into memory stream, just like serialization
-    - Replication system that calls onReplication() on each object will first write networkObjectID (base class)
-    - Replicate creation and destruction of objects as ordered reliable packets
+    - Inside onReplication() object should write type of replication and then own data directly into memory stream, just like serialization.
+    - Replication system that calls onReplication() on each object will first write networkObjectID (base class).
+    - Replicate creation and destruction of objects as ordered reliable packets.
+    - One way or either way replication. What if player object is updated and simulated on client, and server only checks validity.
+      This is very complex, as we have to ensure that we are perfectly syncing between frames.
+    - Latency measurement and calculating packet delay.-
+    - Based on latency, buffer packets and run deterministic simulation (e.g. why send projectile destroy, if we know it collided at this frame).
+    - Preventing some logic from running on clients, e.g. dealing damage. Handled by DamageSystem? Some systems should not exist on clients?
+      What about objects that destroy and modify themselves?
 */
 
 ConsoleVariable<bool> cv_showReplicationInfo("showReplicationInfo", false);
 
-Replication::Replication() :
+ReplicationBase::ReplicationBase() :
     m_world(nullptr),
     m_initialized(false)
 {
 
 }
 
-Replication::~Replication()
+ReplicationBase::~ReplicationBase()
 {
     if(m_world)
     {
@@ -41,22 +48,22 @@ Replication::~Replication()
     }
 }
 
-bool Replication::initialize(GameInstance* gameInstance)
+bool ReplicationBase::initialize(GameInstance* gameInstance)
 {
     // Retrieve world reference.
     m_world = gameInstance->getWorld();
     ASSERT(m_world != nullptr);
 
     // Hook callback methods in world for object creation and destruction.
-    m_world->replicationObjectCreated = std::bind(&Replication::onObjectCreated, this, std::placeholders::_1);
-    m_world->replicationObjectDestroyed = std::bind(&Replication::onObjectDestroyed, this, std::placeholders::_1);
+    m_world->replicationObjectCreated = std::bind(&ReplicationBase::onObjectCreated, this, std::placeholders::_1);
+    m_world->replicationObjectDestroyed = std::bind(&ReplicationBase::onObjectDestroyed, this, std::placeholders::_1);
 
     // Success!
     m_initialized = true;
     return true;
 }
 
-void Replication::onObjectCreated(Object& object)
+void ReplicationBase::onObjectCreated(Object& object)
 {
     // Check if object is replicable.
     Replicable* replicable = object.as<Replicable>();
@@ -78,7 +85,7 @@ void Replication::onObjectCreated(Object& object)
     }
 }
 
-void Replication::onObjectDestroyed(Object& object)
+void ReplicationBase::onObjectDestroyed(Object& object)
 {
     // Check if object is replicable.
     Replicable* replicable = object.as<Replicable>();
@@ -93,7 +100,7 @@ void Replication::onObjectDestroyed(Object& object)
     ASSERT(result, "Failed to remove replicable handle that should exist!");
 }
 
-void Replication::draw()
+void ReplicationBase::draw()
 {
     // Draw debug window.
     if(cv_showReplicationInfo.value)

@@ -9,7 +9,7 @@ class GameInstance;
 class World;
 
 // Replication class.
-class Replication
+class ReplicationBase
 {
 public:
     // List of replicable network handles.
@@ -17,8 +17,8 @@ public:
     using ReplicableList = HandleMap<ReplicableEntry>;
 
 public:
-    Replication();
-    ~Replication();
+    ReplicationBase();
+    virtual ~ReplicationBase();
 
     // Initializes replication.
     bool initialize(GameInstance* gameInstance);

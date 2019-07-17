@@ -1,5 +1,6 @@
 #include "Precompiled.hpp"
 #include "NetworkClient.hpp"
+#include "Network/Replication/ReplicationClient.hpp"
 #include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
@@ -17,6 +18,11 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
 {
     // Initialize base class.
     if(!NetworkBase::initialize(gameInstance))
+        return false;
+
+    // Initialize replication system.
+    m_replication = std::make_unique<ReplicationClient>();
+    if(!m_replication->initialize(gameInstance))
         return false;
 
     // Initialize socket connection.

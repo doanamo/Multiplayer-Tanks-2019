@@ -9,7 +9,7 @@ extern ConsoleVariable<bool> cv_showNetwork;
 
 // Forward declarations.
 class GameInstance;
-class Replication;
+class ReplicationBase;
 
 // Network base class.
 class NetworkBase : public NetworkInterface
@@ -28,7 +28,7 @@ public:
     virtual void draw() override;
 
     // Gets replication system.
-    Replication* getReplication();
+    ReplicationBase& getReplication();
 
 protected:
     // Serializes and sends packet.
@@ -49,5 +49,5 @@ protected:
     GameInstance* m_gameInstance;
 
     // Replication system.
-    std::unique_ptr<Replication> m_replication;
+    std::unique_ptr<ReplicationBase> m_replication;
 };

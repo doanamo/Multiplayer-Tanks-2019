@@ -1,6 +1,7 @@
 #include "Precompiled.hpp"
 #include "NetworkServer.hpp"
 #include "Network/Connection/ConnectionBackend.hpp"
+#include "Network/Replication/ReplicationServer.hpp"
 #include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
@@ -17,8 +18,13 @@ NetworkServer::~NetworkServer()
 
 bool NetworkServer::initialize(GameInstance* gameInstance, unsigned short port)
 {
-    // Initializes UDP socket.
+    // Initialize base class.
     if(!NetworkBase::initialize(gameInstance))
+        return false;
+
+    // Initialize replication system.
+    m_replication = std::make_unique<ReplicationServer>();
+    if(!m_replication->initialize(gameInstance))
         return false;
 
     // Initialize socket connection.

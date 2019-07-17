@@ -1,6 +1,6 @@
 #include "Precompiled.hpp"
 #include "NetworkBase.hpp"
-#include "Network/Replication/Replication.hpp"
+#include "Network/Replication/ReplicationBase.hpp"
 #include "Network/Packets/PacketHeader.hpp"
 #include "Game/GameInstance.hpp"
 
@@ -26,11 +26,6 @@ bool NetworkBase::initialize(GameInstance* gameInstance)
 
     m_gameInstance = gameInstance;
 
-    // Initialize replication system.
-    m_replication = std::make_unique<Replication>();
-    if(!m_replication->initialize(gameInstance))
-        return false;
-    
     // Success!
     return true;
 }
@@ -124,7 +119,8 @@ bool NetworkBase::readPacket(MemoryStream& packetData, std::unique_ptr<PacketBas
     return true;
 }
 
-Replication* NetworkBase::getReplication()
+ReplicationBase& NetworkBase::getReplication()
 {
-    return m_replication.get();
+    ASSERT(m_replication != nullptr, "Replication was not instantiated!");
+    return *m_replication;
 }

@@ -4,7 +4,7 @@
 #include "Game/World/Object.hpp"
 
 // Forward declarations.
-class Replication;
+class ReplicationBase;
 
 // Replicable entry.
 struct ReplicableEntry
@@ -28,7 +28,7 @@ class Replicable : public Object
 
 protected:
     // Allow replication system to access this class.
-    friend Replication;
+    friend ReplicationBase;
 
     // Protected constructor.
     Replicable();
