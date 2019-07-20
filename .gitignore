@@ -1,3 +1,6 @@
+# Ignore Visual Studio temporary folder.
+.vs/
+
 # Ignore CMake build directories containing temporary files.
 Build/CMake-*/
 
