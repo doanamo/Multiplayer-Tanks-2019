@@ -4,7 +4,7 @@
 #include "Network/Packets/PacketHeader.hpp"
 #include "Game/GameInstance.hpp"
 
-ConsoleVariable<bool> cv_showNetwork("showNetwork", false);
+ConsoleVariable<bool> cv_showNetworkInfo("showNetworkInfo", false);
 
 NetworkBase::NetworkBase()
 {
@@ -34,14 +34,19 @@ void NetworkBase::update(float timeDelta)
 {
 }
 
-void NetworkBase::tick(float timeDelta)
+void NetworkBase::preTick(float timeDelta)
 {
+}
+
+void NetworkBase::postTick(float timeDelta)
+{
+
 }
 
 void NetworkBase::draw()
 {
     // Draw replication debug.
-    m_replication->draw();
+    getReplication().draw();
 }
 
 bool NetworkBase::sendPacket(ConnectionSocket& socket, PacketBase& packet, bool reliable, const sf::IpAddress* address, const unsigned short* port)
@@ -119,8 +124,7 @@ bool NetworkBase::readPacket(MemoryStream& packetData, std::unique_ptr<PacketBas
     return true;
 }
 
-ReplicationBase& NetworkBase::getReplication()
+ConnectionSocket& NetworkBase::getSocket()
 {
-    ASSERT(m_replication != nullptr, "Replication was not instantiated!");
-    return *m_replication;
+    return m_socket;
 }

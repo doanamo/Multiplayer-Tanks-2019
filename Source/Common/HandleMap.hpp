@@ -73,10 +73,10 @@ protected:
 
     bool onDeserialize(MemoryStream& buffer) override final
     {
-        if(!serialize(buffer, m_identifier))
+        if(!deserialize(buffer, &m_identifier))
             return false;
         
-        if(!serialize(buffer, m_version))
+        if(!deserialize(buffer, &m_version))
             return false;
 
         return true;

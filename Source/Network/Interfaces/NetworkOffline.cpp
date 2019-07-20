@@ -14,7 +14,11 @@ void NetworkOffline::update(float timeDelta)
 {
 }
 
-void NetworkOffline::tick(float timeDelta)
+void NetworkOffline::preTick(float timeDelta)
+{
+}
+
+void NetworkOffline::postTick(float timeDelta)
 {
 }
 

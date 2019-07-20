@@ -191,7 +191,8 @@ int main(int argc, char* argv[])
             if(provision)
             {
                 gameProcesses[i].arguments += "-showConsole 1 ";
-                gameProcesses[i].arguments += "-showNetwork 1 ";
+                gameProcesses[i].arguments += "-showNetworkInfo 1 ";
+                gameProcesses[i].arguments += "-showReplicationInfo 1 ";
             }
 
             // Make the first player a host.

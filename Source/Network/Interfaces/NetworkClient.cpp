@@ -1,6 +1,5 @@
 #include "Precompiled.hpp"
 #include "NetworkClient.hpp"
-#include "Network/Replication/ReplicationClient.hpp"
 #include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
@@ -21,8 +20,7 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
         return false;
 
     // Initialize replication system.
-    m_replication = std::make_unique<ReplicationClient>();
-    if(!m_replication->initialize(gameInstance))
+    if(!m_replication.initialize(gameInstance))
         return false;
 
     // Initialize socket connection.
@@ -97,9 +95,14 @@ void NetworkClient::update(float timeDelta)
     }
 }
 
-void NetworkClient::tick(float timeDelta)
+void NetworkClient::preTick(float timeDelta)
 {
-    NetworkBase::tick(timeDelta);
+    NetworkBase::preTick(timeDelta);
+}
+
+void NetworkClient::postTick(float timeDelta)
+{
+    NetworkBase::postTick(timeDelta);
 }
 
 void NetworkClient::draw()
@@ -108,7 +111,7 @@ void NetworkClient::draw()
 
     // Draw ImGui debug window.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
-    if(ImGui::Begin("Network State (Client)##NetworkState", &cv_showNetwork.value))
+    if(ImGui::Begin("Network State (Client)##NetworkState", &cv_showNetworkInfo.value))
     {
 
     }
@@ -124,4 +127,9 @@ NetworkMode NetworkClient::getMode() const
 bool NetworkClient::isConnected() const
 {
     return false;
+}
+
+ReplicationBase& NetworkClient::getReplication()
+{
+    return m_replication;
 }

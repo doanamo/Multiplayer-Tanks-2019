@@ -2,11 +2,13 @@
 
 #include "Precompiled.hpp"
 #include "Common/HandleMap.hpp"
+#include "ReplicationCommand.hpp"
 #include "Replicable.hpp"
 
 // Forward declarations.
 class GameInstance;
 class World;
+class NetworkBase;
 
 // Replication class.
 class ReplicationBase
@@ -26,14 +28,14 @@ public:
     // Draws debug info.
     void draw();
 
-public:
+protected:
     // World callback methods for collecting replicables.
-    void onObjectCreated(Object& object);
-    void onObjectDestroyed(Object& object);
+    virtual bool onObjectCreated(Object& object);
+    virtual bool onObjectDestroyed(Object& object);
 
-private:
-    // World reference.
-    World* m_world;
+protected:
+    // Game instance reference.
+    GameInstance* m_gameInstance;
 
     // List of replicable objects.
     ReplicableList m_replicables;

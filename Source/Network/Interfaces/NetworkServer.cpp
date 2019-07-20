@@ -1,7 +1,6 @@
 #include "Precompiled.hpp"
 #include "NetworkServer.hpp"
 #include "Network/Connection/ConnectionBackend.hpp"
-#include "Network/Replication/ReplicationServer.hpp"
 #include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
@@ -23,8 +22,7 @@ bool NetworkServer::initialize(GameInstance* gameInstance, unsigned short port)
         return false;
 
     // Initialize replication system.
-    m_replication = std::make_unique<ReplicationServer>();
-    if(!m_replication->initialize(gameInstance))
+    if(!m_replication.initialize(gameInstance))
         return false;
 
     // Initialize socket connection.
@@ -42,11 +40,11 @@ void NetworkServer::update(float timeDelta)
     NetworkBase::update(timeDelta);
 }
 
-void NetworkServer::tick(float timeDelta)
+void NetworkServer::preTick(float timeDelta)
 {
-    NetworkBase::tick(timeDelta);
+    NetworkBase::preTick(timeDelta);
 
-    // Receive packet from default socket.
+    // Receive packets from default socket.
     // This needs another solution, either simplify or creating ConnectionSwitch for handling connections.
     ConnectionContext& socketContext = m_socket.getConnectionContext();
     ConnectionContext::PacketEntry packetEntry;
@@ -139,13 +137,56 @@ void NetworkServer::tick(float timeDelta)
     }
 }
 
+void NetworkServer::postTick(float timeDelta)
+{
+    NetworkBase::postTick(timeDelta);
+
+    // Prepare reliable server update packet.
+    PacketServerUpdate reliableUpdatePacket;
+    reliableUpdatePacket.tickFrame = m_gameInstance->getTickFrame();
+    reliableUpdatePacket.replicationCommands = m_replication.getReliableCommands();
+
+    // Prepare unreliable server update packet.
+    PacketServerUpdate unreliableUpdatePacket;
+    unreliableUpdatePacket.tickFrame = m_gameInstance->getTickFrame();
+    unreliableUpdatePacket.replicationCommands = m_replication.getUnreliableCommands();
+
+    // Clear processed replication commands.
+    m_replication.clearReplicationCommands();
+
+    // Send packet to connected clients.
+    for(auto& clientEntry : m_clients)
+    {
+        // Send reliable server update packet, but only if it has any commands.
+        if(!reliableUpdatePacket.replicationCommands.empty())
+        {
+            if(!sendPacket(*clientEntry.socket, reliableUpdatePacket, true))
+            {
+                LOG_ERROR("Failed to send reliable server update packet to client!");
+                continue;
+            }
+        }
+
+        // Send unreliable server update packet, but only if it has any commands.
+        if(!unreliableUpdatePacket.replicationCommands.empty())
+        {
+            if(!sendPacket(*clientEntry.socket, unreliableUpdatePacket, false))
+            {
+                LOG_ERROR("Failed to send unreliable server update packet to client!");
+                continue;
+            }
+        }
+    }
+
+}
+
 void NetworkServer::draw()
 {
     NetworkBase::draw();
 
     // Draw ImGui debug window.
     ImGui::PushStyleVar(ImGuiStyleVar_WindowMinSize, ImVec2(200, 100));
-    if(ImGui::Begin("Network State (Server)##NetworkState", &cv_showNetwork.value))
+    if(ImGui::Begin("Network State (Server)##NetworkState", &cv_showNetworkInfo.value))
     {
     }
     ImGui::End();
@@ -160,4 +201,9 @@ NetworkMode NetworkServer::getMode() const
 bool NetworkServer::isConnected() const
 {
     return true;
+}
+
+ReplicationBase& NetworkServer::getReplication()
+{
+    return m_replication;
 }

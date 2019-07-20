@@ -7,7 +7,7 @@
 struct ReplicationCommand
 {
     // Type of replication.
-    enum ReplicationType
+    enum ReplicationType : uint8_t
     {
         Create,
         Update,
@@ -22,3 +22,7 @@ struct ReplicationCommand
     // Replication data for specified handle.
     MemoryStream data;
 };
+
+// Serialization functions.
+bool serialize(MemoryStream& stream, const ReplicationCommand& command);
+bool deserialize(MemoryStream& stream, ReplicationCommand* command);

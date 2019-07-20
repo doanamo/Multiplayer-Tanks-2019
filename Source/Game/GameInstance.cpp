@@ -122,8 +122,8 @@ void GameInstance::update(float timeDelta)
 
 void GameInstance::tick(float timeDelta)
 {
-    // Tick network interface.
-    m_network->tick(timeDelta);
+    // Pre tick network interface.
+    m_network->preTick(timeDelta);
 
     // Increment total tick count.
     ++m_tickFrame;
@@ -136,6 +136,9 @@ void GameInstance::tick(float timeDelta)
 
     // Tick world instance.
     m_world->tick(timeDelta);
+
+    // Post tick network interface.
+    m_network->postTick(timeDelta);
 }
 
 void GameInstance::draw(float timeAlpha)

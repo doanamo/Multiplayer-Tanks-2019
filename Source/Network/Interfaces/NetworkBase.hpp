@@ -5,7 +5,7 @@
 #include "Network/Connection/ConnectionSocket.hpp"
 
 // Global declarations.
-extern ConsoleVariable<bool> cv_showNetwork;
+extern ConsoleVariable<bool> cv_showNetworkInfo;
 
 // Forward declarations.
 class GameInstance;
@@ -24,11 +24,15 @@ public:
     // Network methods.
     bool initialize(GameInstance* gameInstance);
     virtual void update(float timeDelta) override;
-    virtual void tick(float timeDelta) override;
+    virtual void preTick(float timeDelta) override;
+    virtual void postTick(float timeDelta) override;
     virtual void draw() override;
 
+    // Gets connection socket.
+    ConnectionSocket& getSocket();
+
     // Gets replication system.
-    ReplicationBase& getReplication();
+    virtual ReplicationBase& getReplication() = 0;
 
 protected:
     // Serializes and sends packet.
@@ -47,7 +51,4 @@ protected:
 
     // Game instance reference.
     GameInstance* m_gameInstance;
-
-    // Replication system.
-    std::unique_ptr<ReplicationBase> m_replication;
 };

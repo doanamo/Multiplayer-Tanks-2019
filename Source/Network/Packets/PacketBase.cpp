@@ -16,7 +16,7 @@ bool PacketBase::onSerialize(MemoryStream& buffer) const
 
 bool PacketBase::onDeserialize(MemoryStream& buffer)
 {
-    // #todo: Look for a better solution which would instantiate object automatically on deserialization.
+    // #todo: Look for a better solution which would instantiate correct packet type automatically on deserialization.
 
     return true;
 }

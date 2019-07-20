@@ -11,7 +11,8 @@ public:
 
     // Network methods.
     void update(float timeDelta) override;
-    void tick(float timeDelta) override;
+    void preTick(float timeDelta) override;
+    void postTick(float timeDelta) override;
     void draw() override;
 
     // Network info.

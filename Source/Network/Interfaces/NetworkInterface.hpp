@@ -34,7 +34,8 @@ public:
 
     // Network methods.
     virtual void update(float timeDelta) = 0;
-    virtual void tick(float timeDelta) = 0;
+    virtual void preTick(float timeDelta) = 0;
+    virtual void postTick(float timeDelta) = 0;
     virtual void draw() = 0;
 
     // Network info.

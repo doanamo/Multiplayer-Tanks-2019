@@ -16,6 +16,7 @@
     - DONE: Sent server snapshot does not contain replicable handles. Objects are saved one by one from the list and then recreated with different handles.
       We need to serialize network handles and HandleMap should be able to recreate handle identifier in any order (not starting sequentially from 0).
       This cam be accomplished by creating new handle identifiers and pushing them to free list until we get the one we want (slow, but we only want this once).
+    - Implement sending of gathered commands (we want replication form server to client to work at minimum, will not be playable).
     - Client should not be able to create replicated objects. There should be an assert in place that will catch attempts to spawn on client.
     - Sending create/destroy (always reliable) and tick (either reliable or unreliable) commands to clients.
     - Register systems that need onReliableReplication() and onUnreliableReplication() methods called, using common interface
@@ -33,41 +34,42 @@
 ConsoleVariable<bool> cv_showReplicationInfo("showReplicationInfo", false);
 
 ReplicationBase::ReplicationBase() :
-    m_world(nullptr),
+    m_gameInstance(nullptr),
     m_initialized(false)
 {
-
 }
 
 ReplicationBase::~ReplicationBase()
 {
-    if(m_world)
+    // Unregister callbacks.
+    if(m_gameInstance && m_gameInstance->getWorld())
     {
-        m_world->replicationObjectCreated = nullptr;
-        m_world->replicationObjectDestroyed = nullptr;
+        m_gameInstance->getWorld()->replicationObjectCreated = nullptr;
+        m_gameInstance->getWorld()->replicationObjectDestroyed = nullptr;
     }
 }
 
 bool ReplicationBase::initialize(GameInstance* gameInstance)
 {
-    // Retrieve world reference.
-    m_world = gameInstance->getWorld();
-    ASSERT(m_world != nullptr);
+    // Save game instance reference.
+    m_gameInstance = gameInstance;
+    ASSERT(m_gameInstance);
 
     // Hook callback methods in world for object creation and destruction.
-    m_world->replicationObjectCreated = std::bind(&ReplicationBase::onObjectCreated, this, std::placeholders::_1);
-    m_world->replicationObjectDestroyed = std::bind(&ReplicationBase::onObjectDestroyed, this, std::placeholders::_1);
+    m_gameInstance->getWorld()->replicationObjectCreated = std::bind(&ReplicationBase::onObjectCreated, this, std::placeholders::_1);
+    m_gameInstance->getWorld()->replicationObjectDestroyed = std::bind(&ReplicationBase::onObjectDestroyed, this, std::placeholders::_1);
 
     // Success!
     m_initialized = true;
     return true;
 }
 
-void ReplicationBase::onObjectCreated(Object& object)
+bool ReplicationBase::onObjectCreated(Object& object)
 {
     // Check if object is replicable.
     Replicable* replicable = object.as<Replicable>();
-    if(replicable == nullptr) return;
+    if(replicable == nullptr)
+        return false;
 
     // Create replicable object entry.
     ReplicableHandle requestedHandle = replicable->getReplicableHandle();
@@ -83,13 +85,17 @@ void ReplicationBase::onObjectCreated(Object& object)
     {
         replicable->m_replicableHandle = handleEntry.handle;
     }
+
+    // Success!
+    return true;
 }
 
-void ReplicationBase::onObjectDestroyed(Object& object)
+bool ReplicationBase::onObjectDestroyed(Object& object)
 {
     // Check if object is replicable.
     Replicable* replicable = object.as<Replicable>();
-    if(replicable == nullptr) return;
+    if(replicable == nullptr)
+        return false;
 
     // Retrieve objects replicable handle.
     ReplicableHandle replicableHandle = replicable->m_replicableHandle;
@@ -98,6 +104,9 @@ void ReplicationBase::onObjectDestroyed(Object& object)
     // Remove replicable object entry.
     bool result = m_replicables.removeHandle(replicableHandle);
     ASSERT(result, "Failed to remove replicable handle that should exist!");
+
+    // Success!
+    return true;
 }
 
 void ReplicationBase::draw()
