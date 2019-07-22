@@ -78,7 +78,6 @@ bool ReplicationBase::onObjectCreated(Object& object)
 
     // Fill handle entry's data.
     handleEntry.value->objectHandle = replicable->getHandle();
-    handleEntry.value->object = &object;
 
     // Set object's replicable handle, unless it already has one (e.g. after deserialization).
     if(!replicable->getReplicableHandle().isValid())
@@ -120,12 +119,15 @@ void ReplicationBase::draw()
 
             for(auto replicableEntry : m_replicables)
             {
+                Object* replicableObject = m_gameInstance->getWorld()->getObjectByHandle(replicableEntry.value->objectHandle);
+                ASSERT(replicableObject != nullptr, "Object expected to exist at this point!");
+
                 ImGui::BulletText("%u/%u : %u/%u (%s)",
                     replicableEntry.handle.getIdentifier(),
                     replicableEntry.handle.getVersion(),
-                    replicableEntry.value->object->getHandle().getIdentifier(),
-                    replicableEntry.value->object->getHandle().getVersion(),
-                    replicableEntry.value->object->getTypeInfo().getName()
+                    replicableObject->getHandle().getIdentifier(),
+                    replicableObject->getHandle().getVersion(),
+                    replicableObject->getTypeInfo().getName()
                 );
             }
         }

@@ -10,13 +10,11 @@ class ReplicationBase;
 struct ReplicableEntry
 {
     ReplicableEntry() :
-        objectHandle(),
-        object(nullptr)
+        objectHandle()
     {
     }
 
     ObjectHandle objectHandle;
-    Object* object;
 };
 
 using ReplicableHandle = Handle<ReplicableEntry>;
