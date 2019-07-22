@@ -141,6 +141,9 @@ void NetworkServer::postTick(float timeDelta)
 {
     NetworkBase::postTick(timeDelta);
 
+    // Collect replicable object data.
+    m_replication.collectReplicationData();
+
     // Prepare reliable server update packet.
     PacketServerUpdate reliableUpdatePacket;
     reliableUpdatePacket.tickFrame = m_gameInstance->getTickFrame();

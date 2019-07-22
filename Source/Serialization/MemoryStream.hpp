@@ -35,6 +35,8 @@ public:
     bool onDeserialize(MemoryStream& buffer) override;
 
     // Accessors.
+    bool empty() const;
+    std::size_t index() const;
     std::size_t size() const;
     const char* data() const;
     char* data();

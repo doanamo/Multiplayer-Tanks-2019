@@ -184,6 +184,16 @@ bool MemoryStream::onDeserialize(MemoryStream& buffer)
     return true;
 }
 
+bool MemoryStream::empty() const
+{
+    return m_buffer.empty();
+}
+
+std::size_t MemoryStream::index() const
+{
+    return m_index;
+}
+
 std::size_t MemoryStream::size() const
 {
     return m_buffer.size();

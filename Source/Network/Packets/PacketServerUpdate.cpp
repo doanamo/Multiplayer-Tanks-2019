@@ -32,7 +32,7 @@ bool PacketServerUpdate::onSerialize(MemoryStream& buffer) const
 
 bool PacketServerUpdate::onDeserialize(MemoryStream& buffer)
 {
-    if(!Super::onSerialize(buffer))
+    if(!Super::onDeserialize(buffer))
         return false;
 
     if(!deserialize(buffer, &tickFrame))

@@ -22,6 +22,10 @@ protected:
     virtual bool onSerialize(MemoryStream& buffer) const override;
     virtual bool onDeserialize(MemoryStream& buffer) override;
 
+    // Replication methods.
+    virtual bool serializeInitialReplication(MemoryStream& stream) override;
+    virtual bool deserializeInitialReplication(MemoryStream& stream) override;
+
 private:
     // Remaining projectile lifetime.
     float m_remainingLifetime;

@@ -61,7 +61,7 @@ bool Replicable::onDeserialize(MemoryStream& buffer)
     if(!Super::onDeserialize(buffer))
         return false;
 
-    // Serialize networked handle.
+    // Deserialize networked handle.
     if(!deserialize(buffer, &m_replicableHandle))
         return false;
 

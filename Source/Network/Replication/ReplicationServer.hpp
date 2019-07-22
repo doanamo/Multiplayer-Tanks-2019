@@ -15,6 +15,9 @@ public:
     ReplicationServer();
     ~ReplicationServer();
 
+    // Collects object replication data.
+    void collectReplicationData();
+
     // Clears replication commands.
     void clearReplicationCommands();
 

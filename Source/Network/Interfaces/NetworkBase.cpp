@@ -104,6 +104,7 @@ bool NetworkBase::readPacket(MemoryStream& packetData, std::unique_ptr<PacketBas
 
     // Create packet instance.
     std::unique_ptr<PacketBase> receivedPacket(PacketBase::create(packetType));
+
     if(receivedPacket == nullptr)
     {
         LOG_ERROR("Could not instantiate received packet type!");
@@ -116,6 +117,9 @@ bool NetworkBase::readPacket(MemoryStream& packetData, std::unique_ptr<PacketBas
         LOG_ERROR("Could not deserialize received packet data!");
         return false;
     }
+
+    // Ensure that entire packet data was deserialized.
+    ASSERT(packetData.index() == packetData.size(), "Received packet was not fully read!");
 
     // Move packet to provided unique pointer.
     packet = std::move(receivedPacket);

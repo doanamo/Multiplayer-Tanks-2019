@@ -75,3 +75,25 @@ bool Projectile::onDeserialize(MemoryStream& buffer)
 
     return true;
 }
+
+bool Projectile::serializeInitialReplication(MemoryStream& stream)
+{
+    if(!serialize(stream, m_transform.m_currentPosition))
+        return false;
+
+    if(!serialize(stream, m_transform.m_currentRotation))
+        return false;
+
+    return true;
+}
+
+bool Projectile::deserializeInitialReplication(MemoryStream& stream)
+{
+    if(!deserialize(stream, &m_transform.m_currentPosition))
+        return false;
+
+    if(!deserialize(stream, &m_transform.m_currentRotation))
+        return false;
+
+    return true;
+}
