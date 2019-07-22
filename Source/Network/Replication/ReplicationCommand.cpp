@@ -3,7 +3,9 @@
 
 bool serialize(MemoryStream& stream, const ReplicationCommand& command)
 {
-    if(!serialize(stream, command.type))
+    using enumType = std::underlying_type<ReplicationCommand::ReplicationType>::type;
+
+    if(!serialize(stream, (enumType)command.type))
         return false;
 
     if(!serialize(stream, command.handle))

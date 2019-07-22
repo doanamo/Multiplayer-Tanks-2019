@@ -7,7 +7,7 @@
 struct ReplicationCommand
 {
     // Type of replication.
-    enum ReplicationType : uint8_t
+    enum class ReplicationType : uint8_t
     {
         Create,
         Update,
