@@ -16,7 +16,7 @@ ReplicationServer::~ReplicationServer()
 void ReplicationServer::collectReplicationData()
 {
     // Gather update commands for replicable objects.
-    for(auto& replicableEntry : m_replicables)
+    for(const auto replicableEntry : m_replicables)
     {
         // Retrieve replicable object.
         ASSERT(replicableEntry.valid, "Handle map range iteration expected to skip invalid elements!");
