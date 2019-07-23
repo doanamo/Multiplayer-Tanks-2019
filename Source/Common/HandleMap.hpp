@@ -282,9 +282,9 @@ public:
         if(requestedHandle.isValid())
         {
             // Find handle index in free list queue that interests us.
-            freeEntryIndex = std::find_if(m_freeList.begin(), m_freeList.end(), [requestedHandle](const HandleValueType & identifier)
+            freeEntryIndex = std::find_if(m_freeList.begin(), m_freeList.end(), [requestedHandle](const HandleValueType& index)
             {
-                return identifier == requestedHandle.getIdentifier();
+                return (index + 1) == requestedHandle.getIdentifier();
             });
 
             // Check if handle with this identifier is already in use.
@@ -437,7 +437,7 @@ private:
     HandleEntry* fetchHandleEntry(HandleType handle)
     {
         // Make sure identifier is within handle array's range and return null otherwise.
-        if(handle.getIdentifier() <= 0 && handle.getIdentifier() > (HandleValueType)m_handles.size())
+        if(handle.getIdentifier() <= 0 || handle.getIdentifier() > (HandleValueType)m_handles.size())
             return nullptr;
 
         // Make sure handle versions are matching.
