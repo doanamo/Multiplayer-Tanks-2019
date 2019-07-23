@@ -66,6 +66,11 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
 void NetworkClient::update(float timeDelta)
 {
     NetworkBase::update(timeDelta);
+}
+
+void NetworkClient::preTick(float timeDelta)
+{
+    NetworkBase::preTick(timeDelta);
 
     // Send periodical packet.
     m_hearbeatTimer = std::max(0.0f, m_hearbeatTimer - timeDelta);
@@ -87,17 +92,21 @@ void NetworkClient::update(float timeDelta)
 
     while(receivePacket(m_socket, receivedPacket, nullptr, &senderAddress, &senderPort))
     {
+        if(receivedPacket->is<PacketServerUpdate>())
+        {
+            PacketServerUpdate* packetServerUpdate = receivedPacket->as<PacketServerUpdate>();
+            ASSERT(packetServerUpdate != nullptr);
+
+            m_replication.processServerUpdatePacket(*packetServerUpdate);
+        }
         if(receivedPacket->is<PacketMessage>())
         {
             PacketMessage* packetMessage = receivedPacket->as<PacketMessage>();
+            ASSERT(packetMessage != nullptr);
+
             LOG_INFO("Received message packet with \"%s\" text.", packetMessage->text.c_str());
         }
     }
-}
-
-void NetworkClient::preTick(float timeDelta)
-{
-    NetworkBase::preTick(timeDelta);
 }
 
 void NetworkClient::postTick(float timeDelta)

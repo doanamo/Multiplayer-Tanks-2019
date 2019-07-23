@@ -29,6 +29,13 @@ public:
     void draw();
 
 protected:
+    // Sets replicable handle for replicable object.
+    void setReplicableHandle(Replicable& replicable, const ReplicableHandle& handle);
+
+    // Replicable registration and unregistration methods.
+    void registerReplicable(Replicable& replicable);
+    void unregisterReplicable(const ReplicableHandle& handle);
+    
     // World callback methods for collecting replicables.
     virtual bool onObjectCreated(Object& object);
     virtual bool onObjectDestroyed(Object& object);
@@ -38,6 +45,8 @@ protected:
     GameInstance* m_gameInstance;
 
     // List of replicable objects.
+    // Replicable handles should be in sync between server and client.
+    // Objects pointed by replicable handles may not always be valid on client side (e.g. when prematurely destroyed).
     ReplicableList m_replicables;
 
     // Initialization state.

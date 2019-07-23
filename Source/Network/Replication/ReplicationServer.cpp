@@ -81,23 +81,31 @@ const std::vector<ReplicationCommand>& ReplicationServer::getUnreliableCommands(
 
 bool ReplicationServer::onObjectCreated(Object& object)
 {
-    // Call base method to register replicable object.
-    if(!ReplicationBase::onObjectCreated(object))
-        return false;
-
     // Retrieve replicable class.
     Replicable* replicable = object.as<Replicable>();
-    ASSERT(replicable != nullptr, "Object is not replicable despite base method returning true!");
+    if(replicable == nullptr)
+        return false;
 
-    // Create a replication command.
+    // Register replicable object.
+    registerReplicable(*replicable);
+
+    // Create replication command.
     ReplicationCommand command;
     command.type = ReplicationCommand::ReplicationType::Create;
     command.handle = replicable->getReplicableHandle();
+
+    // Write object type identifier.
+    if(!serialize(command.data, getTypeIdentifier(*replicable)))
+    {
+        LOG_ERROR("Failed to serialize replicable object type identifier!");
+        return false;
+    }
 
     // Write initial replication data.
     if(!replicable->serializeInitialReplication(command.data))
     {
         LOG_ERROR("Failed to serialize initial replication of created object!");
+        return false;
     }
 
     // Add command to reliable queue.
@@ -122,9 +130,8 @@ bool ReplicationServer::onObjectDestroyed(Object& object)
     // Add command to reliable queue.
     m_reliableCommands.push_back(command);
 
-    // Call base method to unregister replicable object.
-    bool result = ReplicationBase::onObjectDestroyed(object);
-    ASSERT(result, "Expected to return true as object is derived from Replicable class!");
+    // Unregister replicable object.
+    unregisterReplicable(replicable->getReplicableHandle());
 
     // Success!
     return true;

@@ -124,10 +124,6 @@ void World::update(float timeDelta)
 
 void World::tick(float timeDelta)
 {
-    // Process objects waiting for creation and destruction.
-    // Do this in tick so object commands get processed once per frame.
-    flushObjects();
-
     // Tick all objects.
     for(auto handleEntry : m_objects)
     {
@@ -141,6 +137,10 @@ void World::tick(float timeDelta)
             objectEntry.object->onTick(timeDelta);
         }
     }
+
+    // Process objects waiting for creation and destruction.
+    // Do this in tick so object commands get processed once per frame.
+    flushObjects();
 }
 
 void World::draw(float timeAlpha)

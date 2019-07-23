@@ -64,48 +64,50 @@ bool ReplicationBase::initialize(GameInstance* gameInstance)
     return true;
 }
 
+void ReplicationBase::registerReplicable(Replicable& replicable)
+{
+    // Check if object has valid handle.
+    // This can occur when prematurely registering object that has not been added to world yet.
+    ASSERT(replicable.getHandle().isValid(), "Replicable object does not have a valid handle!");
+    
+    // Create replicable object entry.
+    ReplicableHandle requestedHandle = replicable.getReplicableHandle();
+    ReplicableList::HandleEntryRef replicableEntry = m_replicables.createHandle(requestedHandle);
+    ASSERT(replicableEntry.value != nullptr, "Failed to create handle entry!");
+
+    // Fill replicable entry data.
+    replicableEntry.value->objectHandle = replicable.getHandle();
+
+    // Set object replicable handle, unless it already had one after being deserialized.
+    if(!replicable.getReplicableHandle().isValid())
+    {
+        setReplicableHandle(replicable, replicableEntry.handle);
+    }
+}
+
+void ReplicationBase::unregisterReplicable(const ReplicableHandle& handle)
+{
+    // Retrieve objects replicable handle.
+    ASSERT(handle.isValid(), "Replicable objects has invalid replicable handle!");
+
+    // Remove replicable object entry.
+    bool result = m_replicables.removeHandle(handle);
+    ASSERT(result, "Could not remove replicable handle!");
+}
+
 bool ReplicationBase::onObjectCreated(Object& object)
 {
-    // Check if object is replicable.
-    Replicable* replicable = object.as<Replicable>();
-    if(replicable == nullptr)
-        return false;
-
-    // Create replicable object entry.
-    ReplicableHandle requestedHandle = replicable->getReplicableHandle();
-    ReplicableList::HandleEntryRef handleEntry = m_replicables.createHandle(requestedHandle);
-    ASSERT(handleEntry.value != nullptr, "Failed to create handle entry!");
-
-    // Fill handle entry's data.
-    handleEntry.value->objectHandle = replicable->getHandle();
-
-    // Set object's replicable handle, unless it already has one (e.g. after deserialization).
-    if(!replicable->getReplicableHandle().isValid())
-    {
-        replicable->m_replicableHandle = handleEntry.handle;
-    }
-
-    // Success!
     return true;
 }
 
 bool ReplicationBase::onObjectDestroyed(Object& object)
 {
-    // Check if object is replicable.
-    Replicable* replicable = object.as<Replicable>();
-    if(replicable == nullptr)
-        return false;
-
-    // Retrieve objects replicable handle.
-    ReplicableHandle replicableHandle = replicable->m_replicableHandle;
-    ASSERT(replicableHandle.isValid(), "Replicable objects has invalid replicable handle!");
-
-    // Remove replicable object entry.
-    bool result = m_replicables.removeHandle(replicableHandle);
-    ASSERT(result, "Failed to remove replicable handle that should exist!");
-
-    // Success!
     return true;
+}
+
+void ReplicationBase::setReplicableHandle(Replicable& replicable, const ReplicableHandle& handle)
+{
+    replicable.m_replicableHandle = handle;
 }
 
 void ReplicationBase::draw()
@@ -119,15 +121,16 @@ void ReplicationBase::draw()
 
             for(auto replicableEntry : m_replicables)
             {
-                Object* replicableObject = m_gameInstance->getWorld()->getObjectByHandle(replicableEntry.value->objectHandle);
-                ASSERT(replicableObject != nullptr, "Object expected to exist at this point!");
+                // Retrieve object bound to replicable entry (it can be null).
+                Object* object = m_gameInstance->getWorld()->getObjectByHandle(replicableEntry.value->objectHandle);
 
+                // Write replicable entry.
                 ImGui::BulletText("%u/%u : %u/%u (%s)",
                     replicableEntry.handle.getIdentifier(),
                     replicableEntry.handle.getVersion(),
-                    replicableObject->getHandle().getIdentifier(),
-                    replicableObject->getHandle().getVersion(),
-                    replicableObject->getTypeInfo().getName()
+                    replicableEntry.value->objectHandle.getIdentifier(),
+                    replicableEntry.value->objectHandle.getVersion(),
+                    object != nullptr ? object->getTypeInfo().getName() : "Invalid"
                 );
             }
         }
