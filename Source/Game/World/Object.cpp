@@ -7,7 +7,7 @@ Object::Object() :
     m_handle(),
     m_name(),
     m_group(),
-    m_resetInterpolation(false)
+    m_resetInterpolation(true)
 {
 }
 
