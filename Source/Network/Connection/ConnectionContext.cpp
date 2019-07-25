@@ -75,7 +75,8 @@ bool ConnectionContext::pushOutgoing_NoLock(const PacketEntry & packetEntry)
         }
 
         // Debug trace.
-        LOG_TRACE("Pushing outgoing packet. (sequence %u, previousReliable %u)",
+        LOG_TRACE("Pushing outgoing %s packet. (sequence %u, previousReliable %u)",
+            outgoingPacket.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
             outgoingPacket.header.sequenceIndex, outgoingPacket.header.previousReliableIndex);
     }
     
@@ -93,7 +94,7 @@ bool ConnectionContext::popOutgoing(PacketEntry* packetEntry)
         // Check if need to send acknowledgment.
         if(m_supportsReliability && m_sendAcknowledgment)
         {
-            LOG_TRACE("Pushing acknowledgment packet. (acknowledgment %u)", m_incomingSequenceIndex);
+            LOG_TRACE("Pushing acknowledgment packet.", m_incomingSequenceIndex);
 
             // Push empty outgoing acknowledgment packet.
             PacketEntry acknowledgmentPacket;
@@ -132,7 +133,8 @@ bool ConnectionContext::popOutgoing(PacketEntry* packetEntry)
         }
 
         // Debug trace.
-        LOG_TRACE("Popping outgoing packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+        LOG_TRACE("Popping outgoing %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+            outgoingPacket.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
             outgoingPacket.header.sequenceIndex, outgoingPacket.header.previousReliableIndex, outgoingPacket.header.acknowledgmentIndex);
     }
 
@@ -171,8 +173,8 @@ bool ConnectionContext::pushIncoming(const PacketEntry& packetEntry)
         {
             if(packetEntry.header.transportMethod == (uint32_t)TransformMethod::Reliable)
             {
-                LOG_TRACE("Early incoming reliable packet acknowledged. (previousReliable %u == immediateIncomingReliable %u)",
-                    packetEntry.header.previousReliableIndex, m_immediateIncomingReliableIndex);
+                LOG_TRACE("Early acknowledgement of incoming reliable packet. (previousReliable %u == immediateIncomingReliable %u, sequenceIndex %u)",
+                    packetEntry.header.previousReliableIndex, m_immediateIncomingReliableIndex, packetEntry.header.sequenceIndex);
 
                 // Update immediate incoming reliable index.
                 m_immediateIncomingReliableIndex = packetEntry.header.sequenceIndex;
@@ -190,7 +192,8 @@ bool ConnectionContext::pushIncoming(const PacketEntry& packetEntry)
         }
 
         // Debug trace.
-        LOG_TRACE("Pushing incoming packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+        LOG_TRACE("Pushing incoming %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+            packetEntry.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
             packetEntry.header.sequenceIndex, packetEntry.header.previousReliableIndex, packetEntry.header.acknowledgmentIndex);
     }
 
@@ -208,7 +211,7 @@ bool ConnectionContext::popIncoming(PacketEntry* packetEntry)
     // Get first usable incoming packet.
     while(!m_incomingQueue.empty())
     {
-        // Pop incoming packet from queue.
+        // Get next incoming packet from queue.
         PacketEntry incomingPacket = m_incomingQueue.top();
 
         // Verify popped packets in terms of reliability.
@@ -267,7 +270,8 @@ bool ConnectionContext::popIncoming(PacketEntry* packetEntry)
             m_sendAcknowledgment = true;
 
             // Debug trace.
-            LOG_TRACE("Popping incoming packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+            LOG_TRACE("Popping incoming %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+                incomingPacket.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
                 incomingPacket.header.sequenceIndex, incomingPacket.header.previousReliableIndex, incomingPacket.header.acknowledgmentIndex);
         }
 

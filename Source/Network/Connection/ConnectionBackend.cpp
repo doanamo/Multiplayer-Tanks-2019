@@ -144,7 +144,13 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
     while(backend->m_initialized)
     {
         // Get start time of this iteration.
-        auto startTime = std::chrono::steady_clock::now();
+        auto startTime = std::chrono::high_resolution_clock::now();
+
+        // Max number of received packets to process in single iteration loop.
+        // This is done to prevent infinite loops when sender keeps spamming us with packets faster than we can process them.
+        // If we ever reach this point, we should raise an error and abort the connection.
+        // We can elegantly implement this by checking sizes of outgoing and incoming buffers.
+        const uint32_t MaxReceivedPacketCount = 100;
 
         // Count number of collected packets.
         uint32_t receivedPacketCount = 0;
@@ -239,6 +245,13 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
 
                 // Increment received packet count.
                 receivedPacketCount++;
+
+                // Check if we reached maximum number of packets that we can process in single iteration.
+                if(receivedPacketCount >= MaxReceivedPacketCount)
+                {
+                    LOG_TRACE("Reached maximum received packet count in single iteration. (receivedPacketCount %u)", receivedPacketCount);
+                    break;
+                }
             }
         }
 
@@ -295,10 +308,13 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
             }
 
             // Send collected outgoing packets.
-            while(!outgoingPackets.empty())
+            if(!outgoingPackets.empty())
             {
                 LOG_TRACE("Sending outgoing packets. (%u packets)", outgoingPackets.size());
-
+            }
+            
+            while(!outgoingPackets.empty())
+            {
                 // Extract packet entry from queue.
                 ConnectionContext::PacketEntry packetEntry = outgoingPackets.front();
                 outgoingPackets.pop();

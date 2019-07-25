@@ -180,7 +180,6 @@ void NetworkServer::postTick(float timeDelta)
             }
         }
     }
-
 }
 
 void NetworkServer::draw()
