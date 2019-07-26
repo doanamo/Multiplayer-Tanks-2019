@@ -41,7 +41,7 @@ bool initializeGlobals(int argc, char* argv[])
     // Initialize logger.
     g_logger = std::make_unique<Logger>();
 
-    if(!g_logger->initialize())
+    if(!g_logger->initialize(argc, argv))
     {
         LOG_ERROR("Could not initialize logger!");
         return false;

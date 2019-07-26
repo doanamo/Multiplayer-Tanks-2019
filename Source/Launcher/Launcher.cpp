@@ -200,10 +200,12 @@ int main(int argc, char* argv[])
             {
                 if(i == 0 && firstPlayerHosts)
                 {
+                    gameProcesses[i].arguments += "-logOutput Server.log ";
                     gameProcesses[i].arguments += "-host -port " + serverPort;
                 }
                 else
                 {
+                    gameProcesses[i].arguments += "-logOutput Client" + std::to_string(i) + ".log ";
                     gameProcesses[i].arguments += "-connect -address " + serverAddress + " -port " + serverPort;
                 }
             }

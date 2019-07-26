@@ -28,7 +28,7 @@ public:
     Logger();
     ~Logger();
 
-    bool initialize();
+    bool initialize(int argc, char* argv[]);
     void setName(const char* name);
     void setNextIndent(int indent);
     void write(LogType type, const char* format, ...);
@@ -49,7 +49,7 @@ private:
     int m_nextIndent;
 
     // File output.
-    const char* OutputLogFile = "Log.txt";
+    const char* OutputLogFile = "Game.log";
     std::ofstream m_logFile;
 };
 

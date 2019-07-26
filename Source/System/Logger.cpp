@@ -14,10 +14,27 @@ Logger::~Logger()
 {
 }
 
-bool Logger::initialize()
+bool Logger::initialize(int argc, char* argv[])
 {
+    // Find log output argument.
+    std::string outputLogFile = OutputLogFile;
+
+    for(int i = 1; i < argc; ++i)
+    {
+        std::string argument(argv[i]);
+
+        if(argument == "-logOutput")
+        {
+            if(i + 1 < argc)
+            {
+                outputLogFile = argv[i + 1];
+                break;
+            }
+        }
+    }
+
     // Open file log output.
-    m_logFile.open(OutputLogFile, std::ios::trunc);
+    m_logFile.open(outputLogFile, std::ios::trunc);
     if(!m_logFile.is_open()) return false;
 
     return true;
