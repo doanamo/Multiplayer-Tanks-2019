@@ -48,7 +48,11 @@ bool ConnectionContext::pushOutgoing_NoLock(const PacketEntry & packetEntry)
     // Verify packet entry.
     if(packetEntry.header.transportMethod == (uint32_t)TransformMethod::Reliable)
     {
-        ASSERT(m_supportsReliability, "Socket must support reliability to send reliable packets!");
+        if(!m_supportsReliability)
+        {
+            ASSERT(false, "Socket must support reliability to send reliable packets!");
+            return false;
+        }
     }
 
     ASSERT(packetEntry.header.sequenceIndex == 0, "Sequence index field should have been left untouched!");
@@ -177,6 +181,9 @@ bool ConnectionContext::pushIncoming(const PacketEntry& packetEntry)
                     packetEntry.header.previousReliableIndex, m_immediateIncomingReliableIndex, packetEntry.header.sequenceIndex);
 
                 // Update immediate incoming reliable index.
+                ASSERT(m_immediateIncomingReliableIndex < packetEntry.header.sequenceIndex,
+                    "We are about to set lower immediate incoming reliable index than the current one!");
+
                 m_immediateIncomingReliableIndex = packetEntry.header.sequenceIndex;
 
                 // Send acknowledgment as soon as possible.
@@ -237,6 +244,7 @@ bool ConnectionContext::popIncoming(PacketEntry* packetEntry)
                         incomingPacket.header.sequenceIndex, m_incomingSequenceIndex);
 
                     // Request new acknowledgment packet to be sent.
+                    // We only want to resend acknowledgment for the last resent incoming packet.
                     m_sendAcknowledgment = true;
                 }
 
