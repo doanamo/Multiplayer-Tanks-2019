@@ -85,6 +85,9 @@ private:
     bool pushOutgoing_NoLock(const PacketEntry& packetEntry);
     bool pushReliable_NoLock(const PacketEntry& packetEntry);
 
+    // Get current acknowledgment index for packets received from remote.
+    uint32_t determineAcknowledgmentIndex() const;
+
 private:
     // Connection socket.
     ConnectionSocket* m_connectionSocket;
@@ -122,7 +125,7 @@ private:
 
     // Last acknowledgment index returned from remote.
     // Acknowledgment index must include all past reliable indices, but not necessarily all unreliable.
-    uint32_t m_acknowledgmentIndex;
+    uint32_t m_remoteAcknowledgmentIndex;
 
     // Whether acknowledgment for remote should be sent.
     bool m_sendAcknowledgment;

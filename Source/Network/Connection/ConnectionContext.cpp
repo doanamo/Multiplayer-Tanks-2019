@@ -15,7 +15,7 @@ ConnectionContext::ConnectionContext(ConnectionSocket* connectionSocket) :
     m_outgoingReliableIndex(0),
     m_immediateIncomingReliableIndex(0),
     m_deferredIncomingReliableIndex(0),
-    m_acknowledgmentIndex(0),
+    m_remoteAcknowledgmentIndex(0),
     m_sendAcknowledgment(false),
     m_supportsReliability(false),
     m_initialized(false)
@@ -124,8 +124,7 @@ bool ConnectionContext::popOutgoing(PacketEntry* packetEntry)
     if(m_supportsReliability)
     {
         // Send last processed sequence index received and processed from remote.
-        // This can either be most recent incoming packet popped or most recent incoming packet pushed.
-        outgoingPacket.header.acknowledgmentIndex = std::max(m_incomingSequenceIndex, m_immediateIncomingReliableIndex);
+        outgoingPacket.header.acknowledgmentIndex = determineAcknowledgmentIndex();
     
         // Acknowledgment already included in this packet.
         m_sendAcknowledgment = false;
@@ -170,7 +169,7 @@ bool ConnectionContext::pushIncoming(const PacketEntry& packetEntry)
         }
 
         // Update acknowledgment index.
-        m_acknowledgmentIndex = std::max(m_acknowledgmentIndex, packetEntry.header.acknowledgmentIndex);
+        m_remoteAcknowledgmentIndex = std::max(m_remoteAcknowledgmentIndex, packetEntry.header.acknowledgmentIndex);
 
         // Try to acknowledge received reliable packet early if it was received in expected order.
         if(packetEntry.header.previousReliableIndex == m_immediateIncomingReliableIndex)
@@ -338,13 +337,13 @@ void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
     for(auto& packetEntry : m_reliableQueue)
     {
         // Update acknowledgment index.
-        packetEntry.header.acknowledgmentIndex = m_incomingSequenceIndex;
+        packetEntry.header.acknowledgmentIndex = determineAcknowledgmentIndex();
 
-        // Push copy to provided queue.
+        // Push packet entry copy to provided queue.
         LOG_TRACE("Pushing unacknowledged reliable packet. (sequence %u, previousReliable %u, acknowledgment %u)",
             packetEntry.header.sequenceIndex, packetEntry.header.previousReliableIndex, packetEntry.header.acknowledgmentIndex);
 
-        packetQueue.push(m_reliableQueue.front());
+        packetQueue.push(packetEntry);
     }
 }
 
@@ -362,7 +361,7 @@ void ConnectionContext::popAcknowledged()
         // Check if packet has already been acknowledged.
         PacketEntry& reliableEntry = m_reliableQueue.front();
 
-        if(reliableEntry.header.sequenceIndex > m_acknowledgmentIndex)
+        if(reliableEntry.header.sequenceIndex > m_remoteAcknowledgmentIndex)
         {
             // Packet has not been acknowledged yet.
             // Remaining packets are not acknowledged either.
@@ -370,11 +369,17 @@ void ConnectionContext::popAcknowledged()
         }
 
         LOG_TRACE("Popping acknowledged reliable packet. (sequence %u > acknowledgment %u)",
-            reliableEntry.header.sequenceIndex, m_acknowledgmentIndex);
+            reliableEntry.header.sequenceIndex, m_remoteAcknowledgmentIndex);
 
         // Pop acknowledged packet from queue.
         m_reliableQueue.pop_front();
     }
+}
+
+uint32_t ConnectionContext::determineAcknowledgmentIndex() const
+{
+    // This can either be most recent incoming packet popped or most recent incoming packet pushed.
+    return std::max(m_incomingSequenceIndex, m_immediateIncomingReliableIndex);
 }
 
 bool ConnectionContext::supportsReliability() const
