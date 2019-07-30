@@ -350,10 +350,10 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
             }
         }
 
-        // Sleep thread for some time.
+        // Yield thread for some time.
         // We do not want this running too quick.
-        std::this_thread::sleep_until(startTime + std::chrono::duration<int, std::ratio<1, 120>>(1));
         std::this_thread::yield();
+        std::this_thread::sleep_until(startTime + std::chrono::duration<int, std::ratio<1, 120>>(1));
     }
 }
 
