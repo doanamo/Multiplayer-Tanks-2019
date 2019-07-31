@@ -1,5 +1,6 @@
 #include "Precompiled.hpp"
 #include "ConnectionBackend.hpp"
+#include "ConnectionSettings.hpp"
 #include "ConnectionSocket.hpp"
 #include "Network/Packets/PacketHeader.hpp"
 
@@ -145,12 +146,6 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
         // Get start time of this iteration.
         auto startTime = std::chrono::high_resolution_clock::now();
 
-        // Max number of received packets to process in single iteration loop.
-        // This is done to prevent infinite loops when sender keeps spamming us with packets faster than we can process them.
-        // If we ever reach this point, we should raise an error and abort the connection.
-        // We can elegantly implement this by checking sizes of outgoing and incoming buffers.
-        const uint32_t MaxReceivedPacketCount = 100;
-
         // Count number of collected packets.
         uint32_t receivedPacketCount = 0;
 
@@ -246,9 +241,9 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                 receivedPacketCount++;
 
                 // Check if we reached maximum number of packets that we can process in single iteration.
-                if(receivedPacketCount >= MaxReceivedPacketCount)
+                if(receivedPacketCount >= ConnectionSettings::WorkerMaxReceivePacketBatch)
                 {
-                    LOG_TRACE("Reached maximum received packet count in single iteration. (receivedPacketCount %u)", receivedPacketCount);
+                    LOG_CONNECTION_BACKEND_TRACE("Reached maximum received packet count in single iteration. (receivedPacketCount %u)", receivedPacketCount);
                     break;
                 }
             }
@@ -256,7 +251,7 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
 
         if(receivedPacketCount != 0)
         {
-            LOG_TRACE("Received incoming packets. (%u packets)", receivedPacketCount);
+            LOG_CONNECTION_BACKEND_TRACE("Received incoming packets. (%u packets)", receivedPacketCount);
         }
 
         // Send outgoing packets from connections sockets via UDP socket.
@@ -309,7 +304,7 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
             // Send collected outgoing packets.
             if(!outgoingPackets.empty())
             {
-                LOG_TRACE("Sending outgoing packets. (%u packets)", outgoingPackets.size());
+                LOG_CONNECTION_BACKEND_TRACE("Sending outgoing packets. (%u packets)", outgoingPackets.size());
             }
             
             while(!outgoingPackets.empty())
@@ -336,7 +331,7 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
                     continue;
                 }
 
-                if(datagramBuffer.size() > 1400)
+                if(datagramBuffer.size() > ConnectionSettings::MaxPacketDataSize)
                 {
                     LOG_WARNING("Sending packet with size over 1400 bytes! Datagram will be fragmented.");
                 }
@@ -353,7 +348,7 @@ void ConnectionBackend::workerThreadMain(ConnectionBackend* backend)
         // Yield thread for some time.
         // We do not want this running too quick.
         std::this_thread::yield();
-        std::this_thread::sleep_until(startTime + std::chrono::duration<int, std::ratio<1, 120>>(1));
+        std::this_thread::sleep_until(startTime + std::chrono::duration<int, std::ratio<1, ConnectionSettings::WorkerMaxIterationRate>>(1));
     }
 }
 

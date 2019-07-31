@@ -1,6 +1,7 @@
 #include "Precompiled.hpp"
 #include "ConnectionContext.hpp"
 #include "ConnectionSocket.hpp"
+#include "ConnectionSettings.hpp"
 
 ConnectionContext::PacketEntry::PacketEntry() :
     address(sf::IpAddress::None),
@@ -79,7 +80,7 @@ bool ConnectionContext::pushOutgoing_NoLock(const PacketEntry & packetEntry)
         }
 
         // Debug trace.
-        LOG_TRACE("Pushing outgoing %s packet. (sequence %u, previousReliable %u)",
+        LOG_CONNECTION_CONTEXT_TRACE("Pushing outgoing %s packet. (sequence %u, previousReliable %u)",
             outgoingPacket.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
             outgoingPacket.header.sequenceIndex, outgoingPacket.header.previousReliableIndex);
     }
@@ -98,7 +99,7 @@ bool ConnectionContext::popOutgoing(PacketEntry* packetEntry)
         // Check if need to send acknowledgment.
         if(m_supportsReliability && m_sendAcknowledgment)
         {
-            LOG_TRACE("Pushing acknowledgment packet.", m_incomingSequenceIndex);
+            LOG_CONNECTION_CONTEXT_TRACE("Pushing acknowledgment packet.", m_incomingSequenceIndex);
 
             // Push empty outgoing acknowledgment packet.
             PacketEntry acknowledgmentPacket;
@@ -136,7 +137,7 @@ bool ConnectionContext::popOutgoing(PacketEntry* packetEntry)
         }
 
         // Debug trace.
-        LOG_TRACE("Popping outgoing %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+        LOG_CONNECTION_CONTEXT_TRACE("Popping outgoing %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
             outgoingPacket.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
             outgoingPacket.header.sequenceIndex, outgoingPacket.header.previousReliableIndex, outgoingPacket.header.acknowledgmentIndex);
     }
@@ -176,7 +177,7 @@ bool ConnectionContext::pushIncoming(const PacketEntry& packetEntry)
         {
             if(packetEntry.header.transportMethod == (uint32_t)TransformMethod::Reliable)
             {
-                LOG_TRACE("Early acknowledgement of incoming reliable packet. (previousReliable %u == immediateIncomingReliable %u, sequenceIndex %u)",
+                LOG_CONNECTION_CONTEXT_TRACE("Early acknowledgement of incoming reliable packet. (previousReliable %u == immediateIncomingReliable %u, sequenceIndex %u)",
                     packetEntry.header.previousReliableIndex, m_immediateIncomingReliableIndex, packetEntry.header.sequenceIndex);
 
                 // Update immediate incoming reliable index.
@@ -193,12 +194,12 @@ bool ConnectionContext::pushIncoming(const PacketEntry& packetEntry)
         // Drop incoming packets that do not have any data (e.g. acknowledgment packets).
         if(packetEntry.packet.size() == 0)
         {
-            LOG_TRACE("Received incoming acknowledgment packet without data. (acknowledgment %u)", packetEntry.header.acknowledgmentIndex);
+            LOG_CONNECTION_CONTEXT_TRACE("Received incoming acknowledgment packet without data. (acknowledgment %u)", packetEntry.header.acknowledgmentIndex);
             return false;
         }
 
         // Debug trace.
-        LOG_TRACE("Pushing incoming %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+        LOG_CONNECTION_CONTEXT_TRACE("Pushing incoming %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
             packetEntry.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
             packetEntry.header.sequenceIndex, packetEntry.header.previousReliableIndex, packetEntry.header.acknowledgmentIndex);
     }
@@ -228,18 +229,18 @@ bool ConnectionContext::popIncoming(PacketEntry* packetEntry)
             {
                 if(incomingPacket.header.transportMethod == (uint32_t)TransformMethod::Reliable)
                 {
-                    LOG_TRACE("Dropping already processed reliable incoming packet! (sequence %u <= incomingSequence %u)",
+                    LOG_CONNECTION_CONTEXT_TRACE("Dropping already processed reliable incoming packet! (sequence %u <= incomingSequence %u)",
                         incomingPacket.header.sequenceIndex, m_incomingSequenceIndex);
                 }
                 else
                 {
-                    LOG_TRACE("Dropping obsolete unreliable incoming packet! (sequence %u <= incomingSequence %u)",
+                    LOG_CONNECTION_CONTEXT_TRACE("Dropping obsolete unreliable incoming packet! (sequence %u <= incomingSequence %u)",
                         incomingPacket.header.sequenceIndex, m_incomingSequenceIndex);
                 }
 
                 if(incomingPacket.header.sequenceIndex == m_incomingSequenceIndex)
                 {
-                    LOG_TRACE("Requesting another acknowledgment for reliable incoming packet! (sequence %u == incomingSequence %u)",
+                    LOG_CONNECTION_CONTEXT_TRACE("Requesting another acknowledgment for reliable incoming packet! (sequence %u == incomingSequence %u)",
                         incomingPacket.header.sequenceIndex, m_incomingSequenceIndex);
 
                     // Request new acknowledgment packet to be sent.
@@ -255,7 +256,7 @@ bool ConnectionContext::popIncoming(PacketEntry* packetEntry)
             // Check if we are missing a reliable packet in our sequence.
             if(incomingPacket.header.previousReliableIndex != m_deferredIncomingReliableIndex)
             {
-                LOG_TRACE("Missing previous reliable incoming packet! (previousReliable %u != deferredIncomingReliable %u)",
+                LOG_CONNECTION_CONTEXT_TRACE("Missing previous reliable incoming packet! (previousReliable %u != deferredIncomingReliable %u)",
                     incomingPacket.header.previousReliableIndex, m_deferredIncomingReliableIndex);
 
                 // Do not drop packet and wait until needed reliable packet arrives.
@@ -277,7 +278,7 @@ bool ConnectionContext::popIncoming(PacketEntry* packetEntry)
             m_sendAcknowledgment = true;
 
             // Debug trace.
-            LOG_TRACE("Popping incoming %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+            LOG_CONNECTION_CONTEXT_TRACE("Popping incoming %s packet. (sequence %u, previousReliable %u, acknowledgment %u)",
                 incomingPacket.header.transportMethod == (uint32_t)TransformMethod::Reliable ? "reliable" : "unreliable",
                 incomingPacket.header.sequenceIndex, incomingPacket.header.previousReliableIndex, incomingPacket.header.acknowledgmentIndex);
         }
@@ -342,7 +343,7 @@ void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
         packetEntry.header.acknowledgmentIndex = determineAcknowledgmentIndex();
 
         // Push packet entry copy to provided queue.
-        LOG_TRACE("Pushing unacknowledged reliable packet. (sequence %u, previousReliable %u, acknowledgment %u)",
+        LOG_CONNECTION_CONTEXT_TRACE("Pushing unacknowledged reliable packet. (sequence %u, previousReliable %u, acknowledgment %u)",
             packetEntry.header.sequenceIndex, packetEntry.header.previousReliableIndex, packetEntry.header.acknowledgmentIndex);
 
         packetQueue.push(packetEntry);
@@ -350,7 +351,7 @@ void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
 
         // Hard limit of packets resent at once to prevent congestion.
         // This value should be dynamic depending on network conditions.
-        if(packetsPushed >= 16)
+        if(packetsPushed >= ConnectionSettings::MaxReliableResendCount)
             break;
     }
 }
@@ -376,7 +377,7 @@ void ConnectionContext::popAcknowledged()
             return;
         }
 
-        LOG_TRACE("Popping acknowledged reliable packet. (sequence %u > acknowledgment %u)",
+        LOG_CONNECTION_CONTEXT_TRACE("Popping acknowledged reliable packet. (sequence %u > acknowledgment %u)",
             reliableEntry.header.sequenceIndex, m_remoteAcknowledgmentIndex);
 
         // Pop acknowledged packet from queue.

@@ -42,6 +42,7 @@ set(SOURCE_FILES
     "Source/System/Console.hpp"
     "Source/System/Console.cpp"
 
+    "Source/Network/Connection/ConnectionSettings.hpp"
     "Source/Network/Connection/ConnectionSocket.hpp"
     "Source/Network/Connection/ConnectionSocket.cpp"
     "Source/Network/Connection/ConnectionContext.hpp"
