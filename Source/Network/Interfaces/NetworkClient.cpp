@@ -82,7 +82,7 @@ void NetworkClient::preTick(float timeDelta)
 
         sendPacket(m_socket, packetMessage, true);
 
-        m_hearbeatTimer = 1.0f;
+        m_hearbeatTimer = 0.1f;
     }
 
     // Receive packets.

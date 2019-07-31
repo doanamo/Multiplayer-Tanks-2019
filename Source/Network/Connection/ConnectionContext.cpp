@@ -334,6 +334,8 @@ void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
     ASSERT(m_supportsReliability, "Socket does not support reliability!");
 
     // Copy unacknowledged packets to provided queue.
+    uint32_t packetsPushed = 0;
+
     for(auto& packetEntry : m_reliableQueue)
     {
         // Update acknowledgment index.
@@ -344,6 +346,12 @@ void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
             packetEntry.header.sequenceIndex, packetEntry.header.previousReliableIndex, packetEntry.header.acknowledgmentIndex);
 
         packetQueue.push(packetEntry);
+        packetsPushed++;
+
+        // Hard limit of packets resent at once to prevent congestion.
+        // This value should be dynamic depending on network conditions.
+        if(packetsPushed >= 16)
+            break;
     }
 }
 
