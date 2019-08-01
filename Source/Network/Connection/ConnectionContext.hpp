@@ -85,7 +85,10 @@ private:
     bool pushOutgoing_NoLock(const PacketEntry& packetEntry);
     bool pushReliable_NoLock(const PacketEntry& packetEntry);
 
-    // Get current acknowledgment index for packets received from remote.
+    // Schedules next reliable resend time.
+    void scheduleReliableResend_NoLock();
+
+    // Determines current acknowledgment index for packets received from remote.
     uint32_t determineAcknowledgmentIndex() const;
 
 private:
@@ -101,6 +104,9 @@ private:
 
     // List of reliable packet that still need to be acknowledged.
     std::deque<PacketEntry> m_reliableQueue;
+
+    // Time point after which we want to resend reliable packets.
+    std::chrono::high_resolution_clock::time_point m_reliableResendTime;
     
     // Last outgoing sequence index.
     // Incremented with each new outgoing packet.

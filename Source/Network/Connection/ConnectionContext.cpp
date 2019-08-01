@@ -11,6 +11,7 @@ ConnectionContext::PacketEntry::PacketEntry() :
 
 ConnectionContext::ConnectionContext(ConnectionSocket* connectionSocket) :
     m_connectionSocket(connectionSocket),
+    m_reliableResendTime(),
     m_outgoingSequenceIndex(0),
     m_incomingSequenceIndex(0),
     m_outgoingReliableIndex(0),
@@ -320,6 +321,12 @@ bool ConnectionContext::pushReliable_NoLock(const PacketEntry& packetEntry)
     // Check if packet entry is reliable.
     ASSERT(packetEntry.header.transportMethod == (uint32_t)TransformMethod::Reliable, "Packet entry must be reliable!");
 
+    // Schedule reliable resend on new reliable packet after queue has been emptied.
+    if(m_reliableQueue.empty())
+    {
+        scheduleReliableResend_NoLock();
+    }
+
     // Add reliable packet to queue.
     m_reliableQueue.emplace_back(packetEntry);
 
@@ -333,6 +340,12 @@ void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
 
     // Check if reliability is supported.
     ASSERT(m_supportsReliability, "Socket does not support reliability!");
+
+    // Check if it is time to resend reliable packages.
+    // Do not proceed with pushing unacknowledged packets if we are still waiting for the right time.
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    if(currentTime < m_reliableResendTime)
+        return;
 
     // Copy unacknowledged packets to provided queue.
     uint32_t packetsPushed = 0;
@@ -353,6 +366,12 @@ void ConnectionContext::copyUnacknowledged(std::queue<PacketEntry>& packetQueue)
         // This value should be dynamic depending on network conditions.
         if(packetsPushed >= ConnectionSettings::MaxReliableResendCount)
             break;
+    }
+
+    // Schedule next reliable packet resend.
+    if(!m_reliableQueue.empty())
+    {
+        scheduleReliableResend_NoLock();
     }
 }
 
@@ -383,6 +402,29 @@ void ConnectionContext::popAcknowledged()
         // Pop acknowledged packet from queue.
         m_reliableQueue.pop_front();
     }
+
+    // Stop scheduled reliable resent if queue has been emptied.
+    if(m_reliableQueue.empty())
+    {
+        m_reliableResendTime = std::chrono::high_resolution_clock::time_point();
+    }
+}
+
+void ConnectionContext::scheduleReliableResend_NoLock()
+{
+    // Get current high performance clock time.
+    auto currentTime = std::chrono::high_resolution_clock::now();
+    ASSERT(m_reliableResendTime < currentTime, "Reliable packet resend is already scheduled!");
+    
+    // Calculate reliable packet resend using logarithmic scale.
+    float reliableQueueRatio = std::clamp((float)m_reliableQueue.size() / ConnectionSettings::HighReliableResendCount, 0.0f, 1.0f);
+   
+    float minimumCoefficient = std::pow(ConnectionSettings::MinimumReliableResendDelayMs, 1.0f - reliableQueueRatio);
+    float maximumCoefficient = std::pow(ConnectionSettings::MaximumReliableResendDelayMs, reliableQueueRatio);
+    float calculatedWaitTime = minimumCoefficient * maximumCoefficient;
+
+    // Set time at which we will perform next reliable packet resend.
+    m_reliableResendTime = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds((uint32_t)(calculatedWaitTime));
 }
 
 uint32_t ConnectionContext::determineAcknowledgmentIndex() const
