@@ -28,21 +28,3 @@ namespace ConnectionSettings
     // Maximum rate at which we can spin the worker thread to prevent consuming all CPU resources.
     constexpr uint32_t WorkerMaxIterationRate = 120;
 }
-
-// Log trace macro wrappers.
-// These affect only debug, as trace logging is not enabled in release.
-#define ENABLE_CONNECTION_CONTEXT_LOG_TRACE true
-#define ENABLE_CONNECTION_BACKEND_LOG_TRACE true
-
-#if ENABLE_CONNECTION_CONTEXT_LOG_TRACE
-    #define LOG_CONNECTION_CONTEXT_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)
-#else
-    #define LOG_CONNECTION_CONTEXT_TRACE(format, ...)
-#endif
-
-#if ENABLE_CONNECTION_BACKEND_LOG_TRACE
-    #define LOG_CONNECTION_BACKEND_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)
-#else
-    #define LOG_CONNECTION_BACKEND_TRACE(format, ...)
-#endif
-
