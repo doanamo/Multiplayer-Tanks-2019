@@ -82,7 +82,8 @@ sf::Vector2f Tank::getPosition(float alpha)
 
 bool Tank::onSerialize(MemoryStream& buffer) const
 {
-    Object::onSerialize(buffer);
+    if(!Super::onSerialize(buffer))
+        return false;
 
     if(!serialize(buffer, m_movementInput))
         return false;
@@ -92,7 +93,8 @@ bool Tank::onSerialize(MemoryStream& buffer) const
 
 bool Tank::onDeserialize(MemoryStream& buffer)
 {
-    Object::onDeserialize(buffer);
+    if(!Super::onDeserialize(buffer))
+        return false;
 
     if(!deserialize(buffer, &m_movementInput))
         return false;

@@ -58,7 +58,8 @@ void Projectile::onDraw(float timeAlpha)
 
 bool Projectile::onSerialize(MemoryStream& buffer) const
 {
-    Object::onSerialize(buffer);
+    if(!Super::onSerialize(buffer))
+        return false;
 
     if(!serialize(buffer, m_remainingLifetime))
         return false;
@@ -68,7 +69,8 @@ bool Projectile::onSerialize(MemoryStream& buffer) const
 
 bool Projectile::onDeserialize(MemoryStream& buffer)
 {
-    Object::onDeserialize(buffer);
+    if(!Super::onDeserialize(buffer))
+        return false;
 
     if(!deserialize(buffer, &m_remainingLifetime))
         return false;

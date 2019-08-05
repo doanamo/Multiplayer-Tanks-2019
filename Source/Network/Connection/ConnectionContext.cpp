@@ -423,6 +423,9 @@ void ConnectionContext::scheduleReliableResend_NoLock()
     float maximumCoefficient = std::pow(ConnectionSettings::MaximumReliableResendDelayMs, reliableQueueRatio);
     float calculatedWaitTime = minimumCoefficient * maximumCoefficient;
 
+    ASSERT(calculatedWaitTime >= ConnectionSettings::MinimumReliableResendDelayMs);
+    ASSERT(calculatedWaitTime <= ConnectionSettings::MaximumReliableResendDelayMs);
+
     // Set time at which we will perform next reliable packet resend.
     m_reliableResendTime = std::chrono::high_resolution_clock::now() + std::chrono::milliseconds((uint32_t)(calculatedWaitTime));
 }

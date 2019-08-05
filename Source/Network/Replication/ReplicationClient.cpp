@@ -116,3 +116,16 @@ bool ReplicationClient::onObjectDestroyed(Object& object)
     // Success!
     return false;
 }
+
+bool ReplicationClient::onObjectDeserialized(Object& object)
+{
+    // Make sure that replicable object that was deserialized has valid replication handle.
+    Replicable* replicable = object.as<Replicable>();
+
+    if(replicable != nullptr)
+    {
+        ASSERT(replicable->getReplicableHandle().isValid(), "Deserialized replicable has invalid handle!");
+    }
+
+    return true;
+}

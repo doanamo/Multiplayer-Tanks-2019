@@ -1,11 +1,11 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Game/World/Object.hpp"
+#include "Network/Replication/Replicable.hpp"
 
-class Tank : public Object
+class Tank : public Replicable
 {
-    TYPE_DECLARE(Tank, Object);
+    TYPE_DECLARE(Tank, Replicable);
 
 public:
     Tank();

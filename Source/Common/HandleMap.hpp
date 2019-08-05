@@ -294,6 +294,7 @@ public:
                 if(requestedHandle.getIdentifier() <= currentMaxIdentifier)
                 {
                     // We are unable to create requested handle because it's already in use.
+                    ASSERT(false, "Requested handle already in use!");
                     return HandleEntryRef();
                 }
             }

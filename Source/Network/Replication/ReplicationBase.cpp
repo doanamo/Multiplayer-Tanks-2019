@@ -58,6 +58,7 @@ bool ReplicationBase::initialize(GameInstance* gameInstance)
     // Hook callback methods in world for object creation and destruction.
     m_gameInstance->getWorld()->replicationObjectCreated = std::bind(&ReplicationBase::onObjectCreated, this, std::placeholders::_1);
     m_gameInstance->getWorld()->replicationObjectDestroyed = std::bind(&ReplicationBase::onObjectDestroyed, this, std::placeholders::_1);
+    m_gameInstance->getWorld()->replicationObjectDeserialized = std::bind(&ReplicationBase::onObjectDeserialized, this, std::placeholders::_1);
 
     // Success!
     m_initialized = true;
@@ -101,6 +102,11 @@ bool ReplicationBase::onObjectCreated(Object& object)
 }
 
 bool ReplicationBase::onObjectDestroyed(Object& object)
+{
+    return true;
+}
+
+bool ReplicationBase::onObjectDeserialized(Object& object)
 {
     return true;
 }

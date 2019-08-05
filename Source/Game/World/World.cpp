@@ -534,6 +534,7 @@ bool World::onDeserialize(MemoryStream& buffer)
 
     for(uint32_t i = 0; i < objectCount; i++)
     {
+        // Create and deserialize object.
         TypeInfo::IdentifierType objectType;
         if(!deserialize(buffer, &objectType))
             return false;
@@ -552,6 +553,11 @@ bool World::onDeserialize(MemoryStream& buffer)
         if(!deserialize(buffer, object.get()))
             return false;
 
+        // Notify replication system about deserialized object.
+        if(!this->replicationObjectDeserialized(*object))
+            return false;
+
+        // Add object to world.
         this->addObject(std::move(object), name, group);
     }
 
