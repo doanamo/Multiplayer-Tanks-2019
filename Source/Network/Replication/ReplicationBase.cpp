@@ -107,19 +107,16 @@ void ReplicationBase::unregisterReplicable(const ReplicableHandle& handle)
     ASSERT(result, "Could not remove replicable handle!");
 }
 
-bool ReplicationBase::onObjectCreated(Object& object)
+void ReplicationBase::onObjectCreated(Object& object)
 {
-    return true;
 }
 
-bool ReplicationBase::onObjectDestroyed(Object& object)
+void ReplicationBase::onObjectDestroyed(Object& object)
 {
-    return true;
 }
 
-bool ReplicationBase::onObjectDeserialized(Object& object)
+void ReplicationBase::onObjectDeserialized(Object& object)
 {
-    return true;
 }
 
 void ReplicationBase::setReplicableHandle(Replicable& replicable, const ReplicableHandle& handle)

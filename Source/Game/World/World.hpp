@@ -137,9 +137,9 @@ private:
 
 public:
     // Public list of callbacks that other system can hook into.
-    std::function<bool(Object&)> replicationObjectCreated;
-    std::function<bool(Object&)> replicationObjectDestroyed;
-    std::function<bool(Object&)> replicationObjectDeserialized;
+    std::function<void(Object&)> replicationObjectCreated;
+    std::function<void(Object&)> replicationObjectDestroyed;
+    std::function<void(Object&)> replicationObjectDeserialized;
 
 private:
     // List of commands.

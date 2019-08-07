@@ -587,12 +587,16 @@ bool World::onDeserialize(MemoryStream& buffer)
         if(!deserialize(buffer, object.get()))
             return false;
 
-        // Notify replication system about deserialized object.
-        if(!this->replicationObjectDeserialized(*object))
-            return false;
-
         // Add object to world.
-        this->addObject(std::move(object), name, group);
+        auto objectHandle = this->addObject(std::move(object), name, group);
+
+        // Retrieve added object back.
+        Object* addedObject = this->getObjectByHandle(objectHandle);
+        ASSERT(addedObject != nullptr, "Failed to retrieve just added object!");
+
+        // Notify replication system about deserialized object.
+        // Replication system will have to register it.
+        replicationObjectDeserialized(*addedObject);
     }
 
     // Success!

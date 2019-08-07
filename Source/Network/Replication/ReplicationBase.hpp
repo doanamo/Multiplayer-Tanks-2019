@@ -46,9 +46,9 @@ protected:
     void unregisterReplicable(const ReplicableHandle& handle);
     
     // World callback methods for collecting replicables.
-    virtual bool onObjectCreated(Object& object);
-    virtual bool onObjectDestroyed(Object& object);
-    virtual bool onObjectDeserialized(Object& object);
+    virtual void onObjectCreated(Object& object);
+    virtual void onObjectDestroyed(Object& object);
+    virtual void onObjectDeserialized(Object& object);
 
 protected:
     // Game instance reference.

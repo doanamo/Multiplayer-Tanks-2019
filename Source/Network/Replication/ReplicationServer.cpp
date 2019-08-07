@@ -81,12 +81,12 @@ const std::vector<ReplicationCommand>& ReplicationServer::getUnreliableCommands(
     return m_unreliableCommands;
 }
 
-bool ReplicationServer::onObjectCreated(Object& object)
+void ReplicationServer::onObjectCreated(Object& object)
 {
     // Retrieve replicable class.
     Replicable* replicable = object.as<Replicable>();
     if(replicable == nullptr)
-        return false;
+        return;
 
     // Register replicable object.
     registerReplicable(*replicable);
@@ -100,33 +100,31 @@ bool ReplicationServer::onObjectCreated(Object& object)
     if(!serialize(command.data, getTypeIdentifier(*replicable)))
     {
         LOG_ERROR("Failed to serialize replicable object type identifier!");
-        return false;
+        return;
     }
 
     // Write initial replication data.
     if(!replicable->serializeInitialReplication(command.data))
     {
         LOG_ERROR("Failed to serialize initial replication of created object!");
-        return false;
+        return;
     }
 
     // Add command to reliable queue.
     m_reliableCommands.push_back(command);
 
-    // Success!
+    // Print trace.
     LOG_REPLICATION_TRACE("Replicable object has been created on server side. (%u/%u : %u/%u)",
         replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
         replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
-
-    return true;
 }
 
-bool ReplicationServer::onObjectDestroyed(Object& object)
+void ReplicationServer::onObjectDestroyed(Object& object)
 {
     // Retrieve replicable class.
     Replicable* replicable = object.as<Replicable>();
     if(replicable == nullptr)
-        return false;
+        return;
 
     // Create a replication command.
     ReplicationCommand command;
@@ -139,10 +137,8 @@ bool ReplicationServer::onObjectDestroyed(Object& object)
     // Unregister replicable object.
     unregisterReplicable(replicable->getReplicableHandle());
 
-    // Success!
+    // Print trace.
     LOG_REPLICATION_TRACE("Replicable object has been destroyed on server side. (%u/%u : %u/%u)",
         replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
         replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
-
-    return true;
 }

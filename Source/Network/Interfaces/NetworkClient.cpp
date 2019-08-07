@@ -99,7 +99,7 @@ void NetworkClient::preTick(float timeDelta)
 
             m_replication.processServerUpdatePacket(*packetServerUpdate);
         }
-        if(receivedPacket->is<PacketMessage>())
+        else if(receivedPacket->is<PacketMessage>())
         {
             PacketMessage* packetMessage = receivedPacket->as<PacketMessage>();
             ASSERT(packetMessage != nullptr);

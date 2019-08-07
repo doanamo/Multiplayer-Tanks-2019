@@ -18,7 +18,7 @@ public:
 
 private:
     // World object callback methods.
-    bool onObjectCreated(Object& object) override;
-    bool onObjectDestroyed(Object& object) override;
-    bool onObjectDeserialized(Object& object) override;
+    void onObjectCreated(Object& object) override;
+    void onObjectDestroyed(Object& object) override;
+    void onObjectDeserialized(Object& object) override;
 };

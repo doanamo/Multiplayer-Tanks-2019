@@ -101,25 +101,23 @@ void ReplicationClient::processServerUpdatePacket(const PacketServerUpdate& pack
     }
 }
 
-bool ReplicationClient::onObjectCreated(Object& object)
+void ReplicationClient::onObjectCreated(Object& object)
 {
     // Retrieve replicable class.
     Replicable* replicable = object.as<Replicable>();
     if(replicable == nullptr)
-        return true;
+        return;
 
     // Check if object has valid replicable handle.
     ASSERT(replicable->getReplicableHandle().isValid(), "Client attempted to create replicable object!");
     
-    // Success!
+    // Print trace.
     LOG_REPLICATION_TRACE("Replicable object has been created on client side. (%u/%u : %u/%u)",
         replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
         replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
-
-    return true;
 }
 
-bool ReplicationClient::onObjectDestroyed(Object& object)
+void ReplicationClient::onObjectDestroyed(Object& object)
 {
     // Do not unregister replicable handles on object destruction.
     // If some replicable object gets prematurely destroyed by the client,
@@ -128,33 +126,32 @@ bool ReplicationClient::onObjectDestroyed(Object& object)
     // Retrieve replicable class.
     Replicable* replicable = object.as<Replicable>();
     if(replicable == nullptr)
-        return true;
+        return;
 
     // Check if replicable handle exists.
     auto handleReference = m_replicables.fetchHandle(replicable->getReplicableHandle());
     ASSERT(!handleReference.valid, "Destroyed replicable object that was not registered!");
 
-    // Success!
+    // Print trace.
     LOG_REPLICATION_TRACE("Replicable object has been destroyed on client side. (%u/%u : %u/%u)",
         replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
         replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
-
-    return true;
 }
 
-bool ReplicationClient::onObjectDeserialized(Object& object)
+void ReplicationClient::onObjectDeserialized(Object& object)
 {
     // Retrieve replicable class.
     Replicable* replicable = object.as<Replicable>();
     if(replicable == nullptr)
-        return true;
+        return;
 
     // Make sure that replicable object that was deserialized has valid replication handle.
     ASSERT(replicable->getReplicableHandle().isValid(), "Deserialized replicable has invalid handle!");
 
-    // Success!
+    // Print trace.
     LOG_REPLICATION_TRACE("Replicable object has been deserialized on client side. (%u/%u)",
         replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
-    
-    return true;
+
+    // Register deserialized replicable object, as we will not get replication create command for it.
+    this->registerReplicable(*replicable);
 }

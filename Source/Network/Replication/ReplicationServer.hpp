@@ -29,8 +29,8 @@ public:
 
 private:
     // Overridden methods to add command recording.
-    bool onObjectCreated(Object& object) override final;
-    bool onObjectDestroyed(Object& object) override final;
+    void onObjectCreated(Object& object) override final;
+    void onObjectDestroyed(Object& object) override final;
 
 private:
     // Replication command buffers.
