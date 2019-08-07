@@ -114,11 +114,12 @@ void NetworkServer::postTick(float timeDelta)
     // Clear processed replication commands.
     m_replication.clearReplicationCommands();
 
-    // Send packet to connected clients.
-    for(auto& clientEntry : m_clients)
+    // Send reliable update packet to connected clients.
+    if(!reliableUpdatePacket.replicationCommands.empty())
     {
-        // Send reliable server update packet, but only if it has any commands.
-        if(!reliableUpdatePacket.replicationCommands.empty())
+        LOG_REPLICATION_TRACE("Sending reliable update packet...");
+
+        for(auto& clientEntry : m_clients)
         {
             if(!sendPacket(*clientEntry.socket, reliableUpdatePacket, true))
             {
@@ -126,9 +127,14 @@ void NetworkServer::postTick(float timeDelta)
                 continue;
             }
         }
+    }
 
-        // Send unreliable server update packet, but only if it has any commands.
-        if(!unreliableUpdatePacket.replicationCommands.empty())
+    // Send unreliable update packet to connected clients.
+    if(!unreliableUpdatePacket.replicationCommands.empty())
+    {
+        LOG_REPLICATION_TRACE("Sending unreliable update packet...");
+
+        for(auto& clientEntry : m_clients)
         {
             if(!sendPacket(*clientEntry.socket, unreliableUpdatePacket, false))
             {

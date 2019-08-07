@@ -15,6 +15,8 @@ ReplicationServer::~ReplicationServer()
 
 void ReplicationServer::collectReplicationData()
 {
+    LOG_REPLICATION_TRACE("Collecting replication data...");
+
     // Gather update commands for replicable objects.
     for(const auto replicableEntry : m_replicables)
     {
@@ -112,6 +114,10 @@ bool ReplicationServer::onObjectCreated(Object& object)
     m_reliableCommands.push_back(command);
 
     // Success!
+    LOG_REPLICATION_TRACE("Replicable object has been created on server side. (%u/%u : %u/%u)",
+        replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
+        replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
+
     return true;
 }
 
@@ -134,5 +140,9 @@ bool ReplicationServer::onObjectDestroyed(Object& object)
     unregisterReplicable(replicable->getReplicableHandle());
 
     // Success!
+    LOG_REPLICATION_TRACE("Replicable object has been destroyed on server side. (%u/%u : %u/%u)",
+        replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
+        replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
+
     return true;
 }

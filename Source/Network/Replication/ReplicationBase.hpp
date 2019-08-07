@@ -5,6 +5,15 @@
 #include "ReplicationCommand.hpp"
 #include "Replicable.hpp"
 
+// Debugging trace.
+#define ENABLE_REPLICATION_LOG_TRACE true
+
+#if ENABLE_REPLICATION_LOG_TRACE
+    #define LOG_REPLICATION_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)
+#else
+    #define LOG_REPLICATION_TRACE(format, ...)
+#endif
+
 // Forward declarations.
 class GameInstance;
 class World;

@@ -41,6 +41,8 @@ ReplicationBase::ReplicationBase() :
 
 ReplicationBase::~ReplicationBase()
 {
+    LOG_REPLICATION_TRACE("Calling ReplicationBase destructor.");
+
     // Unregister callbacks.
     if(m_gameInstance && m_gameInstance->getWorld())
     {
@@ -51,6 +53,8 @@ ReplicationBase::~ReplicationBase()
 
 bool ReplicationBase::initialize(GameInstance* gameInstance)
 {
+    LOG_REPLICATION_TRACE("Calling ReplicationBase initialization.");
+
     // Save game instance reference.
     m_gameInstance = gameInstance;
     ASSERT(m_gameInstance);
@@ -67,6 +71,10 @@ bool ReplicationBase::initialize(GameInstance* gameInstance)
 
 void ReplicationBase::registerReplicable(Replicable& replicable)
 {
+    LOG_REPLICATION_TRACE("Registering replicable object... (%u/%u : %u/%u)",
+        replicable.getHandle().getIdentifier(), replicable.getHandle().getVersion(),
+        replicable.getReplicableHandle().getIdentifier(), replicable.getReplicableHandle().getVersion());
+
     // Check if object has valid handle.
     // This can occur when prematurely registering object that has not been added to world yet.
     ASSERT(replicable.getHandle().isValid(), "Replicable object does not have a valid handle!");
@@ -87,7 +95,10 @@ void ReplicationBase::registerReplicable(Replicable& replicable)
 }
 
 void ReplicationBase::unregisterReplicable(const ReplicableHandle& handle)
-{
+{   
+    LOG_REPLICATION_TRACE("Unregistering replicable handle... (%u/%u)",
+        handle.getIdentifier(), handle.getVersion());
+
     // Retrieve objects replicable handle.
     ASSERT(handle.isValid(), "Replicable objects has invalid replicable handle!");
 
@@ -113,6 +124,10 @@ bool ReplicationBase::onObjectDeserialized(Object& object)
 
 void ReplicationBase::setReplicableHandle(Replicable& replicable, const ReplicableHandle& handle)
 {
+    LOG_REPLICATION_TRACE("Set replicable handle for object. (%u/%u : %u/%u)",
+        replicable.getHandle().getIdentifier(), replicable.getHandle().getVersion(),
+        handle.getIdentifier(), handle.getVersion());
+
     replicable.m_replicableHandle = handle;
 }
 

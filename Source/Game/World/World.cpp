@@ -1,6 +1,14 @@
 #include "Precompiled.hpp"
 #include "World.hpp"
 
+#define ENABLE_WORLD_LOG_TRACE true
+
+#if ENABLE_WORLD_LOG_TRACE
+    #define LOG_WORLD_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)
+#else
+    #define LOG_WORLD_TRACE(format, ...)
+#endif
+
 ConsoleVariable<bool> cv_showWorldInfo("showWorldInfo", false);
 
 World::World() :
@@ -10,15 +18,21 @@ World::World() :
 
 World::~World()
 {
+    LOG_WORLD_TRACE("Destructing world...");
 }
 
 bool World::initialize()
 {
+    LOG_WORLD_TRACE("Initializing world...");
+
+    // Success!
     return true;
 }
 
 void World::flushObjects()
 {
+    LOG_WORLD_TRACE("Flushing world objects...");
+
     // Iterate over list of commands.
     // Additional commands can be added during processing of objects.
     // For this reason we make copies of the list and process them until it is empty after all iterations.
@@ -74,6 +88,9 @@ void World::flushObjects()
                     {
                         replicationObjectCreated(*objectEntry->object);
                     }
+
+                    LOG_WORLD_TRACE("Processed create object command. (%u/%u)",
+                        command.handle.getIdentifier(), command.handle.getVersion());
                 }
                 break;
 
@@ -98,6 +115,9 @@ void World::flushObjects()
 
                     // Decrement object count.
                     --m_objectCount;
+
+                    LOG_WORLD_TRACE("Processed destroy object command. (%u/%u)",
+                        command.handle.getIdentifier(), command.handle.getVersion());
                 }
                 break;
             }
@@ -107,6 +127,8 @@ void World::flushObjects()
 
 void World::update(float timeDelta)
 {
+    LOG_WORLD_TRACE("Updating world....");
+
     // Update all objects.
     for(auto handleEntry : m_objects)
     {
@@ -124,6 +146,8 @@ void World::update(float timeDelta)
 
 void World::tick(float timeDelta)
 {
+    LOG_WORLD_TRACE("Ticking world...");
+
     // Tick all objects.
     for(auto handleEntry : m_objects)
     {
@@ -145,6 +169,8 @@ void World::tick(float timeDelta)
 
 void World::draw(float timeAlpha)
 {
+    LOG_WORLD_TRACE("Drawing world...");
+
     // Draw all objects.
     for(auto handleEntry : m_objects)
     {
@@ -278,6 +304,9 @@ ObjectHandle World::addObject(ObjectEntry::ObjectPtr&& object, std::string name,
     m_commands.push(command);
 
     // Return object handle.
+    LOG_WORLD_TRACE("Added world object. (%u/%u)",
+        handleEntry.handle.getIdentifier(), handleEntry.handle.getVersion());
+
     return handleEntry.handle;
 }
 
@@ -288,6 +317,9 @@ void World::destroyObject(ObjectHandle handle)
     command.type = ObjectCommandType::Destroy;
     command.handle = handle;
     m_commands.push(command);
+
+    LOG_WORLD_TRACE("Destroyed world object. (%u/%u)",
+        handle.getIdentifier(), handle.getVersion());
 }
 
 bool World::setObjectName(ObjectHandle handle, std::string name, bool force)
@@ -522,6 +554,8 @@ bool World::onSerialize(MemoryStream& buffer) const
             return false;
     }
 
+    // Success!
+    LOG_WORLD_TRACE("Serialized world to memory.");
     return true;
 }
 
@@ -561,5 +595,7 @@ bool World::onDeserialize(MemoryStream& buffer)
         this->addObject(std::move(object), name, group);
     }
 
+    // Success!
+    LOG_WORLD_TRACE("Deserialized world from memory.");
     return true;
 }

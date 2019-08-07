@@ -53,19 +53,11 @@ void Object::onDestroy()
 
 World* Object::getWorld() const
 {
-    // Calling this before being added to a world does not make sense.
-    ASSERT(m_world != nullptr, "Retrieving world from an object that was not added to a world!");
-
-    // Return assigned world.
     return m_world;
 }
 
 ObjectHandle Object::getHandle() const
 {
-    // Calling this before being added to a world does not make sense.
-    ASSERT(m_world != nullptr, "Attempting to get handle to an object that does not belong to a world!");
-
-    // Return handle to self.
     return m_handle;
 }
 
