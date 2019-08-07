@@ -32,6 +32,9 @@ int main(int argc, char* argv[])
     // Run main loop.
     while(g_window->isOpen())
     {
+        // Calculate time delta.
+        float timeDelta = timer.restart().asSeconds();
+
         // Handle window events.
         sf::Event event;
         while(g_window->pollEvent(event))
@@ -39,19 +42,16 @@ int main(int argc, char* argv[])
             g_application->handleEvent(event);
         }
 
-        // Update application.
-        float timeDelta = timer.restart().asSeconds();
-
-        g_application->update(timeDelta);
-
         // Tick application.
         tickAccumulator += timeDelta;
-
         while(tickAccumulator >= tickRate)
         {
             g_application->tick(tickRate);
             tickAccumulator -= tickRate;
         }
+
+        // Update application.
+        g_application->update(timeDelta);
 
         // Render application.
         float timeAlpha = clamp(tickAccumulator / tickRate, 0.0f, 1.0f);
