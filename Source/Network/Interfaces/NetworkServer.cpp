@@ -44,49 +44,6 @@ void NetworkServer::preTick(float timeDelta)
 {
     NetworkBase::preTick(timeDelta);
 
-    // Receive packets from default socket.
-    // This needs another solution, either simplify or creating ConnectionSwitch for handling connections.
-    ConnectionContext& socketContext = m_socket.getConnectionContext();
-    ConnectionContext::PacketEntry packetEntry;
-
-    while(socketContext.popIncoming(&packetEntry))
-    {
-        // Read received packet.
-        std::unique_ptr<PacketBase> receivedPacket;
-        if(!readPacket(packetEntry.packet, receivedPacket))
-            continue;
-
-        // Retrieve connect packet.
-        PacketConnect* packetConnect = receivedPacket->as<PacketConnect>();
-        if(packetConnect == nullptr)
-            continue;
-
-        // Check if we already have socket registered with remote address and port.
-        auto socketBackend = m_socket.getConnectionBackend();
-        if(socketBackend->hasSocketRegistered(packetEntry.address, packetEntry.port))
-            continue;
-
-        // Add new client connection list.
-        std::unique_ptr<ConnectionSocket> clientSocket = std::make_unique<ConnectionSocket>(socketBackend);
-
-        if(!clientSocket->connect(packetEntry.address, packetEntry.port))
-        {
-            LOG_ERROR("Could not connect new client socket!");
-            continue;
-        }
-
-        // Move socket to client list.
-        ClientEntry& clientEntry = m_clients.emplace_back();
-        clientEntry.socket = std::move(clientSocket);
-
-        // Reset received memory stream index (bit of a hack).
-        // Get lack received packet copy would be a good solution? Would waste some little memory.
-        packetEntry.packet.reset();
-        
-        // Push received packet to new socket.
-        clientEntry.socket->getConnectionContext().pushIncoming(packetEntry);
-    }
-
     // Receive packets from connected clients.
     for(auto& clientEntry : m_clients)
     {
@@ -179,6 +136,49 @@ void NetworkServer::postTick(float timeDelta)
                 continue;
             }
         }
+    }
+
+    // Receive packets from default socket.
+    // This needs another solution, either simplify or creating ConnectionSwitch for handling connections.
+    ConnectionContext& socketContext = m_socket.getConnectionContext();
+    ConnectionContext::PacketEntry packetEntry;
+
+    while(socketContext.popIncoming(&packetEntry))
+    {
+        // Read received packet.
+        std::unique_ptr<PacketBase> receivedPacket;
+        if(!readPacket(packetEntry.packet, receivedPacket))
+            continue;
+
+        // Retrieve connect packet.
+        PacketConnect* packetConnect = receivedPacket->as<PacketConnect>();
+        if(packetConnect == nullptr)
+            continue;
+
+        // Check if we already have socket registered with remote address and port.
+        auto socketBackend = m_socket.getConnectionBackend();
+        if(socketBackend->hasSocketRegistered(packetEntry.address, packetEntry.port))
+            continue;
+
+        // Add new client connection list.
+        std::unique_ptr<ConnectionSocket> clientSocket = std::make_unique<ConnectionSocket>(socketBackend);
+
+        if(!clientSocket->connect(packetEntry.address, packetEntry.port))
+        {
+            LOG_ERROR("Could not connect new client socket!");
+            continue;
+        }
+
+        // Move socket to client list.
+        ClientEntry& clientEntry = m_clients.emplace_back();
+        clientEntry.socket = std::move(clientSocket);
+
+        // Reset received memory stream index (bit of a hack).
+        // Get lack received packet copy would be a good solution? Would waste some little memory.
+        packetEntry.packet.reset();
+
+        // Push received packet to new socket.
+        clientEntry.socket->getConnectionContext().pushIncoming(packetEntry);
     }
 }
 
