@@ -1,7 +1,7 @@
 #include "Precompiled.hpp"
 #include "World.hpp"
 
-#define ENABLE_WORLD_LOG_TRACE true
+#define ENABLE_WORLD_LOG_TRACE false
 
 #if ENABLE_WORLD_LOG_TRACE
     #define LOG_WORLD_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)

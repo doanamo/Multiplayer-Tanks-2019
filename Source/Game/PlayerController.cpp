@@ -30,8 +30,13 @@ void PlayerController::control(ObjectHandle object)
 void PlayerController::handleEvent(const sf::Event& event)
 {
     // Get player tank object.
-    Tank* playerTank = m_world->getObjectByName("Player1_Tank")->as<Tank>();
-    if(playerTank == nullptr) return;
+    Object* playerObject = m_world->getObjectByHandle(m_object);
+    if(playerObject == nullptr)
+        return;
+
+    Tank * playerTank = playerObject->as<Tank>();
+    if(playerTank == nullptr)
+        return;
 
     // Handle player tank input.
     if(event.type == sf::Event::KeyPressed)
@@ -64,8 +69,13 @@ void PlayerController::handleEvent(const sf::Event& event)
 void PlayerController::tick(float timeDelta)
 {
     // Get player tank object.
-    Tank* playerTank = m_world->getObjectByName("Player1_Tank")->as<Tank>();
-    if(playerTank == nullptr) return;
+    Object* playerObject = m_world->getObjectByHandle(m_object);
+    if(playerObject == nullptr)
+        return;
+
+    Tank* playerTank = playerObject->as<Tank>();
+    if(playerTank == nullptr)
+        return;
 
     // Handle player tank movement.
     if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
