@@ -93,7 +93,7 @@ void ReplicationClient::processServerUpdatePacket(const PacketServerUpdate& pack
             // Destroy object (if it still exists).
             m_gameInstance->getWorld()->destroyObject(replicationEntry.value->objectHandle);
 
-            // Unregister replicable object now.
+            // Unregister replicable object immediately.
             // Some time can pass before destroy object commands are flushed,
             // so we cannot rely on onDestroyObject() method for unregistration.
             unregisterReplicable(replicationEntry.handle);
@@ -129,13 +129,17 @@ void ReplicationClient::onObjectDestroyed(Object& object)
         return;
 
     // Check if replicable handle exists.
+    // It may no longer be valid in cases where destroy
+    // command was received before object was actually destroyed.
     auto handleReference = m_replicables.fetchHandle(replicable->getReplicableHandle());
-    ASSERT(!handleReference.valid, "Destroyed replicable object that was not registered!");
 
     // Print trace.
-    LOG_REPLICATION_TRACE("Replicable object has been destroyed on client side. (%u/%u : %u/%u)",
-        replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
-        replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
+    if(handleReference.valid)
+    {
+        LOG_REPLICATION_TRACE("Replicable object has been destroyed on client side. (%u/%u : %u/%u)",
+            replicable->getHandle().getIdentifier(), replicable->getHandle().getVersion(),
+            replicable->getReplicableHandle().getIdentifier(), replicable->getReplicableHandle().getVersion());
+    }
 }
 
 void ReplicationClient::onObjectDeserialized(Object& object)
