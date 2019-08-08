@@ -3,8 +3,6 @@
 #include "ConnectionSocket.hpp"
 #include "ConnectionSettings.hpp"
 
-#define ENABLE_CONNECTION_BACKEND_LOG_TRACE false
-
 #if ENABLE_CONNECTION_CONTEXT_LOG_TRACE
     #define LOG_CONNECTION_CONTEXT_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)
 #else
