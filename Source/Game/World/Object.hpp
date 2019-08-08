@@ -51,8 +51,8 @@ public:
 
     // Object callback virtual methods.
     virtual void onCreate();
-    virtual void onUpdate(float timeDelta);
     virtual void onTick(float timeDelta);
+    virtual void onUpdate(float timeDelta);
     virtual void onDraw(float timeAlpha);
     virtual void onDestroy();
 
@@ -89,10 +89,10 @@ private:
     // Group name.
     std::string m_group;
 
-    // Reset interpolation on next tick.
-    bool m_resetInterpolation;
-
 protected:
     // Object transform.
     Transform m_transform;
+
+    // Reset interpolation on next tick.
+    bool m_resetInterpolation;
 };

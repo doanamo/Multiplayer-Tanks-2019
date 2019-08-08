@@ -28,11 +28,6 @@ void Object::onCreate()
 {
 }
 
-void Object::onUpdate(float timeDelta)
-{
-    m_resetInterpolation = true;
-}
-
 void Object::onTick(float timeDelta)
 {
     if(m_resetInterpolation)
@@ -41,6 +36,11 @@ void Object::onTick(float timeDelta)
         m_transform.resetInterpolation();
         m_resetInterpolation = false;
     }
+}
+
+void Object::onUpdate(float timeDelta)
+{
+    m_resetInterpolation = true;
 }
 
 void Object::onDraw(float timeAlpha)

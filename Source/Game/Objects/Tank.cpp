@@ -131,6 +131,15 @@ bool Tank::serializeUnreliableTickReplication(MemoryStream& stream)
 
 bool Tank::deserializeUnreliableTickReplication(MemoryStream& stream)
 {
+    // Reset interpolation now in pre tick instead of during tick.
+    // Otherwise transform read here will be treated as previous and interpolation will not work properly.
+    if(m_resetInterpolation)
+    {
+        m_transform.resetInterpolation();
+        m_resetInterpolation = false;
+    }
+
+    // Read transform update.
     if(!deserialize(stream, &m_transform.m_currentPosition))
         return false;
 
