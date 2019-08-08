@@ -101,3 +101,41 @@ bool Tank::onDeserialize(MemoryStream& buffer)
 
     return true;
 }
+
+bool Tank::serializeInitialReplication(MemoryStream& stream)
+{
+    if(!serialize(stream, m_transform))
+        return false;
+
+    return true;
+}
+
+bool Tank::deserializeInitialReplication(MemoryStream& stream)
+{
+    if(!deserialize(stream, &m_transform))
+        return false;
+
+    return true;
+}
+
+bool Tank::serializeUnreliableTickReplication(MemoryStream& stream)
+{
+    if(!serialize(stream, m_transform.m_currentPosition))
+        return false;
+
+    if(!serialize(stream, m_transform.m_currentRotation))
+        return false;
+
+    return true;
+}
+
+bool Tank::deserializeUnreliableTickReplication(MemoryStream& stream)
+{
+    if(!deserialize(stream, &m_transform.m_currentPosition))
+        return false;
+
+    if(!deserialize(stream, &m_transform.m_currentRotation))
+        return false;
+
+    return true;
+}

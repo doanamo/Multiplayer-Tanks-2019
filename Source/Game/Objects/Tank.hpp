@@ -24,6 +24,12 @@ protected:
     virtual bool onSerialize(MemoryStream& buffer) const override;
     virtual bool onDeserialize(MemoryStream& buffer) override;
 
+    // Replication methods.
+    virtual bool serializeInitialReplication(MemoryStream& stream) override;
+    virtual bool deserializeInitialReplication(MemoryStream& stream) override;
+    virtual bool serializeUnreliableTickReplication(MemoryStream& stream) override;
+    virtual bool deserializeUnreliableTickReplication(MemoryStream& stream) override;
+
 private:
     // Tank movement input.
     sf::Vector2f m_movementInput;

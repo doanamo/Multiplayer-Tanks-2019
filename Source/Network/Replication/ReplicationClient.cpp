@@ -14,10 +14,14 @@ ReplicationClient::~ReplicationClient()
 
 }
 
-void ReplicationClient::processServerUpdatePacket(const PacketServerUpdate& packet)
+void ReplicationClient::processServerUpdatePacket(const PacketServerUpdate& packet, bool reliable)
 {
     LOG_REPLICATION_TRACE("Processing server update packet...");
 
+    // Acquire reference to world system.
+    World* world = m_gameInstance->getWorld();
+
+    // Process replication commands from the server.
     for(auto replicationCommand : packet.replicationCommands)
     {
         if(replicationCommand.type == ReplicationCommand::ReplicationType::Create)
@@ -60,10 +64,10 @@ void ReplicationClient::processServerUpdatePacket(const PacketServerUpdate& pack
             }
 
             // Add object to world.
-            auto objectHandle = m_gameInstance->getWorld()->addObject(std::move(object));
+            auto objectHandle = world->addObject(std::move(object));
 
             // Retrieve added replicable object back.
-            Object* addedObject = m_gameInstance->getWorld()->getObjectByHandle(objectHandle);
+            Object* addedObject = world->getObjectByHandle(objectHandle);
             ASSERT(addedObject != nullptr, "Failed to retrieve just added object!");
 
             Replicable* addedReplicable = addedObject->as<Replicable>();
@@ -76,7 +80,31 @@ void ReplicationClient::processServerUpdatePacket(const PacketServerUpdate& pack
         {
             LOG_REPLICATION_TRACE("Processing replication update command...");
 
-            // #todo
+            // Fetch replication entry.
+            auto replicationEntry = m_replicables.fetchHandle(replicationCommand.handle);
+            if(replicationEntry.value == nullptr)
+            {
+                LOG_WARNING("Failed to fetch replication handle that is expect to exist!");
+                continue;
+            }
+
+            // Retrieve replicable object and check if it is still valid.
+            Object* object = world->getObjectByHandle(replicationEntry.value->objectHandle);
+            if(object == nullptr)
+                continue;
+
+            Replicable* replicable = object->as<Replicable>();
+            ASSERT(replicable != nullptr, "Object received from replicable registry is not replicable!");
+
+            // Process replication data by objects.
+            if(reliable)
+            {
+                replicable->deserializeReliableTickReplication(replicationCommand.data);
+            }
+            else
+            {
+                replicable->deserializeUnreliableTickReplication(replicationCommand.data);
+            }
         }
         else if(replicationCommand.type == ReplicationCommand::ReplicationType::Destroy)
         {
@@ -91,7 +119,7 @@ void ReplicationClient::processServerUpdatePacket(const PacketServerUpdate& pack
             }
 
             // Destroy object (if it still exists).
-            m_gameInstance->getWorld()->destroyObject(replicationEntry.value->objectHandle);
+            world->destroyObject(replicationEntry.value->objectHandle);
 
             // Unregister replicable object immediately.
             // Some time can pass before destroy object commands are flushed,

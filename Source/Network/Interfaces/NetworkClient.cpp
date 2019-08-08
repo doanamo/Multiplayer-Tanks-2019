@@ -87,17 +87,19 @@ void NetworkClient::preTick(float timeDelta)
 
     // Receive packets.
     std::unique_ptr<PacketBase> receivedPacket;
+    bool reliablePacket;
+
     sf::IpAddress senderAddress;
     unsigned short senderPort;
 
-    while(receivePacket(m_socket, receivedPacket, nullptr, &senderAddress, &senderPort))
+    while(receivePacket(m_socket, receivedPacket, &reliablePacket, &senderAddress, &senderPort))
     {
         if(receivedPacket->is<PacketServerUpdate>())
         {
             PacketServerUpdate* packetServerUpdate = receivedPacket->as<PacketServerUpdate>();
             ASSERT(packetServerUpdate != nullptr);
 
-            m_replication.processServerUpdatePacket(*packetServerUpdate);
+            m_replication.processServerUpdatePacket(*packetServerUpdate, reliablePacket);
         }
         else if(receivedPacket->is<PacketMessage>())
         {

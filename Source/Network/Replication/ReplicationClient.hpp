@@ -14,7 +14,7 @@ public:
     ~ReplicationClient();
 
     // Processes server update packet.
-    void processServerUpdatePacket(const PacketServerUpdate& packet);
+    void processServerUpdatePacket(const PacketServerUpdate& packet, bool reliable);
 
 private:
     // World object callback methods.
