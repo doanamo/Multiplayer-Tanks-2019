@@ -137,6 +137,7 @@ void ReplicationClient::onObjectCreated(Object& object)
         return;
 
     // Check if object has valid replicable handle.
+    // This assert is not essential. We should be able to create replicable object that will not be replicated (client side only).
     ASSERT(replicable->getReplicableHandle().isValid(), "Client attempted to create replicable object!");
     
     // Print trace.
