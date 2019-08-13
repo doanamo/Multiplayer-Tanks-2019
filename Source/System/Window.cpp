@@ -58,7 +58,8 @@ bool Window::pollEvent(sf::Event& event)
 {
     while(m_window.pollEvent(event))
     {
-        ImGui::SFML::ProcessEvent(event);
+        if(ImGui::SFML::ProcessEvent(event))
+            continue;
 
         if(event.type == sf::Event::Closed)
         {
