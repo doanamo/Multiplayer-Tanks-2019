@@ -26,15 +26,26 @@ private:
     World* m_world;
     ObjectHandle m_object;
 
-    // Movement direction.
-    enum class MovementDirection
+    // Movement direction handling.
+    struct MovementDirections
     {
-        None,
-        Up,
-        Down,
-        Left,
-        Right,
+        enum Type : uint8_t
+        {
+            Up,
+            Down,
+            Left,
+            Right,
+            Max,
+
+            None,
+        };
     };
 
-    MovementDirection m_playerMovement;
+    struct MovementInputEntry
+    {
+        std::chrono::high_resolution_clock::time_point inputTime;
+        bool pressed = false;
+    };
+
+    MovementInputEntry m_movementInputs[MovementDirections::Max];
 };

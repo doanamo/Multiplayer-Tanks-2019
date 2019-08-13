@@ -4,8 +4,7 @@
 
 PlayerController::PlayerController() :
     m_world(nullptr),
-    m_object(),
-    m_playerMovement(MovementDirection::None)
+    m_object()
 {
 }
 
@@ -34,7 +33,7 @@ void PlayerController::handleEvent(const sf::Event& event)
     if(playerObject == nullptr)
         return;
 
-    Tank * playerTank = playerObject->as<Tank>();
+    Tank* playerTank = playerObject->as<Tank>();
     if(playerTank == nullptr)
         return;
 
@@ -48,20 +47,76 @@ void PlayerController::handleEvent(const sf::Event& event)
             break;
 
         case sf::Keyboard::Key::Up:
-            m_playerMovement = MovementDirection::Up;
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Up];
+                entry.inputTime = std::chrono::high_resolution_clock::now();
+                entry.pressed = true;
+            }
             break;
 
         case sf::Keyboard::Key::Down:
-            m_playerMovement = MovementDirection::Down;
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Down];
+                entry.inputTime = std::chrono::high_resolution_clock::now();
+                entry.pressed = true;
+            }
             break;
 
         case sf::Keyboard::Key::Left:
-            m_playerMovement = MovementDirection::Left;
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Left];
+                entry.inputTime = std::chrono::high_resolution_clock::now();
+                entry.pressed = true;
+            }
             break;
 
         case sf::Keyboard::Key::Right:
-            m_playerMovement = MovementDirection::Right;
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Right];
+                entry.inputTime = std::chrono::high_resolution_clock::now();
+                entry.pressed = true;
+            }
             break;
+        }
+    }
+    else if(event.type == sf::Event::KeyReleased)
+    {
+        switch(event.key.code)
+        {
+        case sf::Keyboard::Key::Up:
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Up];
+                entry.pressed = false;
+            }
+            break;
+
+        case sf::Keyboard::Key::Down:
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Down];
+                entry.pressed = false;
+            }
+            break;
+
+        case sf::Keyboard::Key::Left:
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Left];
+                entry.pressed = false;
+            }   
+            break;
+
+        case sf::Keyboard::Key::Right:
+            {
+                MovementInputEntry& entry = m_movementInputs[MovementDirections::Right];
+                entry.pressed = false;
+            }
+            break;
+        }
+    }
+    else if(event.type == sf::Event::LostFocus)
+    {
+        for(auto& entry : m_movementInputs)
+        {
+            entry.pressed = false;
         }
     }
 }
@@ -77,42 +132,37 @@ void PlayerController::tick(float timeDelta)
     if(playerTank == nullptr)
         return;
 
+    // Get newest keyboard input.
+    MovementDirections::Type movementDirection = MovementDirections::None;
+    std::chrono::high_resolution_clock::time_point inputTime;
+
+    for(int i = 0; i < MovementDirections::Max; ++i)
+    {
+        auto& movementInput = m_movementInputs[i];
+
+        if(movementInput.pressed && movementInput.inputTime > inputTime)
+        {
+            movementDirection = (MovementDirections::Type)i;
+            inputTime = movementInput.inputTime;
+        }
+    }
+
     // Handle player tank movement.
-    if(sf::Keyboard::isKeyPressed(sf::Keyboard::Up))
+    if(movementDirection == MovementDirections::Up)
     {
-        if(m_playerMovement == MovementDirection::Up || m_playerMovement == MovementDirection::None)
-        {
-            playerTank->setMovementInput(sf::Vector2f(0.0f, -1.0f));
-            m_playerMovement = MovementDirection::Up;
-        }
+        playerTank->setMovementInput(sf::Vector2f(0.0f, -1.0f));
     }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Down))
+    else if(movementDirection == MovementDirections::Down)
     {
-        if(m_playerMovement == MovementDirection::Down || m_playerMovement == MovementDirection::None)
-        {
-            playerTank->setMovementInput(sf::Vector2f(.0f, 1.0f));
-            m_playerMovement = MovementDirection::Down;
-        }
+        playerTank->setMovementInput(sf::Vector2f(.0f, 1.0f));
     }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Left))
+    else if(movementDirection == MovementDirections::Left)
     {
-        if(m_playerMovement == MovementDirection::Left || m_playerMovement == MovementDirection::None)
-        {
-            playerTank->setMovementInput(sf::Vector2f(-1.0f, 0.0f));
-            m_playerMovement = MovementDirection::Left;
-        }
+        playerTank->setMovementInput(sf::Vector2f(-1.0f, 0.0f));
     }
-    else if(sf::Keyboard::isKeyPressed(sf::Keyboard::Right))
+    else if(movementDirection == MovementDirections::Right)
     {
-        if(m_playerMovement == MovementDirection::Right || m_playerMovement == MovementDirection::None)
-        {
-            playerTank->setMovementInput(sf::Vector2f(1.0f, 0.0f));
-            m_playerMovement = MovementDirection::Right;
-        }
-    }
-    else
-    {
-        m_playerMovement = MovementDirection::None;
+        playerTank->setMovementInput(sf::Vector2f(1.0f, 0.0f));
     }
 }
 

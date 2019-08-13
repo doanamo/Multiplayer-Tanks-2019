@@ -77,9 +77,11 @@ bool GameInstance::initialize(const NetworkParams& networkParams)
         // Set network interface.
         m_network = std::move(networkClient);
 
+#if TEMP_DISABLE_CLIENT_INPUT
         // Disable player controller input for client.
         // Temp hack while input is broken.
         m_playerController->control(ObjectHandle());
+#endif
     }
 
     // Success!
