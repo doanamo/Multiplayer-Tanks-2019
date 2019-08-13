@@ -5,7 +5,6 @@ cmake_minimum_required(VERSION 3.10)
 set(SOURCE_FILES
     "Source/Precompiled.hpp"
     "Source/Precompiled.cpp"
-    "Source/GlobalDefines.hpp"
     "Source/Application.hpp"
     "Source/Application.cpp"
 

@@ -6,6 +6,8 @@
 #include "Replicable.hpp"
 
 // Debugging trace.
+#define ENABLE_REPLICATION_LOG_TRACE false
+
 #if ENABLE_REPLICATION_LOG_TRACE
     #define LOG_REPLICATION_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)
 #else

@@ -2,6 +2,8 @@
 #include "PlayerController.hpp"
 #include "Game/World/World.hpp"
 
+#define TEMP_DISABLE_CLIENT_INPUT true
+
 PlayerController::PlayerController() :
     m_world(nullptr),
     m_object()

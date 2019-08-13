@@ -38,7 +38,6 @@
 #include <imgui-SFML.h>
 
 // Project
-#include "GlobalDefines.hpp"
 #include "Common/Debug.hpp"
 #include "Common/Math.hpp"
 #include "Common/Utility.hpp"
