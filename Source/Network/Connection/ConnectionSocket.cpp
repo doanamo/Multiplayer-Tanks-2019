@@ -52,15 +52,18 @@ bool ConnectionSocket::connect(const sf::IpAddress& remoteAddress, unsigned shor
     m_remoteAddress = remoteAddress;
     m_remotePort = remotePort;
 
+    // Mark as initialized before registration to multi threaded backend.
+    m_initialized = true;
+
     // Register socket in connection backend.
     if(!m_connectionBackend->registerSocket(this))
     {
         LOG_ERROR("Could not register socket in connection backend!");
+        m_initialized = false;
         return false;
     }
 
     // Success!
-    m_initialized = true;
     return true;
 }
 
