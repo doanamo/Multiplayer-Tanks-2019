@@ -23,6 +23,7 @@ bool registerTypes()
     REGISTER_TYPE(PacketBase);
     REGISTER_TYPE(PacketMessage);
     REGISTER_TYPE(PacketRequestConnection);
+    REGISTER_TYPE(PacketAcceptConnection);
     REGISTER_TYPE(PacketServerSnapshot);
     REGISTER_TYPE(PacketServerUpdate);
 

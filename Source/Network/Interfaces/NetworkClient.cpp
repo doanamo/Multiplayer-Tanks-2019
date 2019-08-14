@@ -34,6 +34,23 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
     PacketRequestConnection requestConnectionPacket;
     sendPacket(m_socket, requestConnectionPacket, true);
 
+    // Receive and process connection acceptance.
+    while(true)
+    {
+        // Wait until we receive packet.
+        std::unique_ptr<PacketBase> receivedPacket;
+        if(!receivePacket(m_socket, receivedPacket))
+            continue;
+
+        // Check if packet type matches expected type.
+        PacketAcceptConnection* acceptConnectionPacket = receivedPacket->as<PacketAcceptConnection>();
+        if(acceptConnectionPacket == nullptr)
+            continue;
+
+        // Break out of loop.
+        break;
+    }
+
     // Receive and process state snapshot.
     while(true)
     {

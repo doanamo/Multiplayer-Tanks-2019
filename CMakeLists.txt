@@ -78,6 +78,8 @@ set(SOURCE_FILES
     "Source/Network/Packets/PacketMessage.cpp"
     "Source/Network/Packets/PacketRequestConnection.hpp"
     "Source/Network/Packets/PacketRequestConnection.cpp"
+    "Source/Network/Packets/PacketAcceptConnection.hpp"
+    "Source/Network/Packets/PacketAcceptConnection.cpp"
     "Source/Network/Packets/PacketServerSnapshot.cpp"
     "Source/Network/Packets/PacketServerSnapshot.hpp"
     "Source/Network/Packets/PacketServerUpdate.hpp"

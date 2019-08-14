@@ -53,6 +53,14 @@ void NetworkServer::preTick(float timeDelta)
         {
             if(receivedPacket->is<PacketRequestConnection>())
             {
+                // Send accept connection packet.
+                PacketAcceptConnection packetAcceptConnection;
+                if(!sendPacket(*clientEntry.socket, packetAcceptConnection, true))
+                {
+                    LOG_ERROR("Failed to send accept connection packet to client!");
+                    continue;
+                }
+
                 // Save game snapshot into packet memory stream.
                 PacketServerSnapshot packetStateSnapshot;
                 SnapshotSaveLoad snapshotSave(m_gameInstance);
@@ -69,8 +77,6 @@ void NetworkServer::preTick(float timeDelta)
                     LOG_ERROR("Failed to send state snapshot packet to client!");
                     continue;
                 }
-
-
             }
             else if(receivedPacket->is<PacketMessage>())
             {
