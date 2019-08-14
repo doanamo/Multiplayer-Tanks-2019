@@ -31,8 +31,8 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
     }
 
     // Send connection request to server.
-    PacketConnect connectPacket;
-    sendPacket(m_socket, connectPacket, true);
+    PacketRequestConnection requestConnectionPacket;
+    sendPacket(m_socket, requestConnectionPacket, true);
 
     // Receive and process state snapshot.
     while(true)

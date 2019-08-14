@@ -51,7 +51,7 @@ void NetworkServer::preTick(float timeDelta)
         std::unique_ptr<PacketBase> receivedPacket;
         while(receivePacket(*clientEntry.socket, receivedPacket, nullptr))
         {
-            if(receivedPacket->is<PacketConnect>())
+            if(receivedPacket->is<PacketRequestConnection>())
             {
                 // Save game snapshot into packet memory stream.
                 PacketServerSnapshot packetStateSnapshot;
@@ -69,6 +69,8 @@ void NetworkServer::preTick(float timeDelta)
                     LOG_ERROR("Failed to send state snapshot packet to client!");
                     continue;
                 }
+
+
             }
             else if(receivedPacket->is<PacketMessage>())
             {
@@ -157,8 +159,8 @@ void NetworkServer::postTick(float timeDelta)
             continue;
 
         // Retrieve connect packet.
-        PacketConnect* packetConnect = receivedPacket->as<PacketConnect>();
-        if(packetConnect == nullptr)
+        PacketRequestConnection* requestConnectionPacket = receivedPacket->as<PacketRequestConnection>();
+        if(requestConnectionPacket == nullptr)
             continue;
 
         // Check if we already have socket registered with remote address and port.
