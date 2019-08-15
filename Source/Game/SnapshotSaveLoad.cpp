@@ -89,7 +89,7 @@ bool SnapshotSaveLoad::save(MemoryStream& memoryStream)
     VERIFY(m_gameInstance);
 
     // Prepare world for saving.
-    m_gameInstance->getWorld()->flushObjects();
+    m_gameInstance->getWorld().flushObjects();
 
     // Serialize game instance to memory stream.
     if(!serialize(memoryStream, *m_gameInstance))
@@ -109,7 +109,7 @@ bool SnapshotSaveLoad::load(MemoryStream& memoryStream)
 
     // Verify that game instance is fresh.
     // Here we do this by checking if world is empty.
-    VERIFY(m_gameInstance->getWorld()->getObjectCount() == 0, "World appears to have already been populated!");
+    VERIFY(m_gameInstance->getWorld().getObjectCount() == 0, "World appears to have already been populated!");
 
     // Deserialize game instance from memory stream.
     if(!deserialize(memoryStream, m_gameInstance))

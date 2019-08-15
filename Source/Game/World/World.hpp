@@ -4,6 +4,7 @@
 #include "Common/HandleMap.hpp"
 #include "Object.hpp"
 
+// World class.
 class World : public Serializable
 {
 public:

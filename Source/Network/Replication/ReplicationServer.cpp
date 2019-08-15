@@ -22,7 +22,7 @@ void ReplicationServer::collectReplicationData()
     {
         // Retrieve replicable object.
         ASSERT(replicableEntry.valid, "Handle map range iteration expected to skip invalid elements!");
-        Object* object = m_gameInstance->getWorld()->getObjectByHandle(replicableEntry.value->objectHandle);
+        Object* object = m_gameInstance->getWorld().getObjectByHandle(replicableEntry.value->objectHandle);
         ASSERT(object != nullptr, "Valid replication entry contains invalid handle!");
 
         // Cast object entry to replicable class.

@@ -11,7 +11,7 @@
 #include "System/Window.hpp"
 
 GameInstance::GameInstance() :
-    m_tickFrame(0),
+    m_tickCounter(0),
     m_isViewportCentered(false),
     m_isCameraAttachedToPlayer(true)
 {
@@ -132,7 +132,7 @@ void GameInstance::tick(float timeDelta)
     m_network->preTick(timeDelta);
 
     // Increment total tick count.
-    ++m_tickFrame;
+    ++m_tickCounter;
 
     // Tick game level.
     m_level->tick(timeDelta);
@@ -212,32 +212,36 @@ void GameInstance::draw(float timeAlpha)
 
 uint64_t GameInstance::getTickFrame() const
 {
-    return m_tickFrame;
+    return m_tickCounter;
 }
 
-NetworkInterface* GameInstance::getNetwork()
+World& GameInstance::getWorld()
 {
-    return m_network.get();
+    ASSERT(m_world);
+    return *m_world.get();
 }
 
-World* GameInstance::getWorld()
+Level& GameInstance::getLevel()
 {
-    return m_world.get();
+    ASSERT(m_level);
+    return *m_level.get();
 }
 
-Level* GameInstance::getLevel()
+PlayerController& GameInstance::getPlayerController()
 {
-    return m_level.get();
+    ASSERT(m_playerController);
+    return *m_playerController.get();
 }
 
-PlayerController* GameInstance::getPlayerController()
+NetworkInterface& GameInstance::getNetwork()
 {
-    return m_playerController.get();
+    ASSERT(m_network);
+    return *m_network.get();
 }
 
 bool GameInstance::onSerialize(MemoryStream& buffer) const
 {
-    if(!serialize(buffer, m_tickFrame))
+    if(!serialize(buffer, m_tickCounter))
         return false;
 
     if(!serialize(buffer, *m_world))
@@ -254,7 +258,7 @@ bool GameInstance::onSerialize(MemoryStream& buffer) const
 
 bool GameInstance::onDeserialize(MemoryStream& buffer)
 {
-    if(!deserialize(buffer, &m_tickFrame))
+    if(!deserialize(buffer, &m_tickCounter))
         return false;
 
     if(!deserialize(buffer, m_world.get()))

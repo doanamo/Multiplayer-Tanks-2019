@@ -16,10 +16,10 @@ ReplicationBase::~ReplicationBase()
     LOG_REPLICATION_TRACE("Calling ReplicationBase destructor.");
 
     // Unregister callbacks.
-    if(m_gameInstance && m_gameInstance->getWorld())
+    if(m_gameInstance)
     {
-        m_gameInstance->getWorld()->replicationObjectCreated = nullptr;
-        m_gameInstance->getWorld()->replicationObjectDestroyed = nullptr;
+        m_gameInstance->getWorld().replicationObjectCreated = nullptr;
+        m_gameInstance->getWorld().replicationObjectDestroyed = nullptr;
     }
 }
 
@@ -32,9 +32,9 @@ bool ReplicationBase::initialize(GameInstance* gameInstance)
     ASSERT(m_gameInstance);
 
     // Hook callback methods in world for object creation and destruction.
-    m_gameInstance->getWorld()->replicationObjectCreated = std::bind(&ReplicationBase::onObjectCreated, this, std::placeholders::_1);
-    m_gameInstance->getWorld()->replicationObjectDestroyed = std::bind(&ReplicationBase::onObjectDestroyed, this, std::placeholders::_1);
-    m_gameInstance->getWorld()->replicationObjectDeserialized = std::bind(&ReplicationBase::onObjectDeserialized, this, std::placeholders::_1);
+    m_gameInstance->getWorld().replicationObjectCreated = std::bind(&ReplicationBase::onObjectCreated, this, std::placeholders::_1);
+    m_gameInstance->getWorld().replicationObjectDestroyed = std::bind(&ReplicationBase::onObjectDestroyed, this, std::placeholders::_1);
+    m_gameInstance->getWorld().replicationObjectDeserialized = std::bind(&ReplicationBase::onObjectDeserialized, this, std::placeholders::_1);
 
     // Success!
     m_initialized = true;
@@ -112,7 +112,7 @@ void ReplicationBase::draw()
             for(auto replicableEntry : m_replicables)
             {
                 // Retrieve object bound to replicable entry (it can be null).
-                Object* object = m_gameInstance->getWorld()->getObjectByHandle(replicableEntry.value->objectHandle);
+                Object* object = m_gameInstance->getWorld().getObjectByHandle(replicableEntry.value->objectHandle);
 
                 // Write replicable entry.
                 ImGui::BulletText("%u/%u : %u/%u (%s)",

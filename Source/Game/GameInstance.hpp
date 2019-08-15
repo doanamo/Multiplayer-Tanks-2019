@@ -3,10 +3,12 @@
 #include "Precompiled.hpp"
 #include "Network/Interfaces/NetworkInterface.hpp"
 
+// Forward declarations.
 class World;
 class Level;
 class PlayerController;
 
+// Game instance class.
 class GameInstance : public Serializable
 {
 public:
@@ -23,16 +25,16 @@ public:
     uint64_t getTickFrame() const;
 
     // Gets world with objects.
-    World* getWorld();
+    World& getWorld();
 
     // Gets level instance.
-    Level* getLevel();
+    Level& getLevel();
 
     // Gets player controller.
-    PlayerController* getPlayerController();
+    PlayerController& getPlayerController();
     
     // Gets network interface.
-    NetworkInterface* getNetwork();
+    NetworkInterface& getNetwork();
 
 protected:
     // Serialization methods.
@@ -40,10 +42,10 @@ protected:
     bool onDeserialize(MemoryStream& buffer) override;
 
 private:
-    // Current tick frame.
-    uint64_t m_tickFrame;
+    // Tick counter.
+    uint64_t m_tickCounter;
 
-    // Objects in world.
+    // Game world.
     std::unique_ptr<World> m_world;
 
     // Game level.
@@ -52,12 +54,12 @@ private:
     // Local player controller.
     std::unique_ptr<PlayerController> m_playerController;
 
+    // Network interface.
+    std::unique_ptr<NetworkInterface> m_network;
+
     // Camera viewport
     sf::View m_viewport;
 
     bool m_isViewportCentered;
     bool m_isCameraAttachedToPlayer;
-
-    // Network interface.
-    std::unique_ptr<NetworkInterface> m_network;
 };
