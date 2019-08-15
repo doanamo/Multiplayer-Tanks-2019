@@ -37,4 +37,5 @@ private:
     };
 
     std::vector<ClientEntry> m_clients;
+    int m_maxClientCount;
 };

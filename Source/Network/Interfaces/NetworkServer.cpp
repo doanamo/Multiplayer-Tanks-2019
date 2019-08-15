@@ -6,7 +6,8 @@
 #include "Game/World/World.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
 
-NetworkServer::NetworkServer()
+NetworkServer::NetworkServer() :
+    m_maxClientCount(16)
 {
 }
 
@@ -31,6 +32,9 @@ bool NetworkServer::initialize(GameInstance* gameInstance, unsigned short port)
         LOG_ERROR("Could not initialize socket connection!");
         return false;
     }
+    
+    // Preallocate array of clients.
+    m_clients.resize(m_maxClientCount);
 
     return true;
 }
@@ -45,8 +49,15 @@ void NetworkServer::preTick(float timeDelta)
     NetworkBase::preTick(timeDelta);
 
     // Receive packets from connected clients.
-    for(auto& clientEntry : m_clients)
+    ASSERT(m_clients.size() == m_maxClientCount, "We do not expect client size to change at runtime!");
+
+    for(int i = 0; i < m_clients.size(); ++i)
     {
+        // Check if client connection socket exists.
+        ClientEntry& clientEntry = m_clients[i];
+        if(clientEntry.socket == nullptr)
+            continue;
+
         // Respond to received packet.
         std::unique_ptr<PacketBase> receivedPacket;
         while(receivePacket(*clientEntry.socket, receivedPacket, nullptr))
@@ -54,7 +65,10 @@ void NetworkServer::preTick(float timeDelta)
             if(receivedPacket->is<PacketRequestConnection>())
             {
                 // Send accept connection packet.
+                // Specify client index which starts from 1, with 0 reserved for server.
                 PacketAcceptConnection packetAcceptConnection;
+                packetAcceptConnection.playerIndex = i + 1;
+
                 if(!sendPacket(*clientEntry.socket, packetAcceptConnection, true))
                 {
                     LOG_ERROR("Failed to send accept connection packet to client!");
@@ -129,6 +143,9 @@ void NetworkServer::postTick(float timeDelta)
 
         for(auto& clientEntry : m_clients)
         {
+            if(clientEntry.socket == nullptr)
+                continue;
+
             if(!sendPacket(*clientEntry.socket, reliableUpdatePacket, true))
             {
                 LOG_ERROR("Failed to send reliable server update packet to client!");
@@ -144,6 +161,9 @@ void NetworkServer::postTick(float timeDelta)
 
         for(auto& clientEntry : m_clients)
         {
+            if(clientEntry.socket == nullptr)
+                continue;
+
             if(!sendPacket(*clientEntry.socket, unreliableUpdatePacket, false))
             {
                 LOG_ERROR("Failed to send unreliable server update packet to client!");
@@ -174,6 +194,22 @@ void NetworkServer::postTick(float timeDelta)
         if(socketBackend->hasSocketRegistered(packetEntry.address, packetEntry.port))
             continue;
 
+        // Find empty client entry.
+        auto clientEntryIt = m_clients.begin();
+        while(clientEntryIt != m_clients.end())
+        {
+            if(clientEntryIt->socket == nullptr)
+                break;
+
+            ++clientEntryIt;
+        }
+
+        if(clientEntryIt == m_clients.end())
+        {
+            LOG_WARNING("Cannot connect new client due to connection limit being reached.");
+            continue;
+        }
+
         // Add new client connection list.
         std::unique_ptr<ConnectionSocket> clientSocket = std::make_unique<ConnectionSocket>(socketBackend);
 
@@ -184,11 +220,10 @@ void NetworkServer::postTick(float timeDelta)
         }
 
         // Move socket to client list.
-        ClientEntry& clientEntry = m_clients.emplace_back();
+        ClientEntry& clientEntry = *clientEntryIt;
         clientEntry.socket = std::move(clientSocket);
 
-        // Reset received memory stream index (bit of a hack).
-        // Get lack received packet copy would be a good solution? Would waste some little memory.
+        // Reset received memory stream index so it can be read again.
         packetEntry.packet.reset();
 
         // Push received packet to new socket.

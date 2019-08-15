@@ -12,6 +12,9 @@ public:
     PacketAcceptConnection();
     ~PacketAcceptConnection();
 
-public:
+    bool onSerialize(MemoryStream& buffer) const;
+    bool onDeserialize(MemoryStream& buffer);
 
+public:
+    int playerIndex;
 };
