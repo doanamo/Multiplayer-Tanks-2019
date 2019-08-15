@@ -34,17 +34,17 @@ bool ConnectionSocket::connect(const sf::IpAddress& remoteAddress, unsigned shor
         return false;
     }
 
-    // Initialize connection backend.
-    if(!m_connectionBackend->initialize(sf::UdpSocket::AnyPort))
-    {
-        LOG_ERROR("Could not initialize connection backend!");
-        return false;
-    }
-
     // Initialize connection context.
     if(!m_connectionContext.initialize(true))
     {
         LOG_ERROR("Could not initialize connection context!");
+        return false;
+    }
+
+    // Initialize connection backend.
+    if(!m_connectionBackend->initialize(sf::UdpSocket::AnyPort))
+    {
+        LOG_ERROR("Could not initialize connection backend!");
         return false;
     }
 
@@ -71,6 +71,13 @@ bool ConnectionSocket::listen(unsigned short localPort)
 {
     ASSERT(!m_initialized);
 
+    // Initialize connection context.
+    if(!m_connectionContext.initialize(false))
+    {
+        LOG_ERROR("Could not initialize connection context!");
+        return false;
+    }
+
     // Initialize connection backend.
     if(!m_connectionBackend->initialize(localPort))
     {
@@ -78,12 +85,8 @@ bool ConnectionSocket::listen(unsigned short localPort)
         return false;
     }
 
-    // Initialize connection context.
-    if(!m_connectionContext.initialize(false))
-    {
-        LOG_ERROR("Could not initialize connection context!");
-        return false;
-    }
+    // Mark as initialized before registration to multi threaded backend.
+    m_initialized = true;
 
     // Register socket in connection backend.
     if(!m_connectionBackend->registerSocket(this))
@@ -93,7 +96,6 @@ bool ConnectionSocket::listen(unsigned short localPort)
     }
 
     // Success!
-    m_initialized = true;
     return true;
 }
 
@@ -174,20 +176,24 @@ ConnectionContext& ConnectionSocket::getConnectionContext()
 
 const sf::IpAddress& ConnectionSocket::getRemoteAddress() const
 {
+    ASSERT(m_initialized);
     return m_remoteAddress;
 }
 
 unsigned short ConnectionSocket::getRemotePort() const
 {
+    ASSERT(m_initialized);
     return m_remotePort;
 }
 
 unsigned short ConnectionSocket::getLocalPort() const
 {
+    ASSERT(m_initialized);
     return m_connectionBackend->getLocalPort();
 }
 
 bool ConnectionSocket::supportsReliability() const
 {
+    ASSERT(m_initialized);
     return m_remoteAddress != sf::IpAddress::Any;
 }
