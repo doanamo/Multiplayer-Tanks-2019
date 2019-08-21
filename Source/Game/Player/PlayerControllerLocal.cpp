@@ -1,43 +1,48 @@
 #include "Precompiled.hpp"
-#include "PlayerController.hpp"
+#include "PlayerControllerLocal.hpp"
 #include "Game/World/World.hpp"
+#include "Game/Objects/Tank.hpp"
 
-#define TEMP_DISABLE_CLIENT_INPUT true
-
-PlayerController::PlayerController() :
+PlayerControllerLocal::PlayerControllerLocal() :
     m_world(nullptr),
-    m_object()
+    m_object(),
+    m_initialized(false)
 {
 }
 
-PlayerController::~PlayerController()
+PlayerControllerLocal::~PlayerControllerLocal()
 {
 }
 
-bool PlayerController::initialize(World* world)
+bool PlayerControllerLocal::initialize(World* world)
 {
+    // Save world reference.
     ASSERT(world != nullptr, "Cannot initialize player controller without correct world!");
-
     m_world = world;
 
+    // Initialization state.
+    m_initialized = true;
     return true;
 }
 
-void PlayerController::control(ObjectHandle object)
+void PlayerControllerLocal::control(ObjectHandle object)
 {
+    ASSERT(m_initialized);
     m_object = object;
 }
 
-void PlayerController::handleEvent(const sf::Event& event)
+bool PlayerControllerLocal::handleEvent(const sf::Event& event)
 {
+    ASSERT(m_initialized);
+
     // Get player tank object.
     Object* playerObject = m_world->getObjectByHandle(m_object);
     if(playerObject == nullptr)
-        return;
+        return true;
 
     Tank* playerTank = playerObject->as<Tank>();
     if(playerTank == nullptr)
-        return;
+        return true;
 
     // Handle player tank input.
     if(event.type == sf::Event::KeyPressed)
@@ -121,10 +126,14 @@ void PlayerController::handleEvent(const sf::Event& event)
             entry.pressed = false;
         }
     }
+
+    return true;
 }
 
-void PlayerController::tick(float timeDelta)
+void PlayerControllerLocal::tick(float timeDelta)
 {
+    ASSERT(m_initialized);
+
     // Get player tank object.
     Object* playerObject = m_world->getObjectByHandle(m_object);
     if(playerObject == nullptr)
@@ -168,12 +177,14 @@ void PlayerController::tick(float timeDelta)
     }
 }
 
-bool PlayerController::onSerialize(MemoryStream& buffer) const
+bool PlayerControllerLocal::onSerialize(MemoryStream& buffer) const
 {
+    ASSERT(m_initialized);
+
     return true;
 }
 
-bool PlayerController::onDeserialize(MemoryStream& buffer)
+bool PlayerControllerLocal::onDeserialize(MemoryStream& buffer)
 {
     // #todo: Regain control over own player object after game load.
 

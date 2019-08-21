@@ -7,7 +7,6 @@
 #include "Game/World/World.hpp"
 #include "Game/Objects/Tank.hpp"
 #include "Game/Level.hpp"
-#include "Game/PlayerController.hpp"
 #include "Network/Interfaces/NetworkInterface.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.hpp"

@@ -1,20 +1,30 @@
 #pragma once
 
 #include "Precompiled.hpp"
-#include "Objects/Tank.hpp"
+#include "PlayerControllerBase.hpp"
+#include "Game/World/Object.hpp"
 
+// Forward declarations.
 class World;
 
-class PlayerController : public Serializable
+// Player controller local class.
+class PlayerControllerLocal : public PlayerControllerBase
 {
 public:
-    PlayerController();
-    ~PlayerController();
+    PlayerControllerLocal();
+    ~PlayerControllerLocal();
 
+    // Initializes player controller.
     bool initialize(World* world);
+    
+    // Controls object with specified handle.
     void control(ObjectHandle handle);
-    void handleEvent(const sf::Event& event);
-    void tick(float timeDelta);
+
+    // Handles player input event.
+    bool handleEvent(const sf::Event& event) override;
+
+    // Processes player tick.
+    void tick(float timeDelta) override;
 
 protected:
     // Serialization methods.
@@ -48,4 +58,7 @@ private:
     };
 
     MovementInputEntry m_movementInputs[MovementDirections::Max];
+
+    // Initialization state.
+    bool m_initialized;
 };

@@ -2,7 +2,9 @@
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
 #include "Game/Level.hpp"
-#include "Game/PlayerController.hpp"
+#include "Game/Objects/Tank.hpp"
+#include "Game/Player/PlayerManager.hpp"
+#include "Game/Player/PlayerControllerLocal.hpp"
 #include "Network/Interfaces/NetworkServer.hpp"
 #include "Network/Interfaces/NetworkClient.hpp"
 #include "Network/Interfaces/NetworkOffline.hpp"
@@ -33,9 +35,9 @@ bool GameInstance::initialize(const NetworkParams& networkParams)
     if(!m_level->initialize())
         return false;
 
-    // Create player controller. 
-    m_playerController = std::make_unique<PlayerController>();
-    if(!m_playerController->initialize(m_world.get()))
+    // Create player manager.
+    m_playerManager = std::make_unique<PlayerManager>();
+    if(!m_playerManager->initialize(this))
         return false;
 
     // Create network interface.
@@ -76,12 +78,6 @@ bool GameInstance::initialize(const NetworkParams& networkParams)
 
         // Set network interface.
         m_network = std::move(networkClient);
-
-#if TEMP_DISABLE_CLIENT_INPUT
-        // Disable player controller input for client.
-        // Temp hack while input is broken.
-        m_playerController->control(ObjectHandle());
-#endif
     }
 
     // Success!
@@ -113,8 +109,8 @@ void GameInstance::handleEvent(const sf::Event& event)
         }
     }
 
-    // Handle player controller input.
-    m_playerController->handleEvent(event);
+    // Handle player input events.
+    m_playerManager->handleEvent(event);
 }
 
 void GameInstance::update(float timeDelta)
@@ -137,8 +133,8 @@ void GameInstance::tick(float timeDelta)
     // Tick game level.
     m_level->tick(timeDelta);
 
-    // Tick player controller.
-    m_playerController->tick(timeDelta);
+    // Tick players.
+    m_playerManager->tick(timeDelta);
 
     // Tick world instance.
     m_world->tick(timeDelta);
@@ -227,10 +223,10 @@ Level& GameInstance::getLevel()
     return *m_level.get();
 }
 
-PlayerController& GameInstance::getPlayerController()
+PlayerManager& GameInstance::getPlayerManager()
 {
-    ASSERT(m_playerController);
-    return *m_playerController.get();
+    ASSERT(m_playerManager);
+    return *m_playerManager.get();
 }
 
 NetworkInterface& GameInstance::getNetwork()
@@ -250,7 +246,7 @@ bool GameInstance::onSerialize(MemoryStream& buffer) const
     if(!serialize(buffer, *m_level))
         return false;
 
-    if(!serialize(buffer, *m_playerController))
+    if(!serialize(buffer, *m_playerManager))
         return false;
 
     return true;
@@ -267,7 +263,7 @@ bool GameInstance::onDeserialize(MemoryStream& buffer)
     if(!deserialize(buffer, m_level.get()))
         return false;
 
-    if(!deserialize(buffer, m_playerController.get()))
+    if(!deserialize(buffer, m_playerManager.get()))
         return false;
 
     return true;

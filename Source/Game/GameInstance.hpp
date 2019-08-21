@@ -6,7 +6,7 @@
 // Forward declarations.
 class World;
 class Level;
-class PlayerController;
+class PlayerManager;
 
 // Game instance class.
 class GameInstance : public Serializable
@@ -30,9 +30,9 @@ public:
     // Gets level instance.
     Level& getLevel();
 
-    // Gets player controller.
-    PlayerController& getPlayerController();
-    
+    // Gets player manager.
+    PlayerManager& getPlayerManager();
+
     // Gets network interface.
     NetworkInterface& getNetwork();
 
@@ -51,8 +51,8 @@ private:
     // Game level.
     std::unique_ptr<Level> m_level;
 
-    // Local player controller.
-    std::unique_ptr<PlayerController> m_playerController;
+    // Player manager.
+    std::unique_ptr<PlayerManager> m_playerManager;
 
     // Network interface.
     std::unique_ptr<NetworkInterface> m_network;

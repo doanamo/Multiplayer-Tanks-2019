@@ -119,13 +119,14 @@ public:
     struct HandleEntry
     {
         HandleEntry(const HandleType& handle) :
-            handle(handle), valid(false), value()
+            handle(handle),
+            valid(false),
+            value()
         {
         }
 
         HandleType handle;
         bool valid;
-
         Type value;
     };
 
@@ -391,8 +392,12 @@ public:
         handleEntry->valid = false;
 
         // Reset handle value.
-        handleEntry->value = Type();
-        
+        // Our debug new override does not support placement new.
+        #undef new
+        (&handleEntry->value)->~Type();
+        new (&handleEntry->value) Type();
+        #define new DEBUG_NEW
+
         // Add entry index to free list.
         ASSERT(handleEntry->handle.getIdentifier() != 0);
         m_freeList.push_back(handleEntry->handle.getIdentifier() - 1);

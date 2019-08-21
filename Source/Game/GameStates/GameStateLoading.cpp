@@ -3,10 +3,12 @@
 #include "GameStateSession.hpp"
 #include "GameStateMainMenu.hpp"
 #include "Game/GameInstance.hpp"
-#include "Game/PlayerController.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
 #include "Game/World/World.hpp"
 #include "Game/Objects/Tank.hpp"
+#include "Game/Player/Player.hpp"
+#include "Game/Player/PlayerManager.hpp"
+#include "Game/Player/PlayerControllerLocal.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.hpp"
 
@@ -70,12 +72,21 @@ bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& sessi
         // Create player tank object.
         std::unique_ptr<Tank> playerTank(new Tank());
         Handle playerHandle = gameInstance->getWorld().addObject(std::move(playerTank), "Player1_Tank", "Players");
-        gameInstance->getPlayerController().control(playerHandle);
 
         // Test instantiation from runtime type.
         std::unique_ptr<Object> enemyTank(Object::create(getTypeIdentifier<Tank>()));
         enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
         gameInstance->getWorld().addObject(std::move(enemyTank));
+
+        // Create player and set local controller.
+        std::unique_ptr<PlayerControllerLocal> playerController = std::make_unique<PlayerControllerLocal>();
+        if(!playerController->initialize(&gameInstance->getWorld()))
+            return false;
+
+        playerController->control(playerHandle);
+
+        auto& player = gameInstance->getPlayerManager().createPlayer();
+        player.setPlayerController(std::move(playerController));
     }
 
     // Load snapshot file.
