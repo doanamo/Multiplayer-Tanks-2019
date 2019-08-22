@@ -14,6 +14,7 @@ public:
     void shootProjectile();
     void setMovementInput(sf::Vector2f movement);
 
+    void onPlayerCommand(PlayerCommand playerCommand) override;
     void onTick(float timeDelta) override;
     void onDraw(float timeAlpha) override;
 

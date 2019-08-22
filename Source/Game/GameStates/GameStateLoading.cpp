@@ -80,10 +80,7 @@ bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& sessi
 
         // Create player and set local controller.
         std::unique_ptr<PlayerControllerLocal> playerController = std::make_unique<PlayerControllerLocal>();
-        if(!playerController->initialize(&gameInstance->getWorld()))
-            return false;
-
-        playerController->control(playerHandle);
+        playerController->setControlledObject(playerHandle);
 
         auto& player = gameInstance->getPlayerManager().createPlayer();
         player.setPlayerController(std::move(playerController));

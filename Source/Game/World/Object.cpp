@@ -28,6 +28,10 @@ void Object::onCreate()
 {
 }
 
+void Object::onPlayerCommand(PlayerCommand command)
+{
+}
+
 void Object::onTick(float timeDelta)
 {
     if(m_resetInterpolation)

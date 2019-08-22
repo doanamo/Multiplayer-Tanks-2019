@@ -42,6 +42,9 @@ private:
     bool onDeserialize(MemoryStream& stream) override;
 
 private:
+    // Game instance reference.
+    GameInstance* m_gameInstance;
+
     // List of player entries.
     PlayerList m_playerList;
 

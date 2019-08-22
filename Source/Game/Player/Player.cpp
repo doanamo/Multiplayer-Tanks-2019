@@ -10,24 +10,6 @@ Player::~Player()
 {
 }
 
-bool Player::handleEvent(const sf::Event& event)
-{
-    if(m_playerController != nullptr)
-    {
-        return m_playerController->handleEvent(event);
-    }
-
-    return true;
-}
-
-void Player::tick(float timeDelta)
-{
-    if(m_playerController != nullptr)
-    {
-        return m_playerController->tick(timeDelta);
-    }
-}
-
 void Player::setPlayerHandle(PlayerHandle handle)
 {
     ASSERT(!m_playerHandle.isValid(), "Player handle has already been set before!");

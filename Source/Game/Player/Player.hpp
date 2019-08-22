@@ -18,12 +18,6 @@ public:
     // Define move constructor.
     Player(Player&& player) = default;
 
-    // Handles player input event.
-    bool handleEvent(const sf::Event& event);
-
-    // Ticks player.
-    void tick(float timeDelta);
-
     // Sets player handle.
     void setPlayerHandle(PlayerHandle handle);
 

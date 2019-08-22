@@ -4,6 +4,7 @@
 #include "Transform.hpp"
 #include "System/Globals.hpp"
 #include "Common/HandleMap.hpp"
+#include "Game/Player/PlayerCommand.hpp"
 
 // Forward declarations.
 class Object;
@@ -51,6 +52,7 @@ public:
 
     // Object callback virtual methods.
     virtual void onCreate();
+    virtual void onPlayerCommand(PlayerCommand command);
     virtual void onTick(float timeDelta);
     virtual void onUpdate(float timeDelta);
     virtual void onDraw(float timeAlpha);

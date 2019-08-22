@@ -2,7 +2,6 @@
 
 #include "Precompiled.hpp"
 #include "PlayerControllerBase.hpp"
-#include "Game/World/Object.hpp"
 
 // Forward declarations.
 class World;
@@ -13,12 +12,6 @@ class PlayerControllerLocal : public PlayerControllerBase
 public:
     PlayerControllerLocal();
     ~PlayerControllerLocal();
-
-    // Initializes player controller.
-    bool initialize(World* world);
-    
-    // Controls object with specified handle.
-    void control(ObjectHandle handle);
 
     // Handles player input event.
     bool handleEvent(const sf::Event& event) override;
@@ -32,10 +25,6 @@ protected:
     bool onDeserialize(MemoryStream& buffer) override;
 
 private:
-    // Controlled object.
-    World* m_world;
-    ObjectHandle m_object;
-
     // Movement direction handling.
     struct MovementDirections
     {
@@ -58,7 +47,4 @@ private:
     };
 
     MovementInputEntry m_movementInputs[MovementDirections::Max];
-
-    // Initialization state.
-    bool m_initialized;
 };

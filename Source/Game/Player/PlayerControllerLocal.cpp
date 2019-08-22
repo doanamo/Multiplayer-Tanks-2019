@@ -3,10 +3,7 @@
 #include "Game/World/World.hpp"
 #include "Game/Objects/Tank.hpp"
 
-PlayerControllerLocal::PlayerControllerLocal() :
-    m_world(nullptr),
-    m_object(),
-    m_initialized(false)
+PlayerControllerLocal::PlayerControllerLocal()
 {
 }
 
@@ -14,43 +11,15 @@ PlayerControllerLocal::~PlayerControllerLocal()
 {
 }
 
-bool PlayerControllerLocal::initialize(World* world)
-{
-    // Save world reference.
-    ASSERT(world != nullptr, "Cannot initialize player controller without correct world!");
-    m_world = world;
-
-    // Initialization state.
-    m_initialized = true;
-    return true;
-}
-
-void PlayerControllerLocal::control(ObjectHandle object)
-{
-    ASSERT(m_initialized);
-    m_object = object;
-}
-
 bool PlayerControllerLocal::handleEvent(const sf::Event& event)
 {
-    ASSERT(m_initialized);
-
-    // Get player tank object.
-    Object* playerObject = m_world->getObjectByHandle(m_object);
-    if(playerObject == nullptr)
-        return true;
-
-    Tank* playerTank = playerObject->as<Tank>();
-    if(playerTank == nullptr)
-        return true;
-
     // Handle player tank input.
     if(event.type == sf::Event::KeyPressed)
     {
         switch(event.key.code)
         {
         case sf::Keyboard::Key::Space:
-            playerTank->shootProjectile();
+            this->pushPlayerCommand(PlayerCommand::Shoot);
             break;
 
         case sf::Keyboard::Key::Up:
@@ -132,17 +101,6 @@ bool PlayerControllerLocal::handleEvent(const sf::Event& event)
 
 void PlayerControllerLocal::tick(float timeDelta)
 {
-    ASSERT(m_initialized);
-
-    // Get player tank object.
-    Object* playerObject = m_world->getObjectByHandle(m_object);
-    if(playerObject == nullptr)
-        return;
-
-    Tank* playerTank = playerObject->as<Tank>();
-    if(playerTank == nullptr)
-        return;
-
     // Get newest keyboard input.
     MovementDirections::Type movementDirection = MovementDirections::None;
     std::chrono::high_resolution_clock::time_point inputTime;
@@ -161,26 +119,24 @@ void PlayerControllerLocal::tick(float timeDelta)
     // Handle player tank movement.
     if(movementDirection == MovementDirections::Up)
     {
-        playerTank->setMovementInput(sf::Vector2f(0.0f, -1.0f));
+        this->pushPlayerCommand(PlayerCommand::MoveUp);
     }
     else if(movementDirection == MovementDirections::Down)
     {
-        playerTank->setMovementInput(sf::Vector2f(.0f, 1.0f));
+        this->pushPlayerCommand(PlayerCommand::MoveDown);
     }
     else if(movementDirection == MovementDirections::Left)
     {
-        playerTank->setMovementInput(sf::Vector2f(-1.0f, 0.0f));
+        this->pushPlayerCommand(PlayerCommand::MoveLeft);
     }
     else if(movementDirection == MovementDirections::Right)
     {
-        playerTank->setMovementInput(sf::Vector2f(1.0f, 0.0f));
+        this->pushPlayerCommand(PlayerCommand::MoveRight);
     }
 }
 
 bool PlayerControllerLocal::onSerialize(MemoryStream& buffer) const
 {
-    ASSERT(m_initialized);
-
     return true;
 }
 

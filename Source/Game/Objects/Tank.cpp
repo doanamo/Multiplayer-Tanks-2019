@@ -29,9 +29,37 @@ void Tank::setMovementInput(sf::Vector2f movement)
     m_movementInput = movement;
 }
 
+void Tank::onPlayerCommand(PlayerCommand playerCommand)
+{
+    Super::onPlayerCommand(playerCommand);
+
+    switch(playerCommand)
+    {
+    case PlayerCommand::Shoot:
+        this->shootProjectile();
+        break;
+
+    case PlayerCommand::MoveUp:
+        this->setMovementInput(sf::Vector2f(0.0f, -1.0f));
+        break;
+
+    case PlayerCommand::MoveDown:
+        this->setMovementInput(sf::Vector2f(0.0f, 1.0f));
+        break;
+
+    case PlayerCommand::MoveLeft:
+        this->setMovementInput(sf::Vector2f(-1.0f, 0.0f));
+        break;
+
+    case PlayerCommand::MoveRight:
+        this->setMovementInput(sf::Vector2f(1.0f, 0.0f));
+        break;
+    }
+}
+
 void Tank::onTick(float timeDelta)
 {
-    Object::onTick(timeDelta);
+    Super::onTick(timeDelta);
 
     // Move player in direction.
     if(m_movementInput != sf::Vector2f(0.0f, 0.0f))
@@ -47,7 +75,7 @@ void Tank::onTick(float timeDelta)
 
 void Tank::onDraw(float timeAlpha)
 {
-    Object::onDraw(timeAlpha);
+    Super::onDraw(timeAlpha);
 
     // Draw tank.
     m_tankSprite.setSize(sf::Vector2f(1.0f, 1.0f));

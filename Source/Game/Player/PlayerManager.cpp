@@ -1,8 +1,11 @@
 #include "Precompiled.hpp"
 #include "PlayerManager.hpp"
 #include "Player.hpp"
+#include "Game/GameInstance.hpp"
+#include "Game/World/World.hpp"
 
 PlayerManager::PlayerManager() :
+    m_gameInstance(nullptr),
     m_initialized(false)
 {
 }
@@ -13,7 +16,11 @@ PlayerManager::~PlayerManager()
 
 bool PlayerManager::initialize(GameInstance* gameInstance)
 {
-    ASSERT(gameInstance);
+    // Save game instance reference.
+    if(gameInstance == nullptr)
+        return false;
+
+    m_gameInstance = gameInstance;
 
     // Success!
     m_initialized = true;
@@ -57,11 +64,22 @@ bool PlayerManager::handleEvent(const sf::Event& event)
 {
     ASSERT(m_initialized);
 
-    for(auto player : m_playerList)
+    // Process player input events.
+    for(auto playerEntry : m_playerList)
     {
-        ASSERT(player.value != nullptr, "Iterator is not supposed to return invalid entry!");
-        if(!player.value->handleEvent(event))
-            return false;
+        // Get player from handle map entry.
+        ASSERT(playerEntry.value != nullptr, "Iterator is not supposed to return invalid entry!");
+        Player* player = playerEntry.value;
+        
+        // Get player controller attached to player entry.
+        PlayerControllerBase* playerController = player->getPlayerController();
+
+        if(playerController)
+        {
+            // Tick player controller.
+            if(!playerController->handleEvent(event))
+                return false;;
+        }
     }
 
     return true;
@@ -71,10 +89,40 @@ void PlayerManager::tick(float timeDelta)
 {
     ASSERT(m_initialized);
 
-    for(auto player : m_playerList)
+    // Retrieve world from game instance.
+    World& world = m_gameInstance->getWorld();
+
+    // Process player entries in tick.
+    for(auto playerEntry : m_playerList)
     {
-        ASSERT(player.value != nullptr, "Iterator is not supposed to return invalid entry!");
-        player.value->tick(timeDelta);
+        // Get player from handle map entry.
+        ASSERT(playerEntry.value != nullptr, "Iterator is not supposed to return invalid entry!");
+        Player* player = playerEntry.value;
+
+        // Get player controller attached to player entry.
+        PlayerControllerBase* playerController = player->getPlayerController();
+
+        if(playerController)
+        {
+            // Tick player controller.
+            playerController->tick(timeDelta);
+
+            // Retrieve controlled object.
+            Object* object = world.getObjectByHandle(playerController->getControlledObject());
+
+            // Pass player commands to controlled object.
+            while(true)
+            {
+                PlayerCommand playerCommand = playerController->popPlayerCommand();
+                if(playerCommand == PlayerCommand::Invalid)
+                    break;
+
+                if(object)
+                {
+                    object->onPlayerCommand(playerCommand);
+                }
+            }
+        }
     }
 }
 
