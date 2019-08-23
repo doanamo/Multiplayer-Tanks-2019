@@ -11,6 +11,7 @@
         GameProcess() :
             index(0),
             arguments(),
+            adjustWindow(false),
             hWindow(nullptr),
             dwThreadIdArray(0),
             hThreadArray(nullptr)
@@ -20,6 +21,7 @@
         int index;
         std::string path;
         std::string arguments;
+        bool adjustWindow;
 
         HWND hWindow;
         DWORD dwThreadIdArray;
@@ -62,7 +64,7 @@
             WaitForInputIdle(processInfo.hProcess, 5000);
             EnumThreadWindows(processInfo.dwThreadId, EnumThreadWndProc, (LPARAM)&gameProcess->hWindow);
 
-            if(gameProcess->hWindow != nullptr)
+            if(gameProcess->hWindow != nullptr && gameProcess->adjustWindow)
             {
                 const int windowWidth = 640;
                 const int windowHeight = 480;
@@ -187,6 +189,7 @@ int main(int argc, char* argv[])
             gameProcesses[i].index = i;
             gameProcesses[i].path = gamePath;
             gameProcesses[i].arguments += gamePath + " ";
+            gameProcesses[i].adjustWindow = provision;
 
             if(provision)
             {
