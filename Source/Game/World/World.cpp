@@ -596,7 +596,10 @@ bool World::onDeserialize(MemoryStream& buffer)
 
         // Notify replication system about deserialized object.
         // Replication system will have to register it.
-        replicationObjectDeserialized(*addedObject);
+        if(replicationObjectDeserialized)
+        {
+            replicationObjectDeserialized(*addedObject);
+        }
     }
 
     // Success!
