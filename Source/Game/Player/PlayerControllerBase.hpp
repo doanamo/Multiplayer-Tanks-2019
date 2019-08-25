@@ -7,6 +7,8 @@
 // Player controller base class.
 class PlayerControllerBase : public Serializable
 {
+    TYPE_DECLARE(PlayerControllerBase);
+
 protected:
     PlayerControllerBase();
 
@@ -31,6 +33,10 @@ public:
 protected:
     // Pushes player command.
     void pushPlayerCommand(PlayerCommand playerCommand);
+
+    // Serialization methods.
+    bool onSerialize(MemoryStream& buffer) const override;
+    bool onDeserialize(MemoryStream& buffer) override;
 
 private:
     // Controlled object handle.

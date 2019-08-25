@@ -27,12 +27,12 @@ bool PlayerManager::initialize(GameInstance* gameInstance)
     return true;
 }
 
-Player& PlayerManager::createPlayer()
+Player& PlayerManager::createPlayer(const PlayerHandle& requestedHandle)
 {
     ASSERT(m_initialized);
 
     // Create new player entry.
-    auto playerEntry = m_playerList.createHandle();
+    auto playerEntry = m_playerList.createHandle(requestedHandle);
     ASSERT(playerEntry.valid == true, "Failed to create handle (invalid entry)!");
     ASSERT(playerEntry.value != nullptr, "Failed to create handle (nullptr entry)!");
 
@@ -44,7 +44,7 @@ Player& PlayerManager::createPlayer()
     return *playerEntry.value;
 }
 
-Player* PlayerManager::fetchPlayer(PlayerHandle playerHandle)
+Player* PlayerManager::fetchPlayer(const PlayerHandle& playerHandle)
 {
     ASSERT(m_initialized);
 
@@ -53,7 +53,7 @@ Player* PlayerManager::fetchPlayer(PlayerHandle playerHandle)
     return playerEntry.value;
 }
 
-bool PlayerManager::removePlayer(PlayerHandle playerHandle)
+bool PlayerManager::removePlayer(const PlayerHandle& playerHandle)
 {
     ASSERT(m_initialized);
 
@@ -78,7 +78,7 @@ bool PlayerManager::handleEvent(const sf::Event& event)
         {
             // Tick player controller.
             if(!playerController->handleEvent(event))
-                return false;;
+                return false;
         }
     }
 
@@ -130,14 +130,49 @@ bool PlayerManager::onSerialize(MemoryStream& stream) const
 {
     ASSERT(m_initialized);
 
-    // #todo
+    // Write number of player entries.
+    if(!serialize(stream, m_playerList.getValidHandleCount()))
+        return false;
+    
+    // Write each player entry.
+    for(auto playerEntry : m_playerList)
+    {
+        ASSERT(playerEntry.value != nullptr);
+
+        // Write player handle.
+        if(!serialize(stream, playerEntry.value->getPlayerHandle()))
+            return false;
+
+        // Write player entry.
+        if(!serialize(stream, *playerEntry.value))
+            return false;
+    }
 
     return true;
 }
 
 bool PlayerManager::onDeserialize(MemoryStream& stream)
 {
-    // #todo
+    // Read number of player entries.
+    uint32_t playerEntryCount = 0;
+    if(!deserialize(stream, &playerEntryCount))
+        return false;
+
+    // Read serialized player entries.
+    for(uint32_t i = 0; i < playerEntryCount; ++i)
+    {
+        // Read player handle.
+        PlayerHandle playerHandle;
+        if(!deserialize(stream, &playerHandle))
+            return false;
+        
+        // Create player entry.
+        Player& player = this->createPlayer(playerHandle);
+
+        // Deserialize player entry.
+        if(!deserialize(stream, &player))
+            return false;
+    }
 
     return true;
 }

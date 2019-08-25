@@ -48,3 +48,23 @@ const ObjectHandle& PlayerControllerBase::getControlledObject() const
 {
     return m_controlledObject;
 }
+
+bool PlayerControllerBase::onSerialize(MemoryStream& buffer) const
+{
+    ASSERT(m_playerCommands.empty(), "Player command queue is expeted to be empty during serialization!");
+
+    // Serialize controlled object handle.
+    if(!serialize(buffer, m_controlledObject))
+        return false;
+
+    return true;
+}
+
+bool PlayerControllerBase::onDeserialize(MemoryStream& buffer)
+{
+    // Deserialize controlled object handle.
+    if(!deserialize(buffer, &m_controlledObject))
+        return false;
+
+    return true;
+}

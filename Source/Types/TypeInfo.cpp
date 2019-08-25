@@ -3,7 +3,7 @@
 #include "Types/RuntimeTypes.hpp"
 #include "System/Globals.hpp"
 
-static const TypeInfo::IdentifierType InvalidIdentifier = stringHash("");
+const TypeInfo::IdentifierType TypeInfo::InvalidIdentifier = stringHash("");
 
 TypeInfo::TypeInfo(const char* typeName, AllocateFunction allocateFunction, TypeInfo* baseType) :
     m_typeIdentifier(InvalidIdentifier),

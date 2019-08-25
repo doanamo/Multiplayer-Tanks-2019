@@ -9,6 +9,8 @@ class World;
 // Player controller local class.
 class PlayerControllerLocal : public PlayerControllerBase
 {
+    TYPE_DECLARE(PlayerControllerLocal, PlayerControllerBase);
+
 public:
     PlayerControllerLocal();
     ~PlayerControllerLocal();

@@ -137,12 +137,18 @@ void PlayerControllerLocal::tick(float timeDelta)
 
 bool PlayerControllerLocal::onSerialize(MemoryStream& buffer) const
 {
+    // Serialize base class.
+    if(!Super::onSerialize(buffer))
+        return false;
+
     return true;
 }
 
 bool PlayerControllerLocal::onDeserialize(MemoryStream& buffer)
 {
-    // #todo: Regain control over own player object after game load.
+    // Deserialize base class.
+    if(!Super::onDeserialize(buffer))
+        return false;
 
     return true;
 }

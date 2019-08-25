@@ -4,6 +4,8 @@
 #include "Game/World/Object.hpp"
 #include "Game/Objects/Tank.hpp"
 #include "Game/Objects/Projectile.hpp"
+#include "Game/Player/PlayerControllerBase.hpp"
+#include "Game/Player/PlayerControllerLocal.hpp"
 #include "Network/Replication/Replicable.hpp"
 #include "Network/Packets/Protocol.hpp"
 
@@ -19,6 +21,9 @@ bool registerTypes()
     REGISTER_TYPE(Replicable);
     REGISTER_TYPE(Tank);
     REGISTER_TYPE(Projectile);
+
+    REGISTER_TYPE(PlayerControllerBase);
+    REGISTER_TYPE(PlayerControllerLocal);
 
     REGISTER_TYPE(PacketBase);
     REGISTER_TYPE(PacketMessage);

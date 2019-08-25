@@ -17,6 +17,9 @@ public:
     using TypeList = std::vector<TypeInfo*>;
     using AllocateFunction = void*(*)(void);
 
+    // Invalid identifier.
+    static const IdentifierType InvalidIdentifier;
+
 public:
     // Type info constructor.
     TypeInfo(const char* typeName, AllocateFunction allocateFunction, TypeInfo* baseType = nullptr);

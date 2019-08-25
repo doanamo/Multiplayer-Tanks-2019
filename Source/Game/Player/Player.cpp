@@ -21,16 +21,6 @@ void Player::setPlayerController(std::unique_ptr<PlayerControllerBase>&& playerC
     m_playerController = std::move(playerController);
 }
 
-bool Player::onSerialize(MemoryStream& stream) const
-{
-    return true;
-}
-
-bool Player::onDeserialize(MemoryStream& stream)
-{
-    return true;
-}
-
 PlayerHandle Player::getPlayerHandle() const
 {
     ASSERT(m_playerHandle.isValid(), "Player handle should already be set!");
@@ -40,4 +30,52 @@ PlayerHandle Player::getPlayerHandle() const
 PlayerControllerBase* Player::getPlayerController()
 {
     return m_playerController.get();
+}
+
+bool Player::onSerialize(MemoryStream& stream) const
+{
+    // Serialize controller type identifier.
+    TypeInfo::IdentifierType controllerType = TypeInfo::InvalidIdentifier;
+
+    if(m_playerController)
+    {
+        controllerType = getTypeIdentifier(*m_playerController);
+    }
+
+    if(!serialize(stream, controllerType))
+        return false;
+
+    // Serialize controller if it exists.
+    if(m_playerController)
+    {
+        if(!serialize(stream, *m_playerController))
+            return false;
+    }
+
+    return true;
+}
+
+bool Player::onDeserialize(MemoryStream& stream)
+{
+    // Deserialize controller type identifier.
+    TypeInfo::IdentifierType controllerType;
+    if(!deserialize(stream, &controllerType))
+        return false;
+
+    // Check if type identifier is valid (otherwise controller did not exist).
+    if(controllerType != TypeInfo::InvalidIdentifier)
+    {
+        // Create controller instance.
+        std::unique_ptr<PlayerControllerBase> playerController(PlayerControllerBase::create(controllerType));
+        ASSERT(playerController, "Failed to created object instance from known type!");
+
+        // Deserialize data into controller instance.
+        if(!deserialize(stream, playerController.get()))
+            return false;
+        
+        // Set deserialized player controller.
+        this->setPlayerController(std::move(playerController));
+    }
+
+    return true;
 }

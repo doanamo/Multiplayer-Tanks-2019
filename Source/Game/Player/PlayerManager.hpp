@@ -22,13 +22,13 @@ public:
     bool initialize(GameInstance* gameInstance);
 
     // Creates new player.
-    Player& createPlayer();
+    Player& createPlayer(const PlayerHandle& requestedHandle = PlayerHandle());
 
     // Fetches player by index.
-    Player* fetchPlayer(PlayerHandle playerHandle);
+    Player* fetchPlayer(const PlayerHandle& playerHandle);
 
     // Remove player.
-    bool removePlayer(PlayerHandle playerHandler);
+    bool removePlayer(const PlayerHandle& playerHandler);
 
     // Handle player input events.
     bool handleEvent(const sf::Event& event);
