@@ -64,26 +64,29 @@
             WaitForInputIdle(processInfo.hProcess, 5000);
             EnumThreadWindows(processInfo.dwThreadId, EnumThreadWndProc, (LPARAM)&gameProcess->hWindow);
 
-            if(gameProcess->hWindow != nullptr && gameProcess->adjustWindow)
+            if(gameProcess->hWindow != nullptr)
             {
-                const int windowWidth = 640;
-                const int windowHeight = 480;
+                if(gameProcess->adjustWindow)
+                {
+                    const int windowWidth = 640;
+                    const int windowHeight = 480;
 
-                RECT rect;
-                rect.top = 0;
-                rect.left = 0;
-                rect.right = windowWidth;
-                rect.bottom = windowHeight;
+                    RECT rect;
+                    rect.top = 0;
+                    rect.left = 0;
+                    rect.right = windowWidth;
+                    rect.bottom = windowHeight;
 
-                UINT dpi = GetDpiForWindow(gameProcess->hWindow);
+                    UINT dpi = GetDpiForWindow(gameProcess->hWindow);
 
-                AdjustWindowRectExForDpi(&rect, GetWindowLong(gameProcess->hWindow, GWL_STYLE),
-                    FALSE, GetWindowLong(gameProcess->hWindow, GWL_EXSTYLE), dpi);
+                    AdjustWindowRectExForDpi(&rect, GetWindowLong(gameProcess->hWindow, GWL_STYLE),
+                        FALSE, GetWindowLong(gameProcess->hWindow, GWL_EXSTYLE), dpi);
 
-                const int windowPosX = rect.left + (rect.right + rect.left) * (gameProcess->index / 2);
-                const int windowPosY = (windowHeight - rect.top) * (gameProcess->index % 2);
+                    const int windowPosX = rect.left + (rect.right + rect.left) * (gameProcess->index / 2);
+                    const int windowPosY = (windowHeight - rect.top) * (gameProcess->index % 2);
 
-                SetWindowPos(gameProcess->hWindow, HWND_TOP, windowPosX, windowPosY, rect.right - rect.left, rect.bottom - rect.top, 0);
+                    SetWindowPos(gameProcess->hWindow, HWND_TOP, windowPosX, windowPosY, rect.right - rect.left, rect.bottom - rect.top, 0);
+                }
 
                 break;
             }
