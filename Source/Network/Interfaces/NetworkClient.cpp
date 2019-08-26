@@ -3,6 +3,7 @@
 #include "Network/Packets/Protocol.hpp"
 #include "Game/GameInstance.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
+#include "Game/Player/PlayerManager.hpp"
 
 NetworkClient::NetworkClient() :
     m_hearbeatTimer(0.0f)
@@ -69,8 +70,12 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
         if(!snapshotLoad.load(snapshotPacket->serializedGameInstance))
         {
             LOG_ERROR("Could not load snapshot from packet memory!");
-            continue;
+            return false;
         }
+
+        // Remove all player controllers loaded in player manager.
+        PlayerManager& playerManager = gameInstance->getPlayerManager();
+        playerManager.removeControllers();
 
         // Break out of while loop.
         break;

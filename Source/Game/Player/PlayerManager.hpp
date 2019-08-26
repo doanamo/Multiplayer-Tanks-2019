@@ -30,6 +30,9 @@ public:
     // Remove player.
     bool removePlayer(const PlayerHandle& playerHandler);
 
+    // Remove all player controllers.
+    void removeControllers();
+
     // Handle player input events.
     bool handleEvent(const sf::Event& event);
 

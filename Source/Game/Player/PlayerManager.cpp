@@ -60,6 +60,22 @@ bool PlayerManager::removePlayer(const PlayerHandle& playerHandle)
     return m_playerList.removeHandle(playerHandle);
 }
 
+void PlayerManager::removeControllers()
+{
+    ASSERT(m_initialized);
+
+    // Remove all player controllers.
+    for(auto playerEntry : m_playerList)
+    {
+        // Get player from handle map entry.
+        ASSERT(playerEntry.value != nullptr, "Iterator is not supposed to return invalid entry!");
+        Player* player = playerEntry.value;
+
+        // Discard player controller.
+        player->setPlayerController(nullptr);
+    }
+}
+
 bool PlayerManager::handleEvent(const sf::Event& event)
 {
     ASSERT(m_initialized);
