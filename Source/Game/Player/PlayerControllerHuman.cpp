@@ -1,18 +1,21 @@
 #include "Precompiled.hpp"
-#include "PlayerControllerLocal.hpp"
+#include "PlayerControllerHuman.hpp"
 #include "Game/World/World.hpp"
 #include "Game/Objects/Tank.hpp"
 
-PlayerControllerLocal::PlayerControllerLocal()
+PlayerControllerHuman::PlayerControllerHuman()
 {
 }
 
-PlayerControllerLocal::~PlayerControllerLocal()
+PlayerControllerHuman::~PlayerControllerHuman()
 {
 }
 
-bool PlayerControllerLocal::handleEvent(const sf::Event& event)
+bool PlayerControllerHuman::handleEvent(const sf::Event& event)
 {
+    if(!Super::handleEvent(event))
+        return false;
+
     // Handle player tank input.
     if(event.type == sf::Event::KeyPressed)
     {
@@ -99,8 +102,10 @@ bool PlayerControllerLocal::handleEvent(const sf::Event& event)
     return true;
 }
 
-void PlayerControllerLocal::tick(float timeDelta)
+void PlayerControllerHuman::tick(float timeDelta)
 {
+    Super::tick(timeDelta);
+
     // Get newest keyboard input.
     MovementDirections::Type movementDirection = MovementDirections::None;
     std::chrono::high_resolution_clock::time_point inputTime;
@@ -135,7 +140,7 @@ void PlayerControllerLocal::tick(float timeDelta)
     }
 }
 
-bool PlayerControllerLocal::onSerialize(MemoryStream& buffer) const
+bool PlayerControllerHuman::onSerialize(MemoryStream& buffer) const
 {
     // Serialize base class.
     if(!Super::onSerialize(buffer))
@@ -144,7 +149,7 @@ bool PlayerControllerLocal::onSerialize(MemoryStream& buffer) const
     return true;
 }
 
-bool PlayerControllerLocal::onDeserialize(MemoryStream& buffer)
+bool PlayerControllerHuman::onDeserialize(MemoryStream& buffer)
 {
     // Deserialize base class.
     if(!Super::onDeserialize(buffer))

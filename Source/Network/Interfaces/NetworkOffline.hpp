@@ -18,4 +18,5 @@ public:
     // Network info.
     NetworkMode getMode() const override;
     bool isConnected() const override;
+    bool isHost() const override final;
 };

@@ -5,6 +5,9 @@
 #include "Game/GameInstance.hpp"
 #include "Game/World/World.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
+#include "Game/Player/PlayerManager.hpp"
+#include "Game/Player/Player.hpp"
+#include "Game/Player/PlayerControllerClient.hpp"
 
 NetworkServer::NetworkServer() :
     m_maxClientCount(16)
@@ -44,6 +47,23 @@ void NetworkServer::update(float timeDelta)
     NetworkBase::update(timeDelta);
 }
 
+
+PlayerControllerClient* NetworkServer::fetchClientController(const PlayerHandle& playerHandle)
+{
+    // Retrieve player entry.
+    PlayerManager& playerManager = m_gameInstance->getPlayerManager();
+    Player* player = playerManager.fetchPlayer(playerHandle);
+    if(player == nullptr)
+        return nullptr;
+
+    // Retrieve client controller.
+    PlayerControllerBase* playerController = player->getPlayerController();
+    if(playerController == nullptr)
+        return nullptr;
+
+    return playerController->as<PlayerControllerClient>();
+}
+
 void NetworkServer::preTick(float timeDelta)
 {
     NetworkBase::preTick(timeDelta);
@@ -64,10 +84,30 @@ void NetworkServer::preTick(float timeDelta)
         {
             if(receivedPacket->is<PacketRequestConnection>())
             {
+                // Create new player entry.
+                PlayerManager& playerManager = m_gameInstance->getPlayerManager();
+                Player& player = playerManager.createPlayer();
+
+                // Assign created player handle to client entry.
+                clientEntry.playerHandle = player.getPlayerHandle();
+
+                // Create player controller.
+                // #todo: Resolving player name by handle's identifier is a big hack.
+                std::ostringstream playerName;
+                playerName << "Player_" << player.getPlayerHandle().getIdentifier();
+
+                Object* playerTank = m_gameInstance->getWorld().getObjectByName(playerName.str());
+                ASSERT(playerTank != nullptr, "Expected hardcoded player tank to exist!");
+
+                auto playerController = std::make_unique<PlayerControllerClient>();
+                playerController->setControlledObject(playerTank->getHandle());
+
+                player.setPlayerController(std::move(playerController));
+
                 // Send accept connection packet.
                 // Specify client index which starts from 1, with 0 reserved for server.
                 PacketAcceptConnection packetAcceptConnection;
-                packetAcceptConnection.playerIndex = i + 1;
+                packetAcceptConnection.playerHandle = player.getPlayerHandle();
 
                 if(!sendPacket(*clientEntry.socket, packetAcceptConnection, true))
                 {
@@ -92,9 +132,31 @@ void NetworkServer::preTick(float timeDelta)
                     continue;
                 }
             }
+            else if(receivedPacket->is<PacketClientInput>())
+            {
+                // Deserialize client input packet.
+                PacketClientInput* packetClientInput = receivedPacket->as<PacketClientInput>();
+                ASSERT(packetClientInput != nullptr);
+
+                // Fetch client controller and process received player commands.
+                // Current design allows packet sender to impersonate client by using their player handle.
+                // Additional verification is needed to verify source of the packet.
+                PlayerControllerClient* clientController = fetchClientController(packetClientInput->playerHandle);
+
+                if(clientController)
+                {
+                    clientController->processPlayerCommandBuffer(packetClientInput->playerCommands);
+                }
+                else
+                {
+                    Player* player = m_gameInstance->getPlayerManager().fetchPlayer(packetClientInput->playerHandle);
+                    ASSERT(player == nullptr, "Player entry exists but it does not have client controller!");
+                    LOG_WARNING("Received client input packet with player handle that does not exist.");
+                }
+            }
             else if(receivedPacket->is<PacketMessage>())
             {
-                // Deserialize packet.
+                // Deserialize message packet.
                 PacketMessage* packetMessage = receivedPacket->as<PacketMessage>();
                 ASSERT(packetMessage != nullptr);
 
@@ -146,6 +208,14 @@ void NetworkServer::postTick(float timeDelta)
             if(clientEntry.socket == nullptr)
                 continue;
 
+            // Fetch client controller.
+            PlayerControllerClient* clientController = fetchClientController(clientEntry.playerHandle);
+            ASSERT(clientController != nullptr, "Client player entry has incorrect controller!");
+
+            // Fill client specific data.
+            reliableUpdatePacket.acknowledgedPlayerCommand = clientController->getAcknowledgedIndex();
+            
+            // Send reliable server update.
             if(!sendPacket(*clientEntry.socket, reliableUpdatePacket, true))
             {
                 LOG_ERROR("Failed to send reliable server update packet to client!");
@@ -164,6 +234,14 @@ void NetworkServer::postTick(float timeDelta)
             if(clientEntry.socket == nullptr)
                 continue;
 
+            // Fetch client controller.
+            PlayerControllerClient* clientController = fetchClientController(clientEntry.playerHandle);
+            ASSERT(clientController != nullptr, "Client player entry has incorrect controller!");
+
+            // Fill client specific data.
+            unreliableUpdatePacket.acknowledgedPlayerCommand = clientController->getAcknowledgedIndex();
+
+            // Send unreliable server update.
             if(!sendPacket(*clientEntry.socket, unreliableUpdatePacket, false))
             {
                 LOG_ERROR("Failed to send unreliable server update packet to client!");

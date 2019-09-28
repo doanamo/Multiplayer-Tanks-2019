@@ -5,3 +5,4 @@
 #include "Network/Packets/PacketAcceptConnection.hpp"
 #include "Network/Packets/PacketServerSnapshot.hpp"
 #include "Network/Packets/PacketServerUpdate.hpp"
+#include "Network/Packets/PacketClientInput.hpp"

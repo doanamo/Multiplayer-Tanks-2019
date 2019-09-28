@@ -34,6 +34,9 @@ public:
     // Gets replication system.
     virtual ReplicationBase& getReplication() = 0;
 
+    // Checks whether network interface is hosting the game state.
+    bool isHost() const override final;
+
 protected:
     // Serializes and sends packet.
     bool sendPacket(ConnectionSocket& socket, PacketBase& packet, bool reliable, const sf::IpAddress* address = nullptr, const unsigned short* port = nullptr);

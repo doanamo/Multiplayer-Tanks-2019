@@ -132,3 +132,9 @@ ConnectionSocket& NetworkBase::getSocket()
 {
     return m_socket;
 }
+
+bool NetworkBase::isHost() const
+{
+    NetworkMode mode = this->getMode();
+    return mode != NetworkMode::Client;
+}

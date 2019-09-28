@@ -3,7 +3,7 @@
 #include "Precompiled.hpp"
 
 // Player command enumeration.
-enum class PlayerCommand
+enum class PlayerCommand : uint16_t
 {
     Invalid,
 
@@ -14,4 +14,14 @@ enum class PlayerCommand
     MoveDown,
 
     Count,
+};
+
+// Player command acknowledgment index type.
+using PlayerCommandIndex = uint32_t;
+
+// Indexed player command entry.
+struct PlayerCommandEntry
+{
+    PlayerCommandIndex index;
+    PlayerCommand command;
 };

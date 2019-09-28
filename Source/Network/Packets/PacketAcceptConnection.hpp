@@ -2,6 +2,7 @@
 
 #include "Precompiled.hpp"
 #include "PacketBase.hpp"
+#include "Game/Player/Player.hpp"
 
 // Accept connection packet class.
 class PacketAcceptConnection : public PacketBase
@@ -16,5 +17,5 @@ public:
     bool onDeserialize(MemoryStream& buffer);
 
 public:
-    int playerIndex;
+    PlayerHandle playerHandle;
 };

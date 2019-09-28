@@ -1,6 +1,12 @@
 #include "Precompiled.hpp"
 #include "PlayerControllerBase.hpp"
 
+#if ENABLE_PLAYER_CONTROLLER_LOG_TRACE
+    #define LOG_PLAYER_CONTROLLER_TRACE(format, ...) LOG_TRACE(format, ## __VA_ARGS__)
+#else
+    #define LOG_PLAYER_CONTROLLER_TRACE(format, ...)
+#endif
+
 PlayerControllerBase::PlayerControllerBase()
 {
 }
@@ -16,10 +22,13 @@ bool PlayerControllerBase::handleEvent(const sf::Event& event)
 
 void PlayerControllerBase::tick(float timeDelta)
 {
+    LOG_PLAYER_CONTROLLER_TRACE("Ticking player controller");
 }
 
 void PlayerControllerBase::pushPlayerCommand(PlayerCommand playerCommand)
 {
+    LOG_PLAYER_CONTROLLER_TRACE("Pushing player command index %i", (int)playerCommand);
+
     m_playerCommands.push(playerCommand);
 }
 
@@ -30,6 +39,9 @@ PlayerCommand PlayerControllerBase::popPlayerCommand()
     if(!m_playerCommands.empty())
     {
         playerCommand = m_playerCommands.front();
+
+        LOG_PLAYER_CONTROLLER_TRACE("Popping player command index %i", (int)playerCommand);
+
         m_playerCommands.pop();
     }
 
@@ -47,6 +59,11 @@ void PlayerControllerBase::setControlledObject(const ObjectHandle& objectHandle)
 const ObjectHandle& PlayerControllerBase::getControlledObject() const
 {
     return m_controlledObject;
+}
+
+bool PlayerControllerBase::isSerializable() const
+{
+    return true;
 }
 
 bool PlayerControllerBase::onSerialize(MemoryStream& buffer) const

@@ -34,10 +34,13 @@ PlayerControllerBase* Player::getPlayerController()
 
 bool Player::onSerialize(MemoryStream& stream) const
 {
+    // Determine if controller should be serialized.
+    bool serializeController = m_playerController && m_playerController->isSerializable();
+
     // Serialize controller type identifier.
     TypeInfo::IdentifierType controllerType = TypeInfo::InvalidIdentifier;
 
-    if(m_playerController)
+    if(serializeController)
     {
         controllerType = getTypeIdentifier(*m_playerController);
     }
@@ -45,8 +48,8 @@ bool Player::onSerialize(MemoryStream& stream) const
     if(!serialize(stream, controllerType))
         return false;
 
-    // Serialize controller if it exists.
-    if(m_playerController)
+    // Serialize controller object.
+    if(serializeController)
     {
         if(!serialize(stream, *m_playerController))
             return false;

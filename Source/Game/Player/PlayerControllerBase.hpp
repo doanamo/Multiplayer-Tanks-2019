@@ -4,7 +4,9 @@
 #include "PlayerCommand.hpp"
 #include "Game/World/Object.hpp"
 
-// Player controller base class.
+#define ENABLE_PLAYER_CONTROLLER_LOG_TRACE false
+
+// Base version of this class only stores player commands without any logic.
 class PlayerControllerBase : public Serializable
 {
     TYPE_DECLARE(PlayerControllerBase);
@@ -29,6 +31,9 @@ public:
 
     // Gets controlled object handle.
     const ObjectHandle& getControlledObject() const;
+
+    // Returns whether controller should be serializable.
+    virtual bool isSerializable() const;
 
 protected:
     // Pushes player command.

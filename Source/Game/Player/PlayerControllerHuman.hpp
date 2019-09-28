@@ -6,14 +6,14 @@
 // Forward declarations.
 class World;
 
-// Player controller local class.
-class PlayerControllerLocal : public PlayerControllerBase
+// Player controller human class.
+class PlayerControllerHuman : public PlayerControllerBase
 {
-    TYPE_DECLARE(PlayerControllerLocal, PlayerControllerBase);
+    TYPE_DECLARE(PlayerControllerHuman, PlayerControllerBase);
 
 public:
-    PlayerControllerLocal();
-    ~PlayerControllerLocal();
+    PlayerControllerHuman();
+    ~PlayerControllerHuman();
 
     // Handles player input event.
     bool handleEvent(const sf::Event& event) override;

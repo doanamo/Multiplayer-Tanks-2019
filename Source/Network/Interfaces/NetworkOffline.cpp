@@ -7,7 +7,6 @@ NetworkOffline::NetworkOffline()
 
 NetworkOffline::~NetworkOffline()
 {
-
 }
 
 void NetworkOffline::update(float timeDelta)
@@ -34,4 +33,9 @@ NetworkMode NetworkOffline::getMode() const
 bool NetworkOffline::isConnected() const
 {
     return false;
+}
+
+bool NetworkOffline::isHost() const
+{
+    return true;
 }

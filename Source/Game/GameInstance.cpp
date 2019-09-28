@@ -4,7 +4,7 @@
 #include "Game/Level.hpp"
 #include "Game/Objects/Tank.hpp"
 #include "Game/Player/PlayerManager.hpp"
-#include "Game/Player/PlayerControllerLocal.hpp"
+#include "Game/Player/PlayerControllerHuman.hpp"
 #include "Network/Interfaces/NetworkServer.hpp"
 #include "Network/Interfaces/NetworkClient.hpp"
 #include "Network/Interfaces/NetworkOffline.hpp"

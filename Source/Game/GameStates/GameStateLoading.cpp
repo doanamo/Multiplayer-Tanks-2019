@@ -8,7 +8,7 @@
 #include "Game/Objects/Tank.hpp"
 #include "Game/Player/Player.hpp"
 #include "Game/Player/PlayerManager.hpp"
-#include "Game/Player/PlayerControllerLocal.hpp"
+#include "Game/Player/PlayerControllerHuman.hpp"
 #include "System/Globals.hpp"
 #include "System/Window.hpp"
 
@@ -69,21 +69,33 @@ bool GameStateLoading::provisionSession(std::shared_ptr<GameStateSession>& sessi
     if(m_params.provisionMode == GameProvisionMode::Regular ||
         m_params.provisionMode == GameProvisionMode::Host)
     {
-        // Create player tank object.
-        std::unique_ptr<Tank> playerTank(new Tank());
-        Handle playerHandle = gameInstance->getWorld().addObject(std::move(playerTank), "Player1_Tank", "Players");
+        // #todo: This should be replaced by dedicated game mode logic which spawns tanks for connected players.
+        World& world = gameInstance->getWorld();
 
-        // Test instantiation from runtime type.
-        std::unique_ptr<Object> enemyTank(Object::create(getTypeIdentifier<Tank>()));
-        enemyTank->getTransform().setPosition(sf::Vector2f(0.0f, 2.0f));
-        gameInstance->getWorld().addObject(std::move(enemyTank));
+        for(int i = 0; i < 6; ++i)
+        {
+            // Create player tank object.
+            std::unique_ptr<Tank> tankObject(new Tank());
+            tankObject->getTransform().setPosition(sf::Vector2f(2.0f * (i - 3), 0.0f));
+            Handle tankHandle = world.addObject(std::move(tankObject));
 
-        // Create player and set local controller.
-        std::unique_ptr<PlayerControllerLocal> playerController = std::make_unique<PlayerControllerLocal>();
-        playerController->setControlledObject(playerHandle);
+            // Group and name tank object.
+            std::ostringstream playerName;
+            playerName << "Player_" << i + 1;
 
-        auto& player = gameInstance->getPlayerManager().createPlayer();
-        player.setPlayerController(std::move(playerController));
+            world.setObjectGroup(tankHandle, "Players");
+            world.setObjectName(tankHandle, playerName.str());
+
+            // Create local player with controller.
+            if(i == 0)
+            {
+                std::unique_ptr<PlayerControllerHuman> playerController = std::make_unique<PlayerControllerHuman>();
+                playerController->setControlledObject(tankHandle);
+
+                auto& player = gameInstance->getPlayerManager().createPlayer();
+                player.setPlayerController(std::move(playerController));
+            }
+        }
     }
 
     // Load snapshot file.

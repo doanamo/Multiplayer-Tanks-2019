@@ -126,16 +126,20 @@ void PlayerManager::tick(float timeDelta)
             // Retrieve controlled object.
             Object* object = world.getObjectByHandle(playerController->getControlledObject());
 
-            // Pass player commands to controlled object.
-            while(true)
+            // Pass player commands to controlled object to act on them.
+            // This will result in game logic being executed, so do this only if we are the host.
+            if(m_gameInstance->getNetwork().isHost())
             {
-                PlayerCommand playerCommand = playerController->popPlayerCommand();
-                if(playerCommand == PlayerCommand::Invalid)
-                    break;
-
-                if(object)
+                while(true)
                 {
-                    object->onPlayerCommand(playerCommand);
+                    PlayerCommand playerCommand = playerController->popPlayerCommand();
+                    if(playerCommand == PlayerCommand::Invalid)
+                        break;
+
+                    if(object)
+                    {
+                        object->onPlayerCommand(playerCommand);
+                    }
                 }
             }
         }

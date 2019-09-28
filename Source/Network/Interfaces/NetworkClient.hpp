@@ -3,8 +3,12 @@
 #include "Precompiled.hpp"
 #include "NetworkBase.hpp"
 #include "Network/Replication/ReplicationClient.hpp"
+#include "Game/Player/Player.hpp"
 
-// Console variable used by launcher to connect immediatelly on game launch.
+// Forward declarations.
+class PlayerControllerRemote;
+
+// Console variable used by launcher to connect immediately on game launch.
 extern ConsoleVariable<std::string> cv_connect;
 
 // Network client class.
@@ -38,9 +42,19 @@ public:
     // Gets replication system.
     ReplicationBase& getReplication() override final;
 
+    // Gets player's handle.
+    const PlayerHandle& getPlayerHandle() const;
+
+private:
+    // Gets client's remote controller.
+    PlayerControllerRemote* getRemoteController();
+
 private:
     // Replication system.
     ReplicationClient m_replication;
+
+    // Player handle.
+    PlayerHandle m_playerHandle;
 
     // Heartbeat timer.
     float m_hearbeatTimer;

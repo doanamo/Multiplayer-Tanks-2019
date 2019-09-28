@@ -1,8 +1,7 @@
 #include "Precompiled.hpp"
 #include "PacketAcceptConnection.hpp"
 
-PacketAcceptConnection::PacketAcceptConnection() :
-    playerIndex(0)
+PacketAcceptConnection::PacketAcceptConnection()
 {
 }
 
@@ -12,7 +11,9 @@ PacketAcceptConnection::~PacketAcceptConnection()
 
 bool PacketAcceptConnection::onSerialize(MemoryStream& buffer) const
 {
-    if(!serialize(buffer, playerIndex))
+    ASSERT(playerHandle.isValid(), "Excepted valid player handle to be set!");
+
+    if(!serialize(buffer, playerHandle))
         return false;
 
     return true;
@@ -20,7 +21,7 @@ bool PacketAcceptConnection::onSerialize(MemoryStream& buffer) const
 
 bool PacketAcceptConnection::onDeserialize(MemoryStream& buffer)
 {
-    if(!deserialize(buffer, &playerIndex))
+    if(!deserialize(buffer, &playerHandle))
         return false;
 
     return true;

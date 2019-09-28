@@ -2,7 +2,8 @@
 #include "PacketServerUpdate.hpp"
 
 PacketServerUpdate::PacketServerUpdate() :
-    tickFrame(0)
+    tickFrame(0),
+    acknowledgedPlayerCommand(0)
 {
 }
 
@@ -16,6 +17,9 @@ bool PacketServerUpdate::onSerialize(MemoryStream& buffer) const
         return false;
 
     if(!serialize(buffer, tickFrame))
+        return false;
+
+    if(!serialize(buffer, acknowledgedPlayerCommand))
         return false;
 
     if(!serialize(buffer, (uint32_t)replicationCommands.size()))
@@ -36,6 +40,9 @@ bool PacketServerUpdate::onDeserialize(MemoryStream& buffer)
         return false;
 
     if(!deserialize(buffer, &tickFrame))
+        return false;
+
+    if(!deserialize(buffer, &acknowledgedPlayerCommand))
         return false;
 
     uint32_t replicationCommandCount = 0;

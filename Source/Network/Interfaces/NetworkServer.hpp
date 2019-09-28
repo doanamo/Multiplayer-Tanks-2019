@@ -4,9 +4,11 @@
 #include "NetworkBase.hpp"
 #include "Network/Replication/ReplicationServer.hpp"
 #include "Network/Connection/ConnectionSocket.hpp"
+#include "Game/Player/Player.hpp"
 
 // Forward declarations.
 class ConnectionBackend;
+class PlayerControllerClient;
 
 // Network server class.
 class NetworkServer : public NetworkBase
@@ -27,6 +29,9 @@ public:
     ReplicationBase& getReplication() override final;
 
 private:
+    PlayerControllerClient* fetchClientController(const PlayerHandle& playerHandle);
+
+private:
     // Replication system.
     ReplicationServer m_replication;
 
@@ -34,6 +39,7 @@ private:
     struct ClientEntry
     {
         std::unique_ptr<ConnectionSocket> socket;
+        PlayerHandle playerHandle;
     };
 
     std::vector<ClientEntry> m_clients;

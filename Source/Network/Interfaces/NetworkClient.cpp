@@ -4,6 +4,7 @@
 #include "Game/GameInstance.hpp"
 #include "Game/SnapshotSaveLoad.hpp"
 #include "Game/Player/PlayerManager.hpp"
+#include "Game/Player/PlayerControllerRemote.hpp"
 
 NetworkClient::NetworkClient() :
     m_hearbeatTimer(0.0f)
@@ -48,6 +49,9 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
         if(acceptConnectionPacket == nullptr)
             continue;
 
+        // Save player handle assigned to this client.
+        m_playerHandle = acceptConnectionPacket->playerHandle;
+
         // Break out of loop.
         break;
     }
@@ -73,11 +77,25 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
             return false;
         }
 
-        // Remove all player controllers loaded in player manager.
+        // Remove all player controllers loaded into player manager.
+        // They may have gotten deserialized from game snapshot.
         PlayerManager& playerManager = gameInstance->getPlayerManager();
         playerManager.removeControllers();
 
-        // Break out of while loop.
+        // Fetch this client's player entry.
+        Player* player = playerManager.fetchPlayer(m_playerHandle);
+
+        if(player == nullptr)
+        {
+            LOG_ERROR("We have been assigned player handle that does not exists!");
+            return false;
+        }
+
+        // Create player controller for our player entry.
+        auto remoteController = std::make_unique<PlayerControllerRemote>();
+        player->setPlayerController(std::move(remoteController));
+
+        // Break out of wait loop.
         break;
     }
 
@@ -88,6 +106,22 @@ bool NetworkClient::initialize(GameInstance* gameInstance, const sf::IpAddress& 
 void NetworkClient::update(float timeDelta)
 {
     NetworkBase::update(timeDelta);
+
+    // Consume player commands and send them before they get processed.
+    PlayerControllerRemote* remoteController = this->getRemoteController();
+    remoteController->consumePlayerCommands();
+
+    if(remoteController->hasUnacknowledgedPlayerCommands())
+    {
+        PacketClientInput packetClientInput;
+        packetClientInput.playerHandle = m_playerHandle;
+        packetClientInput.playerCommands = remoteController->constructPlayerCommandBuffer();
+
+        if(!sendPacket(m_socket, packetClientInput, false))
+        {
+            LOG_ERROR("Failed to send client input packet!");
+        }
+    }
 }
 
 void NetworkClient::preTick(float timeDelta)
@@ -104,7 +138,7 @@ void NetworkClient::preTick(float timeDelta)
 
         sendPacket(m_socket, packetMessage, true);
 
-        m_hearbeatTimer = 0.1f;
+        m_hearbeatTimer = 1.0f;
     }
 
     // Receive packets.
@@ -121,6 +155,11 @@ void NetworkClient::preTick(float timeDelta)
             PacketServerUpdate* packetServerUpdate = receivedPacket->as<PacketServerUpdate>();
             ASSERT(packetServerUpdate != nullptr);
 
+            // Process player command acknowledgment.
+            PlayerControllerRemote* remoteController = this->getRemoteController();
+            remoteController->acknowledgePlayerCommand(packetServerUpdate->acknowledgedPlayerCommand);
+
+            // Process replication commands.
             m_replication.processServerUpdatePacket(*packetServerUpdate, reliablePacket);
         }
         else if(receivedPacket->is<PacketMessage>())
@@ -165,4 +204,20 @@ bool NetworkClient::isConnected() const
 ReplicationBase& NetworkClient::getReplication()
 {
     return m_replication;
+}
+
+const PlayerHandle& NetworkClient::getPlayerHandle() const
+{
+    return m_playerHandle;
+}
+
+PlayerControllerRemote* NetworkClient::getRemoteController()
+{
+    // Retrieve player remote controller.
+    ASSERT(m_playerHandle.isValid(), "Client's player hadle is not valid!");
+    Player* player = m_gameInstance->getPlayerManager().fetchPlayer(m_playerHandle);
+    PlayerControllerRemote* remoteController = player->getPlayerController()->as<PlayerControllerRemote>();
+    ASSERT(remoteController != nullptr, "Expected remote controller to exist for local client!");
+
+    return remoteController;
 }

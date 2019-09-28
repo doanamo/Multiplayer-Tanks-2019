@@ -41,4 +41,5 @@ public:
     // Network info.
     virtual NetworkMode getMode() const = 0;
     virtual bool isConnected() const = 0;
+    virtual bool isHost() const = 0;
 };
