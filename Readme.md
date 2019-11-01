@@ -1,6 +1,6 @@
 Multiplayer Tanks
 ====
-Multiplayer game engine written from almost scratch, using only SFML as the base for rendering and multiplatform socket wrapper. Game supports host and client server architesture.
+Multiplayer game engine written from almost scratch, using only SFML as the base for rendering and multiplatform socket wrapper. Game supports host and client server architecture.
 
 Notable features:
 * Multithreaded socket/packet processing (I am pretty proud with the easy implementation I could come up with).
