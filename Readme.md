@@ -4,7 +4,8 @@ Multiplayer game engine written from almost scratch, using only SFML as the base
 
 Notable features:
 * Multithreaded socket/packet processing (split between Socket/Conext/Backend interfaces).
-* Protocol for sending unreliable and reliable packets over UDP in as efficient was as possible (uses acknowledgments and checks redundancy).
+* Protocol for sending unreliable and reliable packets over UDP in as efficient way possible (uses acknowledgments and checks redundancy).
+* Object replication system from server to all connected clients (creation, destruction, update).
 * Host and client server architecture where player can connect at any point of the game.
 * Serialization that can write entire game state to buffer and transfer it to connecting player.
 * Custom RTTI solution for instancing arbitrary game objects from identifier.
