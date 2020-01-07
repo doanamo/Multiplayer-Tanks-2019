@@ -1,16 +1,16 @@
 Multiplayer Tanks
 ====
-Multiplayer game engine written from almost scratch, using only SFML as the base for rendering and multiplatform socket wrapper. Game supports host and client server architecture.
+Multiplayer game engine written from almost scratch, using only SFML library as the base for rendering and multiplatform socket wrapper. Engine supports host and client server architecture.
 
 ![](Screenshot.png)
 
 Notable features:
-* Multithreaded socket/packet processing (split between Socket/Conext/Backend interfaces).
-* Protocol for sending unreliable and reliable packets over UDP in as efficient way possible (uses acknowledgments and checks redundancy).
-* Object replication system from server to all connected clients (creation, destruction, update).
-* Host and client server architecture where player can connect at any point of the game.
+* Multithreaded socket/packet processing (split between Socket/Context/Backend interfaces).
+* Protocol for efficiently sending unreliable and reliable packets over UDP with minimal latency (utilizes acknowledgments and redundancy).
+* Object replication system from server to all connected clients (with events such as creation, destruction and update).
+* Host and client server architecture where player can connect at any point of the game (game state can also be saved to file).
 * Serialization that can write entire game state to buffer and transfer it to connecting player.
-* Custom RTTI solution for instancing arbitrary game objects from identifier.
+* Custom RTTI solution for instancing arbitrary game objects from integer identifier.
 * Written to compile under Linux (not actually tested if it runs).
 
 Repository structure
